@@ -19,3 +19,9 @@ class EditTaskEvent extends TaskListEvent {
 
   EditTaskEvent(this.task);
 }
+
+class EditTaskCheckEvent extends TaskListEvent {
+  Task task;
+
+  EditTaskCheckEvent(this.task);
+}

@@ -13,20 +13,37 @@ class TaskDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     void deleteCurrentTask() {
       context.bloc<TaskListBloc>().add(DeleteTaskEvent(task));
       Navigator.of(context).pop();
     }
 
     void openTaskEditor() {
-      Navigator.push(context, MaterialPageRoute(
-          builder: (_) {
-            return EditTaskScreen(
-              task: task,
-            );
-          }
-      ));
+      Navigator.push(context, MaterialPageRoute(builder: (_) {
+        return EditTaskScreen(
+          task: task,
+        );
+      }));
+    }
+
+    String correctTimeNaming(taskExpiredTime){
+      taskExpiredTime = taskExpiredTime.toString();
+      List<String> result = taskExpiredTime.split('');
+      int secint = int.parse(result[1]);
+
+        // // taskExpiredTime = int.parse(taskExpiredTime);
+        String hoursStr = "";
+
+      if (secint == 1){
+         hoursStr = "час";
+      }
+      else if (secint > 1 && secint < 5){
+         hoursStr = "часа";
+      }
+      else{
+         hoursStr = "часов";
+      }
+      return hoursStr;
     }
 
     return Scaffold(
@@ -43,17 +60,45 @@ class TaskDetailsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      task.name,
-                      style: TextStyle(fontSize: 25),
-                      textAlign: TextAlign.left,
+                    Row(
+                      children: [
+                        Text(
+                          task.name,
+                          style: TextStyle(fontSize: 25),
+                          textAlign: TextAlign.left,
+                        ),
+                        Spacer(),
+                        Container(
+                          // color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            "Создано: ${task.taskCreateTime}",
+                            textAlign: TextAlign.right,
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      ],
                     ),
-                    Container(
-                      margin: EdgeInsets.only(top: 5),
-                      child: Text(
-                        "Тэг: ${task.tag}",
-                        style: TextStyle(color: Colors.grey),
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(top: 5),
+                          child: Text(
+                            "Тэг: ${task.tag}",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                        Spacer(),
+                        Container(
+                          // color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            "На выполнение: ${task.taskExpiredTime} ${correctTimeNaming(task.taskExpiredTime)}",
+                            textAlign: TextAlign.right,
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 )),
@@ -75,7 +120,7 @@ class TaskDetailsScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Container(
-            margin: EdgeInsets.only(left:10),
+            margin: EdgeInsets.only(left: 10),
             child: FloatingActionButton(
               child: Icon(Icons.delete),
               onPressed: deleteCurrentTask,
@@ -84,7 +129,7 @@ class TaskDetailsScreen extends StatelessWidget {
             ),
           ),
           Container(
-            margin: EdgeInsets.only(left:10),
+            margin: EdgeInsets.only(left: 10),
             child: FloatingActionButton(
               child: Icon(Icons.edit),
               onPressed: openTaskEditor,
