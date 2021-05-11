@@ -22,7 +22,6 @@ class TaskListBloc extends Bloc<TaskListEvent, List<Task>> {
       yield tasks;
     } else if (event is EditTaskCheckEvent) {
       List<Task> tasks = List.from(state);
-      tasks.add(event.task);
       yield tasks;
     }
   }

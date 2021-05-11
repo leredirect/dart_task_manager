@@ -7,6 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 
+import '../constants.dart';
+
 class CreateNewTaskScreen extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _CreateNewTaskScreenState();
@@ -15,52 +17,77 @@ class CreateNewTaskScreen extends StatefulWidget {
 class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   final _nameController = TextEditingController();
   final _textController = TextEditingController();
-  var taskExpiredTime;
+  DateTime taskExpiredTime;
+  String dropdownValue = "Dart";
 
   void addTask(String tag, taskExpiredTime) {
+    if (taskExpiredTime != null) {
+      taskExpiredTime = DateFormat.H().format(taskExpiredTime);
+    } else {
+      taskExpiredTime = "Не задано";
+    }
     String taskName = _nameController.text;
     String taskText = _textController.text;
     var taskCreateTime = DateFormat.Hm().format(DateTime.now());
-    taskExpiredTime = DateFormat.H().format(taskExpiredTime);
     Task task = Task(taskName, taskText, tag, taskCreateTime, taskExpiredTime);
+    // ignore: deprecated_member_use
     context.bloc<TaskListBloc>().add(AddTaskEvent(task));
     Navigator.of(context).pop();
   }
-
-  String dropdownValue = "Dart";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Новая задача"),
-        backgroundColor: Colors.redAccent,
+        backgroundColor: primaryColor,
       ),
       body: Column(
         children: [
           TextField(
             controller: _nameController,
+            style: TextStyle(color: Colors.white),
             decoration: InputDecoration(
-                hintText: "Название задачи",
-                contentPadding: EdgeInsets.only(left: 5)),
+              hintText: "Название задачи",
+              contentPadding: EdgeInsets.only(left: 5),
+              hintStyle: TextStyle(color: Colors.white),
+              enabledBorder: UnderlineInputBorder(
+                borderSide:
+                    BorderSide(color: secondaryColorLight.withOpacity(0.45)),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: secondaryColorLight),
+              ),
+            ),
           ),
           TextField(
             controller: _textController,
+            style: TextStyle(color: Colors.white),
             decoration: InputDecoration(
-                hintText: "Условия задачи",
-                contentPadding: EdgeInsets.only(left: 5),
-                focusColor: Colors.redAccent),
+              hintText: "Условия задачи",
+              hintStyle: TextStyle(color: Colors.white),
+              contentPadding: EdgeInsets.only(left: 5),
+              enabledBorder: UnderlineInputBorder(
+                borderSide:
+                    BorderSide(color: secondaryColorLight.withOpacity(0.45)),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: secondaryColorLight),
+              ),
+            ),
           ),
           Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
             child: DropdownButton<String>(
+              style: TextStyle(color: Colors.white, fontSize: 16),
+              dropdownColor: primaryColorDark,
               value: dropdownValue,
               iconSize: 24,
               elevation: 16,
               underline: Container(
                 height: 2,
-                color: Colors.redAccent,
+                color: secondaryColorLight,
               ),
               onChanged: (String newValue) {
                 setState(() {
@@ -74,7 +101,10 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               ].map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value),
+                  child: Text(
+                    value,
+                    style: TextStyle(color: Colors.white),
+                  ),
                 );
               }).toList(),
             ),
@@ -83,11 +113,11 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               onTap: () {
                 DatePicker.showTimePicker(
                   context,
-                  currentTime: DateTime(1,1,0,0),
+                  currentTime: DateTime(1, 1, 0, 0),
                   showSecondsColumn: false,
                   showTitleActions: true,
                   onConfirm: (time) {
-                   taskExpiredTime = time;
+                    taskExpiredTime = time;
                     print('confirm $time');
                   },
                   locale: LocaleType.ru,
@@ -98,16 +128,16 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 decoration: BoxDecoration(
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
+                      color: Colors.black.withOpacity(0.4),
                       spreadRadius: 1,
                       blurRadius: 7,
                       offset: Offset(0, 3),
                     )
                   ],
                   borderRadius: BorderRadius.circular(12),
-                  color: Colors.redAccent,
+                  color: secondaryColorLight,
                 ),
-                width: 250,
+                width: MediaQuery.of(context).size.width * 0.6,
                 height: 40,
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 child: Center(
@@ -115,24 +145,23 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                   "Задать время на выполнение",
                   style: TextStyle(color: Colors.white),
                 )),
-                // color: Colors.redAccent,
               )),
           Spacer(),
           InkWell(
-              onTap:() => addTask(dropdownValue, taskExpiredTime),
+              onTap: () => addTask(dropdownValue, taskExpiredTime),
               child: Container(
                 decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 1,
-                          blurRadius: 7,
-                          offset: Offset(0, 3),
-                        )
-                      ],
-                    color: Colors.redAccent,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5),
+                        spreadRadius: 1,
+                        blurRadius: 7,
+                        offset: Offset(0, 3),
+                      )
+                    ],
+                    color: secondaryColorLight,
                     borderRadius: BorderRadius.circular(12)),
-                width: 200,
+                width: MediaQuery.of(context).size.width * 0.4,
                 height: 40,
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 margin: EdgeInsets.only(bottom: 50),
@@ -145,6 +174,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               ))
         ],
       ),
+      backgroundColor: primaryColorDark,
     );
   }
 

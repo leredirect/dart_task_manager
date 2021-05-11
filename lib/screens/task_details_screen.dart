@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../constants.dart';
+
 class TaskDetailsScreen extends StatelessWidget {
   final Task task;
 
@@ -26,119 +28,120 @@ class TaskDetailsScreen extends StatelessWidget {
       }));
     }
 
-    String correctTimeNaming(taskExpiredTime){
+    String correctTimeNaming(String taskExpiredTime) {
+      String hoursStr = "";
       taskExpiredTime = taskExpiredTime.toString();
       List<String> result = taskExpiredTime.split('');
-      int secint = int.parse(result[1]);
-
-        // // taskExpiredTime = int.parse(taskExpiredTime);
-        String hoursStr = "";
-
-      if (secint == 1){
-         hoursStr = "час";
-      }
-      else if (secint > 1 && secint < 5){
-         hoursStr = "часа";
-      }
-      else{
-         hoursStr = "часов";
+      int secInt = int.tryParse(result[1]) ?? 0;
+      if (secInt == 0) {
+        hoursStr = "Время не задано";
+      } else if (secInt == 1) {
+        hoursStr = "На выполнение ${task.taskExpiredTime} час";
+      } else if (secInt > 1 && secInt < 5) {
+        hoursStr = "На выполнение ${task.taskExpiredTime} часа";
+      } else {
+        hoursStr = "На выполнение ${task.taskExpiredTime} часов";
       }
       return hoursStr;
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.redAccent,
-        title: Text("Детали задачи"),
-      ),
-      body: Center(
-        child: Column(
+    return BlocBuilder<TaskListBloc, List<Task>>(builder: (context, state) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: primaryColor,
+          title: Text("Детали задачи"),
+        ),
+        body: Center(
+          child: Column(
+            children: [
+              Container(
+                  alignment: Alignment.centerLeft,
+                  margin: EdgeInsets.fromLTRB(15, 15, 15, 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Container(
+                          child: Text(
+                            task.name,
+                            style: TextStyle(fontSize: 30, color: Colors.white),
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.left,
+                          ),
+                        ),
+                      ),
+                      // Container(
+                      //   margin: EdgeInsets.only(top: 5),
+                      //   child: Text(
+                      //     "Тэг: ${task.tag}",
+                      //     style: TextStyle(color: Colors.grey),
+                      //   ),
+                      // ),
+                      Row(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(top: 20),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Создано: ${task.taskCreateTime}",
+                              textAlign: TextAlign.right,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          Spacer(),
+                          Container(
+                            margin: EdgeInsets.only(top: 20),
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              "${correctTimeNaming(task.taskExpiredTime)}",
+                              textAlign: TextAlign.right,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )),
+              Container(
+                margin: EdgeInsets.only(bottom: 20),
+                height: 2,
+                color: secondaryColorLight,
+              ),
+              Container(
+                child: Text(task.text,
+                    style: TextStyle(fontSize: 20, color: Colors.white)),
+                alignment: Alignment.centerLeft,
+                margin: EdgeInsets.only(left: 15),
+              ),
+            ],
+          ),
+        ),
+        backgroundColor: primaryColorDark,
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
-                alignment: Alignment.centerLeft,
-                margin: EdgeInsets.fromLTRB(15, 15, 15, 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          task.name,
-                          style: TextStyle(fontSize: 25),
-                          textAlign: TextAlign.left,
-                        ),
-                        Spacer(),
-                        Container(
-                          // color: Colors.red,
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            "Создано: ${task.taskCreateTime}",
-                            textAlign: TextAlign.right,
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(top: 5),
-                          child: Text(
-                            "Тэг: ${task.tag}",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ),
-                        Spacer(),
-                        Container(
-                          // color: Colors.red,
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            "На выполнение: ${task.taskExpiredTime} ${correctTimeNaming(task.taskExpiredTime)}",
-                            textAlign: TextAlign.right,
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )),
-            Container(
-              margin: EdgeInsets.only(bottom: 20),
-              height: 2,
-              color: Colors.redAccent,
+              margin: EdgeInsets.only(left: 10),
+              child: FloatingActionButton(
+                child: Icon(Icons.delete),
+                onPressed: deleteCurrentTask,
+                backgroundColor: secondaryColorLight,
+                heroTag: null,
+              ),
             ),
             Container(
-              child: Text(task.text,
-                  style: TextStyle(fontSize: 20, color: Colors.black)),
-              alignment: Alignment.centerLeft,
-              margin: EdgeInsets.only(left: 15),
+              margin: EdgeInsets.only(left: 10),
+              child: FloatingActionButton(
+                child: Icon(Icons.edit),
+                onPressed: openTaskEditor,
+                backgroundColor: secondaryColorLight,
+                heroTag: null,
+              ),
             ),
           ],
         ),
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Container(
-            margin: EdgeInsets.only(left: 10),
-            child: FloatingActionButton(
-              child: Icon(Icons.delete),
-              onPressed: deleteCurrentTask,
-              backgroundColor: Colors.redAccent,
-              heroTag: null,
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 10),
-            child: FloatingActionButton(
-              child: Icon(Icons.edit),
-              onPressed: openTaskEditor,
-              backgroundColor: Colors.redAccent,
-              heroTag: null,
-            ),
-          ),
-        ],
-      ),
-    );
+      );
+    });
   }
 }

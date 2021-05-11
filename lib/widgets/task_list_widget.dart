@@ -12,7 +12,6 @@ class TaskListWidget extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: taskList.map((e) => TaskWidget(task: e)).toList(),
-
       ),
     );
   }
