@@ -1,4 +1,5 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
+import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
 import 'package:dart_task_manager/widgets/task_list_widget.dart';
@@ -24,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: primaryColor,
         title: Text("TaskManager"),
         actions: [
           IconButton(
@@ -31,17 +33,17 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {},
           )
         ],
-        backgroundColor: Colors.redAccent,
       ),
       body: BlocBuilder<TaskListBloc, List<Task>>(
         builder: (context, state) {
           return TaskListWidget(taskList: state);
         },
       ),
+      backgroundColor: primaryColorDark,
       floatingActionButton: FloatingActionButton(
         child: Text("+"),
         onPressed: createTask,
-        backgroundColor: Colors.redAccent,
+        backgroundColor: secondaryColorLight,
       ),
     );
   }

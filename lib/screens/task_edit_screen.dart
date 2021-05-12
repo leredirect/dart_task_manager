@@ -7,6 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 
+import '../constants.dart';
+
 class EditTaskScreen extends StatefulWidget {
   final Task task;
 
@@ -22,19 +24,22 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   var taskExpiredTime;
 
   void addTask(String taskTag, taskExpiredTime) {
+    if (taskExpiredTime != null) {
+      taskExpiredTime = DateFormat.H().format(taskExpiredTime);
+    } else {
+      taskExpiredTime = "Не задано";
+    }
     String taskName = _nameController.text;
     String taskText = _textController.text;
     widget.task.name = taskName;
     widget.task.text = taskText;
     widget.task.tag = taskTag;
     var taskCreateTime = DateFormat.Hm().format(DateTime.now());
-    taskExpiredTime = DateFormat.H().format(taskExpiredTime);
-    // taskExpiredTime = taskExpiredTime.toString();
-    // taskExpiredTime = int.parse(taskExpiredTime);
     widget.task.taskExpiredTime = taskExpiredTime;
     context.bloc<TaskListBloc>().add(EditTaskEvent(widget.task));
+    context.bloc<TaskListBloc>().add(EditTaskCheckEvent(widget.task));
     Navigator.of(context).pop();
-    Navigator.of(context).pop();
+
   }
 
   String dropdownValue;
@@ -44,33 +49,54 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Редактирование задачи"),
-        backgroundColor: Colors.redAccent,
+        backgroundColor: primaryColor,
       ),
       body: Column(
         children: [
           TextField(
             controller: _nameController,
+            style: TextStyle(color: Colors.white),
             decoration: InputDecoration(
-                hintText: "Название задачи",
-                contentPadding: EdgeInsets.only(left: 5)),
+              hintText: "Название задачи",
+              contentPadding: EdgeInsets.only(left: 5),
+              hintStyle: TextStyle(color: Colors.white),
+              enabledBorder: UnderlineInputBorder(
+                borderSide:
+                    BorderSide(color: secondaryColorLight.withOpacity(0.45)),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: secondaryColorLight),
+              ),
+            ),
           ),
           TextField(
             controller: _textController,
+            style: TextStyle(color: Colors.white),
             decoration: InputDecoration(
-                hintText: "Условия задачи",
-                contentPadding: EdgeInsets.only(left: 5),
-                focusColor: Colors.redAccent),
+              hintText: "Условия задачи",
+              hintStyle: TextStyle(color: Colors.white),
+              contentPadding: EdgeInsets.only(left: 5),
+              enabledBorder: UnderlineInputBorder(
+                borderSide:
+                    BorderSide(color: secondaryColorLight.withOpacity(0.45)),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: secondaryColorLight),
+              ),
+            ),
           ),
           Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
             child: DropdownButton<String>(
               value: dropdownValue,
+              style: TextStyle(color: Colors.white, fontSize: 16),
+              dropdownColor: primaryColorDark,
               iconSize: 24,
               elevation: 16,
               underline: Container(
                 height: 2,
-                color: Colors.redAccent,
+                color: secondaryColorLight,
               ),
               onChanged: (String newValue) {
                 setState(() {
@@ -84,7 +110,10 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               ].map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value),
+                  child: Text(
+                    value,
+                    style: TextStyle(color: Colors.white),
+                  ),
                 );
               }).toList(),
             ),
@@ -108,16 +137,16 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 decoration: BoxDecoration(
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
+                      color: Colors.black.withOpacity(0.4),
                       spreadRadius: 1,
                       blurRadius: 7,
                       offset: Offset(0, 3),
                     )
                   ],
                   borderRadius: BorderRadius.circular(12),
-                  color: Colors.redAccent,
+                  color: secondaryColorLight,
                 ),
-                width: 250,
+                width: MediaQuery.of(context).size.width * 0.6,
                 height: 40,
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 child: Center(
@@ -125,16 +154,23 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   "Задать время на выполнение",
                   style: TextStyle(color: Colors.white),
                 )),
-                // color: Colors.redAccent,
               )),
           Spacer(),
           InkWell(
               onTap: () => addTask(dropdownValue, taskExpiredTime),
               child: Container(
                 decoration: BoxDecoration(
-                    color: Colors.redAccent,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5),
+                        spreadRadius: 1,
+                        blurRadius: 7,
+                        offset: Offset(0, 3),
+                      )
+                    ],
+                    color: secondaryColorLight,
                     borderRadius: BorderRadius.circular(12)),
-                width: 200,
+                width: MediaQuery.of(context).size.width * 0.4,
                 height: 40,
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 margin: EdgeInsets.only(bottom: 50),
@@ -147,6 +183,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               ))
         ],
       ),
+      backgroundColor: primaryColorDark,
     );
   }
 

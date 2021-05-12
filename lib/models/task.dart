@@ -5,7 +5,8 @@ class Task {
   var taskCreateTime;
   var taskExpiredTime;
 
-  Task(this.name, this.text, this.tag, this.taskCreateTime, this.taskExpiredTime);
+  Task(this.name, this.text, this.tag, this.taskCreateTime,
+      this.taskExpiredTime);
 }
 //
 // enum Tags{
