@@ -33,7 +33,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     String taskText = _textController.text;
     widget.task.name = taskName;
     widget.task.text = taskText;
-    widget.task.tag = taskTag;
+    widget.task.tag = tagsMap[taskTag];
     var taskCreateTime = DateFormat.Hm().format(DateTime.now());
     widget.task.taskExpiredTime = taskExpiredTime;
     context.bloc<TaskListBloc>().add(EditTaskEvent(widget.task));
@@ -103,11 +103,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   dropdownValue = newValue;
                 });
               },
-              items: <String>[
-                'Dart',
-                'Flutter',
-                'Алгоритмы',
-              ].map<DropdownMenuItem<String>>((String value) {
+              items: tagsMap.keys.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(
@@ -197,7 +193,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   @override
   void initState() {
     super.initState();
-    dropdownValue = widget.task.tag;
+    dropdownValue = tagsMap.keys.firstWhere(
+            (k) => tagsMap[k] == widget.task.tag);
     _nameController.text = widget.task.name;
     _textController.text = widget.task.text;
   }

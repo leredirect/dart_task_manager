@@ -22,17 +22,14 @@ class TaskWidget extends StatelessWidget {
 
     MaterialColor tagColor() {
       switch (task.tag) {
-        case "Dart":
-          return Colors.amber;
+        case Tags.DART:
+          return Colors.blueGrey;
           break;
-        case "Flutter":
-          return Colors.cyan;
-          break;
-        case "Алгоритмы":
+        case Tags.FLUTTER:
           return Colors.pink;
           break;
-        default:
-          return Colors.blueGrey;
+        case Tags.ALGORITHMS:
+          return Colors.cyan;
           break;
       }
     }

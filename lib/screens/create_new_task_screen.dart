@@ -29,7 +29,8 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     String taskName = _nameController.text;
     String taskText = _textController.text;
     var taskCreateTime = DateFormat.Hm().format(DateTime.now());
-    Task task = Task(taskName, taskText, tag, taskCreateTime, taskExpiredTime);
+    Tags tagValue =  tagsMap[tag];
+    Task task = Task(taskName, taskText, tagValue, taskCreateTime, taskExpiredTime);
     // ignore: deprecated_member_use
     context.bloc<TaskListBloc>().add(AddTaskEvent(task));
     Navigator.of(context).pop();
@@ -94,11 +95,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                   dropdownValue = newValue;
                 });
               },
-              items: <String>[
-                'Dart',
-                'Flutter',
-                'Алгоритмы',
-              ].map<DropdownMenuItem<String>>((String value) {
+              items: tagsMap.keys.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(
