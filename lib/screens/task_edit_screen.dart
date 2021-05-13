@@ -47,8 +47,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     if (isBefore) {
       return addTask(dropdownValue, deadline);
     } else {
-     deadline = null;
-      return addTask(dropdownValue, deadline);
+      return addTask(dropdownValue, null);
     }
   }
 

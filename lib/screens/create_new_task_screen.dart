@@ -31,8 +31,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     if (isAfter) {
       return addTask(dropdownValue, deadline);
     } else {
-      deadline = null;
-      return addTask(dropdownValue, deadline);
+      return addTask(dropdownValue, null);
     }
   }
 
