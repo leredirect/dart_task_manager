@@ -4,7 +4,6 @@ import 'package:dart_task_manager/models/task.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../constants.dart';
@@ -19,18 +18,31 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   final _textController = TextEditingController();
   DateTime taskExpiredTime;
   String dropdownValue = "Dart";
+  DateTime pickedDate;
+  TimeOfDay pickedTime;
 
-  void addTask(String tag, taskExpiredTime) {
-    if (taskExpiredTime != null) {
-      taskExpiredTime = DateFormat.H().format(taskExpiredTime);
+  void deadlineCalc(
+      String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) {
+    DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
+        pickedDate.day, pickedTime.hour, pickedTime.minute);
+    bool isBefore = deadline.isAfter(DateTime.now());
+    Duration diff = deadline.difference(DateTime.now());
+    print(diff);
+    if (isBefore) {
+      DateTime result = deadline;
+      return addTask(dropdownValue, result);
     } else {
-      taskExpiredTime = "Не задано";
+      DateTime result;
+      return addTask(dropdownValue, result);
     }
+  }
+
+  void addTask(String tag, DateTime deadline) {
     String taskName = _nameController.text;
     String taskText = _textController.text;
     var taskCreateTime = DateFormat.Hm().format(DateTime.now());
-    Tags tagValue =  tagsMap[tag];
-    Task task = Task(taskName, taskText, tagValue, taskCreateTime, taskExpiredTime);
+    Tags tagValue = tagsMap[tag];
+    Task task = Task(taskName, taskText, tagValue, taskCreateTime, deadline);
     // ignore: deprecated_member_use
     context.bloc<TaskListBloc>().add(AddTaskEvent(task));
     Navigator.of(context).pop();
@@ -157,7 +169,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               )),
           Spacer(),
           InkWell(
-              onTap: () => addTask(dropdownValue, taskExpiredTime),
+              onTap: () => deadlineCalc(dropdownValue, pickedDate, pickedTime),
               child: Container(
                 decoration: BoxDecoration(
                     boxShadow: [

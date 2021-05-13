@@ -28,21 +28,36 @@ class TaskDetailsScreen extends StatelessWidget {
       }));
     }
 
-    String correctTimeNaming(String taskExpiredTime) {
-      String hoursStr = "";
-      taskExpiredTime = taskExpiredTime.toString();
-      List<String> result = taskExpiredTime.split('');
-      int secInt = int.tryParse(result[1]) ?? 0;
-      if (secInt == 0) {
-        hoursStr = "Время не задано";
-      } else if (secInt == 1) {
-        hoursStr = "На выполнение ${task.taskExpiredTime} час";
-      } else if (secInt > 1 && secInt < 5) {
-        hoursStr = "На выполнение ${task.taskExpiredTime} часа";
+    // String correctTimeNaming(DateTime deadline) {
+    //   Duration difference = DateTime.now().difference(deadline);
+    //
+    //   String hoursStr = "";
+    //   String fmResultStr = difference.toString();
+    //   List<String> result = fmResultStr.split('');
+    //   int secInt = int.tryParse(result[1]) ?? 0;
+    //   print (secInt);
+    //   if (secInt == 0) {
+    //     hoursStr = "Время не задано";
+    //   } else if (secInt == 1) {
+    //     hoursStr = "час";
+    //   } else if (secInt > 1 && secInt < 5) {
+    //     hoursStr = "часа";
+    //   } else {
+    //     hoursStr = "часов";
+    //   }}
+
+    String deadlineDisplay(DateTime deadline) {
+      if (deadline == null) {
+        String result = "булщит";
+        return result;
       } else {
-        hoursStr = "На выполнение ${task.taskExpiredTime} часов";
+        Duration difference = DateTime.now().difference(deadline);
+        String fmResultStr = difference.inHours.toString();
+        fmResultStr = fmResultStr.replaceAll("-", "");
+        print(fmResultStr);
+        String result = "Дедлайн через: $fmResultStr часов";
+        return result;
       }
-      return hoursStr;
     }
 
     return BlocBuilder<TaskListBloc, List<Task>>(builder: (context, state) {
@@ -90,16 +105,16 @@ class TaskDetailsScreen extends StatelessWidget {
                             ),
                           ),
                           Spacer(),
-                          Container(
-                            margin: EdgeInsets.only(top: 20),
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              "${correctTimeNaming(task.taskExpiredTime)}",
-                              textAlign: TextAlign.right,
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
                         ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 20),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "${deadlineDisplay(task.taskDeadline)}",
+                          textAlign: TextAlign.right,
+                          style: TextStyle(color: Colors.grey),
+                        ),
                       ),
                     ],
                   )),
