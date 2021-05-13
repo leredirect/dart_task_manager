@@ -89,9 +89,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
             child: DropdownButton<String>(
-              value: dropdownValue,
               style: TextStyle(color: Colors.white, fontSize: 16),
               dropdownColor: primaryColorDark,
+              value: dropdownValue,
               iconSize: 24,
               elevation: 16,
               underline: Container(
@@ -116,17 +116,29 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
           ),
           InkWell(
               onTap: () {
-                DatePicker.showTimePicker(
-                  context,
-                  currentTime: DateTime(1, 1, 0, 0),
-                  showSecondsColumn: false,
-                  showTitleActions: true,
-                  onConfirm: (time) {
-                    taskExpiredTime = time;
-                    print('confirm $time');
-                  },
-                  locale: LocaleType.ru,
-                );
+                // DatePicker.showTimePicker(
+                //   context,
+                //   currentTime: DateTime(1, 1, 0, 0),
+                //   showSecondsColumn: false,
+                //   showTitleActions: true,
+                //   onConfirm: (time) {
+                //     taskExpiredTime = time;
+                //     print('confirm $time');
+                //   },
+                //   locale: LocaleType.ru,
+                // );
+                DateTime now = DateTime.now();
+                var lastDate = now.add(const Duration(days: 60));
+                var firstDate = now.subtract(const Duration(days: 5));
+                showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: firstDate,
+                  lastDate: lastDate,
+                ).then((value) => pickedDate = value).then((value) =>
+                    showTimePicker(
+                            context: context, initialTime: TimeOfDay.now())
+                        .then((value) => pickedTime = value));
               },
               child: Container(
                 margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
@@ -193,8 +205,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   @override
   void initState() {
     super.initState();
-    dropdownValue = tagsMap.keys.firstWhere(
-            (k) => tagsMap[k] == widget.task.tag);
+    dropdownValue =
+        tagsMap.keys.firstWhere((k) => tagsMap[k] == widget.task.tag);
     _nameController.text = widget.task.name;
     _textController.text = widget.task.text;
   }

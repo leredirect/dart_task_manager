@@ -3,17 +3,12 @@ class Task {
   String text = "";
   Tags tag;
   var taskCreateTime;
-  var taskExpiredTime;
+  DateTime taskDeadline;
 
-  Task(this.name, this.text, this.tag, this.taskCreateTime,
-      this.taskExpiredTime);
+  Task(this.name, this.text, this.tag, this.taskCreateTime, this.taskDeadline);
 }
 
-enum Tags {
-  DART,
-  FLUTTER,
-  ALGORITHMS
-}
+enum Tags { DART, FLUTTER, ALGORITHMS }
 
 final tagsMap = {
   "Flutter": Tags.FLUTTER,
