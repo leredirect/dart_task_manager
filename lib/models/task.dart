@@ -4,6 +4,7 @@ class Task {
   Tags tag;
   var taskCreateTime;
   DateTime taskDeadline;
+  int taskId;
 
   Task(this.name, this.text, this.tag, this.taskCreateTime, this.taskDeadline);
 }

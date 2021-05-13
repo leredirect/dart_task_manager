@@ -20,7 +20,7 @@ class EditTaskScreen extends StatefulWidget {
 class _EditTaskScreenState extends State<EditTaskScreen> {
   final _nameController = TextEditingController();
   final _textController = TextEditingController();
-  String dropdownValue = "Dart";
+  String dropdownValue;
   DateTime pickedDate;
   TimeOfDay pickedTime;
 
@@ -45,11 +45,10 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     Duration diff = deadline.difference(DateTime.now());
     print(diff);
     if (isBefore) {
-      DateTime result = deadline;
-      return addTask(dropdownValue, result);
+      return addTask(dropdownValue, deadline);
     } else {
-      DateTime result;
-      return addTask(dropdownValue, result);
+     deadline = null;
+      return addTask(dropdownValue, deadline);
     }
   }
 

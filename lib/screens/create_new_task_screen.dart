@@ -17,7 +17,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   final _nameController = TextEditingController();
   final _textController = TextEditingController();
   DateTime taskExpiredTime;
-  String dropdownValue = "Dart";
+  String dropdownValue = tagsMap.keys.first;
   DateTime pickedDate;
   TimeOfDay pickedTime;
 
@@ -25,15 +25,14 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
       String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) {
     DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
         pickedDate.day, pickedTime.hour, pickedTime.minute);
-    bool isBefore = deadline.isAfter(DateTime.now());
+    bool isAfter = deadline.isAfter(DateTime.now());
     Duration diff = deadline.difference(DateTime.now());
     print(diff);
-    if (isBefore) {
-      DateTime result = deadline;
-      return addTask(dropdownValue, result);
+    if (isAfter) {
+      return addTask(dropdownValue, deadline);
     } else {
-      DateTime result;
-      return addTask(dropdownValue, result);
+      deadline = null;
+      return addTask(dropdownValue, deadline);
     }
   }
 
@@ -43,7 +42,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     var taskCreateTime = DateFormat.Hm().format(DateTime.now());
     Tags tagValue = tagsMap[tag];
     Task task = Task(taskName, taskText, tagValue, taskCreateTime, deadline);
-    // ignore: deprecated_member_use
     context.bloc<TaskListBloc>().add(AddTaskEvent(task));
     Navigator.of(context).pop();
   }
