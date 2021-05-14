@@ -4,7 +4,6 @@ import 'package:dart_task_manager/models/task.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../constants.dart';
@@ -21,28 +20,36 @@ class EditTaskScreen extends StatefulWidget {
 class _EditTaskScreenState extends State<EditTaskScreen> {
   final _nameController = TextEditingController();
   final _textController = TextEditingController();
-  var taskExpiredTime;
+  String dropdownValue;
+  DateTime pickedDate;
+  TimeOfDay pickedTime;
 
-  void addTask(String taskTag, taskExpiredTime) {
-    if (taskExpiredTime != null) {
-      taskExpiredTime = DateFormat.H().format(taskExpiredTime);
-    } else {
-      taskExpiredTime = "Не задано";
-    }
+  void addTask(String taskTag, DateTime deadline) {
     String taskName = _nameController.text;
     String taskText = _textController.text;
     widget.task.name = taskName;
     widget.task.text = taskText;
     widget.task.tag = tagsMap[taskTag];
     var taskCreateTime = DateFormat.Hm().format(DateTime.now());
-    widget.task.taskExpiredTime = taskExpiredTime;
+    widget.task.taskDeadline = deadline;
     context.bloc<TaskListBloc>().add(EditTaskEvent(widget.task));
     context.bloc<TaskListBloc>().add(EditTaskCheckEvent(widget.task));
     Navigator.of(context).pop();
-
   }
 
-  String dropdownValue;
+  void deadlineCalc(
+      String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) {
+    DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
+        pickedDate.day, pickedTime.hour, pickedTime.minute);
+    bool isBefore = deadline.isAfter(DateTime.now());
+    Duration diff = deadline.difference(DateTime.now());
+    print(diff);
+    if (isBefore) {
+      return addTask(dropdownValue, deadline);
+    } else {
+      return addTask(dropdownValue, null);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +172,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               )),
           Spacer(),
           InkWell(
-              onTap: () => addTask(dropdownValue, taskExpiredTime),
+              onTap: () => deadlineCalc(dropdownValue, pickedDate, pickedTime),
               child: Container(
                 decoration: BoxDecoration(
                     boxShadow: [
