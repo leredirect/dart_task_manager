@@ -2,6 +2,7 @@ import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
+import 'package:dart_task_manager/utils/hive_utils.dart';
 import 'package:dart_task_manager/widgets/task_list_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +38,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: BlocBuilder<TaskListBloc, List<Task>>(
         builder: (context, state) {
           return TaskListWidget(taskList: state);
+
         },
+
       ),
       backgroundColor: primaryColorDark,
       floatingActionButton: FloatingActionButton(

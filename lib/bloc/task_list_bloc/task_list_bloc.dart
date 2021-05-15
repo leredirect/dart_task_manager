@@ -14,6 +14,7 @@ class TaskListBloc extends Bloc<TaskListEvent, List<Task>> {
     } else if (event is DeleteTaskEvent) {
       List<Task> tasks = List.from(state);
       tasks.remove(event.task);
+
       yield tasks;
     } else if (event is EditTaskEvent) {
       List<Task> tasks = List.from(state);
