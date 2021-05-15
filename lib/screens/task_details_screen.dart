@@ -17,6 +17,7 @@ class TaskDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     void deleteCurrentTask() {
       context.bloc<TaskListBloc>().add(DeleteTaskEvent(task));
+      
       Navigator.of(context).pop();
     }
 
@@ -46,16 +47,14 @@ class TaskDetailsScreen extends StatelessWidget {
     //     hoursStr = "часов";
     //   }}
 
-    String deadlineDisplay(DateTime deadline) {
+    String deadlineDisplay(String deadline) {
       if (deadline == null) {
-        String result = "булщит";
+        String result = "Дедлайн был тут.";
         return result;
       } else {
-        Duration difference = DateTime.now().difference(deadline);
-        String fmResultStr = difference.inHours.toString();
-        fmResultStr = fmResultStr.replaceAll("-", "");
-        print(fmResultStr);
-        String result = "Дедлайн через: $fmResultStr часов";
+        // String deadlineRes = (deadline.day.toString() + "." + deadline.month.toString() + "." + deadline.year.toString() + " в " + deadline.hour.toString() + ":" + deadline.minute.toString());
+        print(deadline);
+        String result = "Дедлайн: $deadline";
         return result;
       }
     }

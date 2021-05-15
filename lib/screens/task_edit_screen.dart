@@ -24,7 +24,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   DateTime pickedDate;
   TimeOfDay pickedTime;
 
-  void addTask(String taskTag, DateTime deadline) {
+  void addTask(String taskTag, String deadline) {
     String taskName = _nameController.text;
     String taskText = _textController.text;
     widget.task.name = taskName;
@@ -41,11 +41,35 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) {
     DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
         pickedDate.day, pickedTime.hour, pickedTime.minute);
+    String deadlineMinute;
     bool isBefore = deadline.isAfter(DateTime.now());
     Duration diff = deadline.difference(DateTime.now());
     print(diff);
     if (isBefore) {
-      return addTask(dropdownValue, deadline);
+      if (pickedTime.minute.toInt() <= 9) {
+        deadlineMinute = "0" + pickedTime.minute.toString();
+        String deadlineRes = (deadline.day.toString() +
+            "." +
+            deadline.month.toString() +
+            "." +
+            deadline.year.toString() +
+            " в " +
+            deadline.hour.toString() +
+            ":" +
+            deadlineMinute);
+        return addTask(dropdownValue, deadlineRes);
+      } else {
+        String deadlineRes = (deadline.day.toString() +
+            "." +
+            deadline.month.toString() +
+            "." +
+            deadline.year.toString() +
+            " в " +
+            deadline.hour.toString() +
+            ":" +
+            deadline.minute.toString());
+        return addTask(dropdownValue, deadlineRes);
+      }
     } else {
       return addTask(dropdownValue, null);
     }

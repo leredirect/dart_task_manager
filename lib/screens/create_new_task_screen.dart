@@ -25,23 +25,62 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
       String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) {
     DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
         pickedDate.day, pickedTime.hour, pickedTime.minute);
+    String deadlineMinute;
     bool isAfter = deadline.isAfter(DateTime.now());
     Duration diff = deadline.difference(DateTime.now());
     print(diff);
     if (isAfter) {
-      return addTask(dropdownValue, deadline);
+      if (pickedTime.minute.toInt() <= 9) {
+        deadlineMinute = "0" + pickedTime.minute.toString();
+        String deadlineRes = (deadline.day.toString() +
+            "." +
+            deadline.month.toString() +
+            "." +
+            deadline.year.toString() +
+            " в " +
+            deadline.hour.toString() +
+            ":" +
+            deadlineMinute);
+        return addTask(dropdownValue, deadlineRes);
+      } else {
+        String deadlineRes = (deadline.day.toString() +
+            "." +
+            deadline.month.toString() +
+            "." +
+            deadline.year.toString() +
+            " в " +
+            deadline.hour.toString() +
+            ":" +
+            deadline.minute.toString());
+        return addTask(dropdownValue, deadlineRes);
+      }
     } else {
       return addTask(dropdownValue, null);
     }
   }
 
-  void addTask(String tag, DateTime deadline) {
+  void addTask(String tag, String deadline) {
+    HiveUtils.getInstance().then((value) => print(value.getTasks()));
     String taskName = _nameController.text;
     String taskText = _textController.text;
-    var taskCreateTime = DateFormat.Hm().format(DateTime.now());
+    String taskCreateTime = DateFormat.d().format(DateTime.now()) +
+        "." +
+        DateFormat.M().format(DateTime.now()) +
+        "." +
+        DateFormat.y().format(DateTime.now()) +
+        " в " +
+        DateFormat.Hm().format(DateTime.now());
+    print(taskCreateTime);
     Tags tagValue = tagsMap[tag];
     Task task = Task(taskName, taskText, tagValue, taskCreateTime, deadline);
+
     context.bloc<TaskListBloc>().add(AddTaskEvent(task));
+    List<Task> tasks = context.bloc<TaskListBloc>().state;
+    Map jsnTasks = taskListToJson(tasks);
+    HiveUtils.getInstance().then((value) {
+      value.setTasks(jsnTasks);
+    });
+
     Navigator.of(context).pop();
   }
 
@@ -117,17 +156,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
           ),
           InkWell(
               onTap: () {
-                // DatePicker.showTimePicker(
-                //   context,
-                //   currentTime: DateTime(1, 1, 0, 0),
-                //   showSecondsColumn: false,
-                //   showTitleActions: true,
-                //   onConfirm: (time) {
-                //     taskExpiredTime = time;
-                //     print('confirm $time');
-                //   },
-                //   locale: LocaleType.ru,
-                // );
                 DateTime now = DateTime.now();
                 var lastDate = now.add(const Duration(days: 60));
                 var firstDate = now.subtract(const Duration(days: 5));
