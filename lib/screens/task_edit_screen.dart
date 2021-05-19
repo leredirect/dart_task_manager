@@ -4,7 +4,7 @@ import 'package:dart_task_manager/models/task.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:hive/hive.dart';
 
 import '../constants.dart';
 
@@ -24,7 +24,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   DateTime pickedDate;
   TimeOfDay pickedTime;
 
-  void addTask(String taskTag, String deadline) {
+  Future<void> addTask(String taskTag, String deadline) async {
     String taskName = _nameController.text;
     String taskText = _textController.text;
     widget.task.name = taskName;
@@ -33,17 +33,19 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     widget.task.taskDeadline = deadline;
     context.bloc<TaskListBloc>().add(EditTaskEvent(widget.task));
     context.bloc<TaskListBloc>().add(EditTaskCheckEvent(widget.task));
+    var listBox = await Hive.openBox<List<Task>>('taskList');
+    listBox.put('task', context.bloc<TaskListBloc>().state);
+    listBox.close();
     Navigator.of(context).pop();
   }
 
-  void deadlineCalc(
-      String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) {
+  Future<void> deadlineCalc(
+      String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) async {
     DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
         pickedDate.day, pickedTime.hour, pickedTime.minute);
     String deadlineMinute;
     bool isBefore = deadline.isAfter(DateTime.now());
     Duration diff = deadline.difference(DateTime.now());
-    print(diff);
     if (isBefore) {
       if (pickedTime.minute.toInt() <= 9) {
         deadlineMinute = "0" + pickedTime.minute.toString();
@@ -56,7 +58,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             deadline.hour.toString() +
             ":" +
             deadlineMinute);
-        return addTask(dropdownValue, deadlineRes);
+        return await addTask(dropdownValue, deadlineRes);
       } else {
         String deadlineRes = (deadline.day.toString() +
             "." +
@@ -67,10 +69,19 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             deadline.hour.toString() +
             ":" +
             deadline.minute.toString());
-        return addTask(dropdownValue, deadlineRes);
+        return await addTask(dropdownValue, deadlineRes);
       }
     } else {
-      return addTask(dropdownValue, null);
+      String deadlineRes = (deadline.day.toString() +
+          "." +
+          deadline.month.toString() +
+          "." +
+          deadline.year.toString() +
+          " в " +
+          deadline.hour.toString() +
+          ":" +
+          deadline.minute.toString());
+      return await addTask(dropdownValue, deadlineRes);
     }
   }
 

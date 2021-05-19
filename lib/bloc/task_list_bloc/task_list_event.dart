@@ -25,3 +25,9 @@ class EditTaskCheckEvent extends TaskListEvent {
 
   EditTaskCheckEvent(this.task);
 }
+
+class HiveChecker extends TaskListEvent {
+  List<Task> tasks;
+
+  HiveChecker(this.tasks);
+}
