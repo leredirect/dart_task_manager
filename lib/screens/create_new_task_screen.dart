@@ -55,11 +55,12 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
         return addTask(dropdownValue, deadlineRes);
       }
     } else {
-      return addTask(dropdownValue, null);
+      bool isDeadline = false;
+      return addTask(dropdownValue, null, isDeadline: isDeadline);
     }
   }
 
-  void addTask(String tag, String deadline) {
+  void addTask(String tag, String deadline, {bool isDeadline}) {
     HiveUtils.getInstance().then((value) => print(value.getTasks()));
     String taskName = _nameController.text;
     String taskText = _textController.text;
