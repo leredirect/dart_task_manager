@@ -3,7 +3,7 @@ class Task {
   String text = "";
   Tags tag;
   var taskCreateTime;
-  DateTime taskDeadline;
+  String taskDeadline;
 
   Task(this.name, this.text, this.tag, this.taskCreateTime, this.taskDeadline);
 }

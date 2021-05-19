@@ -24,13 +24,12 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   DateTime pickedDate;
   TimeOfDay pickedTime;
 
-  void addTask(String taskTag, DateTime deadline) {
+  void addTask(String taskTag, String deadline) {
     String taskName = _nameController.text;
     String taskText = _textController.text;
     widget.task.name = taskName;
     widget.task.text = taskText;
     widget.task.tag = tagsMap[taskTag];
-    var taskCreateTime = DateFormat.Hm().format(DateTime.now());
     widget.task.taskDeadline = deadline;
     context.bloc<TaskListBloc>().add(EditTaskEvent(widget.task));
     context.bloc<TaskListBloc>().add(EditTaskCheckEvent(widget.task));
@@ -41,11 +40,35 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) {
     DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
         pickedDate.day, pickedTime.hour, pickedTime.minute);
+    String deadlineMinute;
     bool isBefore = deadline.isAfter(DateTime.now());
     Duration diff = deadline.difference(DateTime.now());
     print(diff);
     if (isBefore) {
-      return addTask(dropdownValue, deadline);
+      if (pickedTime.minute.toInt() <= 9) {
+        deadlineMinute = "0" + pickedTime.minute.toString();
+        String deadlineRes = (deadline.day.toString() +
+            "." +
+            deadline.month.toString() +
+            "." +
+            deadline.year.toString() +
+            " в " +
+            deadline.hour.toString() +
+            ":" +
+            deadlineMinute);
+        return addTask(dropdownValue, deadlineRes);
+      } else {
+        String deadlineRes = (deadline.day.toString() +
+            "." +
+            deadline.month.toString() +
+            "." +
+            deadline.year.toString() +
+            " в " +
+            deadline.hour.toString() +
+            ":" +
+            deadline.minute.toString());
+        return addTask(dropdownValue, deadlineRes);
+      }
     } else {
       return addTask(dropdownValue, null);
     }
@@ -123,17 +146,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
           ),
           InkWell(
               onTap: () {
-                // DatePicker.showTimePicker(
-                //   context,
-                //   currentTime: DateTime(1, 1, 0, 0),
-                //   showSecondsColumn: false,
-                //   showTitleActions: true,
-                //   onConfirm: (time) {
-                //     taskExpiredTime = time;
-                //     print('confirm $time');
-                //   },
-                //   locale: LocaleType.ru,
-                // );
                 DateTime now = DateTime.now();
                 var lastDate = now.add(const Duration(days: 60));
                 var firstDate = now.subtract(const Duration(days: 5));
