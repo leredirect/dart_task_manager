@@ -29,34 +29,9 @@ class TaskDetailsScreen extends StatelessWidget {
       }));
     }
 
-    // String correctTimeNaming(DateTime deadline) {
-    //   Duration difference = DateTime.now().difference(deadline);
-    //
-    //   String hoursStr = "";
-    //   String fmResultStr = difference.toString();
-    //   List<String> result = fmResultStr.split('');
-    //   int secInt = int.tryParse(result[1]) ?? 0;
-    //   print (secInt);
-    //   if (secInt == 0) {
-    //     hoursStr = "Время не задано";
-    //   } else if (secInt == 1) {
-    //     hoursStr = "час";
-    //   } else if (secInt > 1 && secInt < 5) {
-    //     hoursStr = "часа";
-    //   } else {
-    //     hoursStr = "часов";
-    //   }}
-
     String deadlineDisplay(String deadline) {
-      if (deadline == null) {
-        String result = "Дедлайн был тут.";
-        return result;
-      } else {
-        // String deadlineRes = (deadline.day.toString() + "." + deadline.month.toString() + "." + deadline.year.toString() + " в " + deadline.hour.toString() + ":" + deadline.minute.toString());
-        print(deadline);
         String result = "Дедлайн: $deadline";
         return result;
-      }
     }
 
     return BlocBuilder<TaskListBloc, List<Task>>(builder: (context, state) {

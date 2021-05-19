@@ -30,7 +30,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     widget.task.name = taskName;
     widget.task.text = taskText;
     widget.task.tag = tagsMap[taskTag];
-    var taskCreateTime = DateFormat.Hm().format(DateTime.now());
     widget.task.taskDeadline = deadline;
     context.bloc<TaskListBloc>().add(EditTaskEvent(widget.task));
     context.bloc<TaskListBloc>().add(EditTaskCheckEvent(widget.task));
@@ -147,17 +146,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
           ),
           InkWell(
               onTap: () {
-                // DatePicker.showTimePicker(
-                //   context,
-                //   currentTime: DateTime(1, 1, 0, 0),
-                //   showSecondsColumn: false,
-                //   showTitleActions: true,
-                //   onConfirm: (time) {
-                //     taskExpiredTime = time;
-                //     print('confirm $time');
-                //   },
-                //   locale: LocaleType.ru,
-                // );
                 DateTime now = DateTime.now();
                 var lastDate = now.add(const Duration(days: 60));
                 var firstDate = now.subtract(const Duration(days: 5));
