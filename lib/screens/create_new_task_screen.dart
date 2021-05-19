@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:hive/hive.dart';
+
 
 import '../constants.dart';
 
@@ -22,8 +24,8 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   DateTime pickedDate;
   TimeOfDay pickedTime;
 
-  void deadlineCalc(
-      String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) {
+  Future<void> deadlineCalc(
+      String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) async {
     DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
         pickedDate.day, pickedTime.hour, pickedTime.minute);
     String deadlineMinute;
@@ -42,7 +44,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
             deadline.hour.toString() +
             ":" +
             deadlineMinute);
-        return addTask(dropdownValue, deadlineRes);
+        return await addTask(dropdownValue, deadlineRes);
       } else {
         String deadlineRes = (deadline.day.toString() +
             "." +
@@ -60,7 +62,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     }
   }
 
-  void addTask(String tag, String deadline) {
+  Future<void> addTask(String tag, String deadline) async {
     HiveUtils.getInstance().then((value) => print(value.getTasks()));
     String taskName = _nameController.text;
     String taskText = _textController.text;
@@ -73,16 +75,20 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
         DateFormat.Hm().format(DateTime.now());
     print(taskCreateTime);
     Tags tagValue = tagsMap[tag];
-    Task task = Task(taskName, taskText, tagValue, taskCreateTime, deadline);
+    var idBox = await Hive.openBox<int>('id_box');
+    int id = idBox.get('id');
+    if (id == null) {
+      idBox.put('id', 0);
+    }
+    else{
+      int id = idBox.get('id');
+      idBox.put('id', id+1);
+    }
+print (id);
+    Task task = Task(taskName, taskText, tagValue, taskCreateTime, deadline, id);
 
     context.bloc<TaskListBloc>().add(AddTaskEvent(task));
-    List<Task> tasks = context.bloc<TaskListBloc>().state;
-    Map jsnTasks = taskListToJson(tasks);
-    HiveUtils.getInstance().then((value) {
-      value.setTasks(jsnTasks);
-    });
-
-    Navigator.of(context).pop();
+      Navigator.of(context).pop();
   }
 
   @override
