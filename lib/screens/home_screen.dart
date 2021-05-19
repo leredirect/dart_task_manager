@@ -37,7 +37,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: BlocBuilder<TaskListBloc, List<Task>>(
         builder: (context, state) {
           return TaskListWidget(taskList: state);
+
         },
+
       ),
       backgroundColor: primaryColorDark,
       floatingActionButton: FloatingActionButton(
