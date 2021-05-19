@@ -43,6 +43,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
             deadlineMinute);
         return addTask(dropdownValue, deadlineRes);
       } else {
+
         String deadlineRes = (deadline.day.toString() +
             "." +
             deadline.month.toString() +
@@ -61,7 +62,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   }
 
   void addTask(String tag, String deadline, {bool isDeadline}) {
-    HiveUtils.getInstance().then((value) => print(value.getTasks()));
     String taskName = _nameController.text;
     String taskText = _textController.text;
     String taskCreateTime = DateFormat.d().format(DateTime.now()) +
@@ -74,13 +74,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     print(taskCreateTime);
     Tags tagValue = tagsMap[tag];
     Task task = Task(taskName, taskText, tagValue, taskCreateTime, deadline);
-
-    context.bloc<TaskListBloc>().add(AddTaskEvent(task));
-    List<Task> tasks = context.bloc<TaskListBloc>().state;
-    Map jsnTasks = taskListToJson(tasks);
-    HiveUtils.getInstance().then((value) {
-      value.setTasks(jsnTasks);
-    });
 
     Navigator.of(context).pop();
   }
