@@ -1,7 +1,6 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
-import 'package:dart_task_manager/utils/hive_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -63,7 +62,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   }
 
   Future<void> addTask(String tag, String deadline) async {
-    HiveUtils.getInstance().then((value) => print(value.getTasks()));
     String taskName = _nameController.text;
     String taskText = _textController.text;
     String taskCreateTime = DateFormat.d().format(DateTime.now()) +
