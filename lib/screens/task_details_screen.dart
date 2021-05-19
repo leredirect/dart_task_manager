@@ -5,6 +5,7 @@ import 'package:dart_task_manager/screens/task_edit_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 
 import '../constants.dart';
 
@@ -15,9 +16,11 @@ class TaskDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void deleteCurrentTask() {
+    Future<void> deleteCurrentTask() async {
       context.bloc<TaskListBloc>().add(DeleteTaskEvent(task));
-      
+      var listBox = await Hive.openBox<List<Task>>('taskList');
+      listBox.put('task', context.bloc<TaskListBloc>().state);
+      listBox.close();
       Navigator.of(context).pop();
     }
 
@@ -30,8 +33,8 @@ class TaskDetailsScreen extends StatelessWidget {
     }
 
     String deadlineDisplay(String deadline) {
-        String result = "Дедлайн: $deadline";
-        return result;
+      String result = "Дедлайн: $deadline";
+      return result;
     }
 
     return BlocBuilder<TaskListBloc, List<Task>>(builder: (context, state) {

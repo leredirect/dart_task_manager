@@ -4,16 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import "package:hive_flutter/hive_flutter.dart";
+
+import 'models/task.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final appDocumentDir = await getApplicationDocumentsDirectory();
-  await Hive.initFlutter(appDocumentDir.path);
+  Hive
+    ..init(appDocumentDir.path)
+    ..registerAdapter(TaskAdapter())
+    ..registerAdapter(TagsAdapter());
   runApp(MyApp());
 }
-
-
 
 class MyApp extends StatelessWidget {
   @override

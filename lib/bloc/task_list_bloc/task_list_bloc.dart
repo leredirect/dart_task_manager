@@ -10,6 +10,7 @@ class TaskListBloc extends Bloc<TaskListEvent, List<Task>> {
     if (event is AddTaskEvent) {
       List<Task> tasks = List.from(state);
       tasks.add(event.task);
+
       yield tasks;
     } else if (event is DeleteTaskEvent) {
       List<Task> tasks = List.from(state);
@@ -21,10 +22,11 @@ class TaskListBloc extends Bloc<TaskListEvent, List<Task>> {
       tasks.removeWhere((element) => element.id == event.task.id);
       tasks.add(event.task);
       yield tasks;
-      
     } else if (event is EditTaskCheckEvent) {
       List<Task> tasks = List.from(state);
       yield tasks;
+    } else if (event is HiveChecker) {
+      yield event.tasks;
     }
   }
 }
