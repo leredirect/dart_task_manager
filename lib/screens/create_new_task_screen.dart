@@ -130,8 +130,13 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
             ),
           ),
           Container(
+            margin: EdgeInsets.fromLTRB(5, 20, 0, 0),
             alignment: Alignment.centerLeft,
-            margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
+            child: Text("Выберите тег:", style: TextStyle(color: Colors.white), textAlign: TextAlign.left,),
+          ),
+          Container(
+            alignment: Alignment.centerLeft,
+            margin: EdgeInsets.fromLTRB(5, 0, 0, 0),
             child: DropdownButton<String>(
               style: TextStyle(color: Colors.white, fontSize: 16),
               dropdownColor: primaryColorDark,
