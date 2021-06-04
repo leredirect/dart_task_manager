@@ -144,7 +144,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   dropdownValue = newValue;
                 });
               },
-              items: nameToTagMap.keys.map<DropdownMenuItem<String>>((String value) {
+              items: nameToTagMap.keys.toList().where((element) => element != tagToNameMap[Tags.CLEAR]).map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(

@@ -19,7 +19,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String dropdownValue = "Dart";
+  String dropdownValue = tagToNameMap[Tags.DART];
 
   void createTask() {
     Navigator.push(context, MaterialPageRoute(
