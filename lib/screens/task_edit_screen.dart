@@ -127,8 +127,13 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             ),
           ),
           Container(
+            margin: EdgeInsets.fromLTRB(5, 20, 0, 0),
             alignment: Alignment.centerLeft,
-            margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
+            child: Text("Выберите тег:", style: TextStyle(color: Colors.white), textAlign: TextAlign.left,),
+          ),
+          Container(
+            alignment: Alignment.centerLeft,
+            margin: EdgeInsets.fromLTRB(5, 0, 0, 0),
             child: DropdownButton<String>(
               style: TextStyle(color: Colors.white, fontSize: 16),
               dropdownColor: primaryColorDark,
@@ -167,8 +172,10 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   lastDate: lastDate,
                 ).then((value) => pickedDate = value).then((value) =>
                     showTimePicker(
-                            context: context, initialTime: TimeOfDay.now())
-                        .then((value) => pickedTime = value));
+                        context: context, initialTime: TimeOfDay.now())
+                        .then((value) => setState(() {
+                      pickedTime = value;
+                    })));
               },
               child: Container(
                 margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
@@ -193,6 +200,11 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   style: TextStyle(color: Colors.white),
                 )),
               )),
+          Container(
+            margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
+            alignment: Alignment.center,
+            child: Text("Выбранное время: $pickedDate, $pickedTime", style: TextStyle(color: Colors.white), textAlign: TextAlign.center,),
+          ),
           Spacer(),
           InkWell(
               onTap: () => deadlineCalc(dropdownValue, pickedDate, pickedTime),
