@@ -19,6 +19,8 @@ class TagsAdapter extends TypeAdapter<Tags> {
         return Tags.FLUTTER;
       case 2:
         return Tags.ALGORITHMS;
+      case 3:
+        return Tags.CLEAR;
       default:
         return null;
     }
@@ -35,6 +37,9 @@ class TagsAdapter extends TypeAdapter<Tags> {
         break;
       case Tags.ALGORITHMS:
         writer.writeByte(2);
+        break;
+      case Tags.CLEAR:
+        writer.writeByte(3);
         break;
     }
   }

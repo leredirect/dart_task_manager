@@ -28,11 +28,21 @@ enum Tags {
   @HiveField(1)
   FLUTTER,
   @HiveField(2)
-  ALGORITHMS
+  ALGORITHMS,
+  @HiveField(3)
+  CLEAR
 }
 
-final tagsMap = {
+final nameToTagMap = {
   "Flutter": Tags.FLUTTER,
   "Dart": Tags.DART,
   "Алгоритмы": Tags.ALGORITHMS,
+  "Сбросить" : Tags.CLEAR
+};
+
+final tagToNameMap = {
+  Tags.FLUTTER: "Flutter",
+  Tags.DART: "Dart",
+  Tags.ALGORITHMS: "Алгоритмы",
+  Tags.CLEAR: "Сбросить"
 };

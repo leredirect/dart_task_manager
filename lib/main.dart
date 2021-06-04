@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'bloc/filter_bloc/filter_bloc.dart';
 import 'models/task.dart';
 
 Future<void> main() async {
@@ -22,7 +23,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<TaskListBloc>(create: (context) => TaskListBloc())
+        BlocProvider<TaskListBloc>(create: (context) => TaskListBloc()),
+        BlocProvider<FilterBloc>(create: (context) => FilterBloc())
       ],
       child: MaterialApp(
           title: 'Flutter Demo',

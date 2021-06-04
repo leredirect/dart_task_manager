@@ -29,7 +29,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     String taskText = _textController.text;
     widget.task.name = taskName;
     widget.task.text = taskText;
-    widget.task.tag = tagsMap[taskTag];
+    widget.task.tag = nameToTagMap[taskTag];
     widget.task.taskDeadline = deadline;
     context.bloc<TaskListBloc>().add(EditTaskEvent(widget.task));
     context.bloc<TaskListBloc>().add(EditTaskCheckEvent(widget.task));
@@ -144,7 +144,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   dropdownValue = newValue;
                 });
               },
-              items: tagsMap.keys.map<DropdownMenuItem<String>>((String value) {
+              items: nameToTagMap.keys.toList().where((element) => element != tagToNameMap[Tags.CLEAR]).map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(
@@ -236,7 +236,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   void initState() {
     super.initState();
     dropdownValue =
-        tagsMap.keys.firstWhere((k) => tagsMap[k] == widget.task.tag);
+        nameToTagMap.keys.firstWhere((k) => nameToTagMap[k] == widget.task.tag);
     _nameController.text = widget.task.name;
     _textController.text = widget.task.text;
   }
