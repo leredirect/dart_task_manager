@@ -18,7 +18,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   final _nameController = TextEditingController();
   final _textController = TextEditingController();
   DateTime taskExpiredTime;
-  String dropdownValue = tagsMap.keys.first;
+  String dropdownValue = nameToTagMap.keys.first;
   DateTime pickedDate;
   TimeOfDay pickedTime;
 
@@ -69,7 +69,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
         DateFormat.y().format(DateTime.now()) +
         " в " +
         DateFormat.Hm().format(DateTime.now());
-    Tags tagValue = tagsMap[tag];
+    Tags tagValue = nameToTagMap[tag];
     var idBox = await Hive.openBox<int>('id_box');
     int id = idBox.get('id');
     if (id == null) {
@@ -147,7 +147,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                   dropdownValue = newValue;
                 });
               },
-              items: tagsMap.keys.map<DropdownMenuItem<String>>((String value) {
+              items: nameToTagMap.keys.toList().where((element) => element != "Сбросить").map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(
