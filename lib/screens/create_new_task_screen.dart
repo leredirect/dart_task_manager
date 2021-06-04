@@ -171,7 +171,10 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 ).then((value) => pickedDate = value).then((value) =>
                     showTimePicker(
                             context: context, initialTime: TimeOfDay.now())
-                        .then((value) => pickedTime = value));
+                        .then((value) => setState(() {
+                      pickedTime = value;
+                    })));
+
               },
               child: Container(
                 margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
@@ -196,6 +199,11 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                   style: TextStyle(color: Colors.white),
                 )),
               )),
+          Container(
+            margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
+            alignment: Alignment.center,
+            child: Text("Выбранное время: $pickedDate, $pickedTime", style: TextStyle(color: Colors.white), textAlign: TextAlign.center,),
+          ),
           Spacer(),
           InkWell(
               onTap: () => deadlineCalc(dropdownValue, pickedDate, pickedTime),
