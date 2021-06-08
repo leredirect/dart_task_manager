@@ -10,8 +10,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
-import 'package:enum_to_string/enum_to_string.dart';
-
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -19,7 +17,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String dropdownValue = tagToNameMap[Tags.DART];
+  String dropdownValue = tagToNameMap[Tags.CLEAR];
+
+  dynamic tagColor(String drp) {
+    switch (drp) {
+      case "Dart":
+        return Colors.indigoAccent;
+        break;
+      case "Flutter":
+        return Colors.deepPurpleAccent;
+        break;
+      case "Алгоритмы":
+        return Colors.cyanAccent.withOpacity(0.7);
+        break;
+      case "Нет фильтра":
+        return Colors.white;
+    }
+  }
 
   void createTask() {
     Navigator.push(context, MaterialPageRoute(
@@ -43,25 +57,28 @@ class _HomeScreenState extends State<HomeScreen> {
               dropdownColor: primaryColorDark,
               value: dropdownValue,
               isExpanded: false,
-              icon: Icon(Icons.filter_alt, color: Colors.white,),
+              icon: Icon(
+                Icons.filter_alt,
+                color: tagColor(dropdownValue),
+              ),
               iconSize: 24,
               underline: Container(
                 height: 2,
-                color: secondaryColorLight,
+                color: tagColor(dropdownValue),
               ),
               onChanged: (String newValue) {
                 setState(() {
                   dropdownValue = newValue;
                   final result = nameToTagMap[dropdownValue];
-                  if (result == Tags.CLEAR){
+                  if (result == Tags.CLEAR) {
                     context.bloc<FilterBloc>().add(ClearFilter(result));
-                  }
-                  else {
+                  } else {
                     context.bloc<FilterBloc>().add(FilterChecker(result));
                   }
                 });
               },
-              items: nameToTagMap.keys.map<DropdownMenuItem<String>>((String value) {
+              items: nameToTagMap.keys
+                  .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(
@@ -74,28 +91,28 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: BlocBuilder<FilterBloc, Tags>(
-        builder: (context, filtState) {
-          print (filtState);
-          return BlocBuilder<TaskListBloc, List<Task>>(
-            builder: (context, state) {
-              if (filtState != null) {
-                List<Task> filtredState = state.where((element) =>
-                element.tag == filtState).toList();
-                return TaskListWidget(taskList: filtredState);
-              }
-              else {
-                return TaskListWidget(taskList: state);
-              }
-            },
-          );
-        }
-      ),
+      body: BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+        print(filtState);
+        return BlocBuilder<TaskListBloc, List<Task>>(
+          builder: (context, state) {
+            if (filtState != null) {
+              List<Task> filtredState =
+                  state.where((element) => element.tag == filtState).toList();
+              return TaskListWidget(taskList: filtredState);
+            } else {
+              return TaskListWidget(taskList: state);
+            }
+          },
+        );
+      }),
       backgroundColor: primaryColorDark,
       floatingActionButton: FloatingActionButton(
-        child: Text("+"),
+        child: Text(
+          "+",
+          style: TextStyle(color: primaryColor),
+        ),
         onPressed: createTask,
-        backgroundColor: secondaryColorLight,
+        backgroundColor: tagColor(dropdownValue),
       ),
     );
   }

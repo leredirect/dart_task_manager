@@ -1,7 +1,8 @@
-import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/task_details_screen.dart';
 import 'package:flutter/material.dart';
+
+import '../constants.dart';
 
 class TaskWidget extends StatelessWidget {
   final Task task;
@@ -20,46 +21,42 @@ class TaskWidget extends StatelessWidget {
       ));
     }
 
-    MaterialColor tagColor() {
+    dynamic tagColor() {
       switch (task.tag) {
         case Tags.DART:
-          return Colors.blueGrey;
+          return Colors.indigoAccent;
           break;
         case Tags.FLUTTER:
-          return Colors.pink;
+          return Colors.deepPurpleAccent;
           break;
         case Tags.ALGORITHMS:
-          return Colors.cyan;
+          return Colors.cyanAccent.withOpacity(0.7);
           break;
+        case Tags.CLEAR:
+          return primaryColor;
       }
     }
 
     return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          InkWell(
-            onTap: openTaskDetails,
-            child: Container(
-              margin: EdgeInsets.fromLTRB(30, 10, 30, 0),
-              width: MediaQuery.of(context).size.width * 0.8,
-              alignment: Alignment.center,
-              height: MediaQuery.of(context).size.height * 0.05,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: tagColor()),
-                color: secondaryColorLight,
+      child: InkWell(
+        onTap: openTaskDetails,
+        child: Container(
+          color: tagColor(),
+          child: Column(
+            children: [
+              Container(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  task.name,
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(color: Colors.black, fontSize: 25),
+                ),
               ),
-              child: Center(
-                  child: Text(
-                task.name,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white),
-              )),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

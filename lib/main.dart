@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
           title: 'Flutter Demo',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            primarySwatch: Colors.green,
+            splashColor: Colors.white,
             visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
           home: SafeArea(child: Scaffold(body: HomeScreen()))),

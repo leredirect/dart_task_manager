@@ -39,14 +39,234 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     Navigator.of(context).pop();
   }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: Text("Редактирование задачи"),
+  //       backgroundColor: primaryColor,
+  //     ),
+  //     body: Column(
+  //       children: [
+  //         TextField(
+  //           controller: _nameController,
+  //           style: TextStyle(color: Colors.white),
+  //           decoration: InputDecoration(
+  //             hintText: "Название задачи",
+  //             contentPadding: EdgeInsets.only(left: 5),
+  //             hintStyle: TextStyle(color: Colors.white),
+  //             enabledBorder: UnderlineInputBorder(
+  //               borderSide:
+  //                   BorderSide(color: secondaryColorLight.withOpacity(0.45)),
+  //             ),
+  //             focusedBorder: UnderlineInputBorder(
+  //               borderSide: BorderSide(color: secondaryColorLight),
+  //             ),
+  //           ),
+  //         ),
+  //         TextField(
+  //           controller: _textController,
+  //           style: TextStyle(color: Colors.white),
+  //           decoration: InputDecoration(
+  //             hintText: "Условия задачи",
+  //             hintStyle: TextStyle(color: Colors.white),
+  //             contentPadding: EdgeInsets.only(left: 5),
+  //             enabledBorder: UnderlineInputBorder(
+  //               borderSide:
+  //                   BorderSide(color: secondaryColorLight.withOpacity(0.45)),
+  //             ),
+  //             focusedBorder: UnderlineInputBorder(
+  //               borderSide: BorderSide(color: secondaryColorLight),
+  //             ),
+  //           ),
+  //         ),
+  //         Container(
+  //           margin: EdgeInsets.fromLTRB(5, 20, 0, 0),
+  //           alignment: Alignment.centerLeft,
+  //           child: Text("Выберите тег:", style: TextStyle(color: Colors.white), textAlign: TextAlign.left,),
+  //         ),
+  //         Container(
+  //           alignment: Alignment.centerLeft,
+  //           margin: EdgeInsets.fromLTRB(5, 0, 0, 0),
+  //           child: DropdownButton<String>(
+  //             style: TextStyle(color: Colors.white, fontSize: 16),
+  //             dropdownColor: primaryColorDark,
+  //             value: dropdownValue,
+  //             iconSize: 24,
+  //             elevation: 16,
+  //             underline: Container(
+  //               height: 2,
+  //               color: secondaryColorLight,
+  //             ),
+  //             onChanged: (String newValue) {
+  //               setState(() {
+  //                 dropdownValue = newValue;
+  //               });
+  //             },
+  //             items: nameToTagMap.keys.toList().where((element) => element != tagToNameMap[Tags.CLEAR]).map<DropdownMenuItem<String>>((String value) {
+  //               return DropdownMenuItem<String>(
+  //                 value: value,
+  //                 child: Text(
+  //                   value,
+  //                   style: TextStyle(color: Colors.white),
+  //                 ),
+  //               );
+  //             }).toList(),
+  //           ),
+  //         ),
+  //         InkWell(
+  //             onTap: () {
+  //               DateTime now = DateTime.now();
+  //               var lastDate = now.add(const Duration(days: 60));
+  //               var firstDate = now.subtract(const Duration(days: 5));
+  //               showDatePicker(
+  //                 context: context,
+  //                 initialDate: DateTime.now(),
+  //                 firstDate: firstDate,
+  //                 lastDate: lastDate,
+  //               ).then((value) => pickedDate = value).then((value) =>
+  //                   showTimePicker(
+  //                       context: context, initialTime: TimeOfDay.now())
+  //                       .then((value) => setState(() {
+  //                     pickedTime = value;
+  //                   })));
+  //             },
+  //             child: Container(
+  //               margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
+  //               decoration: BoxDecoration(
+  //                 boxShadow: [
+  //                   BoxShadow(
+  //                     color: Colors.black.withOpacity(0.4),
+  //                     spreadRadius: 1,
+  //                     blurRadius: 7,
+  //                     offset: Offset(0, 3),
+  //                   )
+  //                 ],
+  //                 borderRadius: BorderRadius.circular(12),
+  //                 color: secondaryColorLight,
+  //               ),
+  //               width: MediaQuery.of(context).size.width * 0.6,
+  //               height: 40,
+  //               padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+  //               child: Center(
+  //                   child: Text(
+  //                 "Задать время на выполнение",
+  //                 style: TextStyle(color: Colors.white),
+  //               )),
+  //             )),
+  //         Container(
+  //           margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
+  //           alignment: Alignment.center,
+  //           child: Text("Выбранное время: $pickedDate, $pickedTime", style: TextStyle(color: Colors.white), textAlign: TextAlign.center,),
+  //         ),
+  //         Spacer(),
+  //         InkWell(
+  //             onTap: () => deadlineCalc(dropdownValue, pickedDate, pickedTime),
+  //             child: Container(
+  //               decoration: BoxDecoration(
+  //                   boxShadow: [
+  //                     BoxShadow(
+  //                       color: Colors.black.withOpacity(0.5),
+  //                       spreadRadius: 1,
+  //                       blurRadius: 7,
+  //                       offset: Offset(0, 3),
+  //                     )
+  //                   ],
+  //                   color: secondaryColorLight,
+  //                   borderRadius: BorderRadius.circular(12)),
+  //               width: MediaQuery.of(context).size.width * 0.4,
+  //               height: 40,
+  //               padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+  //               margin: EdgeInsets.only(bottom: 50),
+  //               child: Center(
+  //                   child: Text(
+  //                 "Подтвердить",
+  //                 style: TextStyle(color: Colors.white),
+  //               )),
+  //               // color: Colors.redAccent,
+  //             ))
+  //       ],
+  //     ),
+  //     backgroundColor: primaryColorDark,
+  //   );
+  // }
+
+  dynamic tagColor(String drp) {
+    switch (drp) {
+      case "Dart":
+        return Colors.indigoAccent;
+        break;
+      case "Flutter":
+        return Colors.deepPurpleAccent;
+        break;
+      case "Алгоритмы":
+        return Colors.cyanAccent.withOpacity(0.6);
+        break;
+      case "Сбросить":
+        return primaryColorLight;
+    }
+  }
+
+  dynamic choosedTimeColor(pickedDate, pickedTime) {
+    if (pickedDate != null && pickedTime != null) {
+      return Colors.white;
+    } else {
+      return primaryColorDark;
+    }
+  }
+
+  String choosedTimeVisible(pickedDate, pickedTime) {
+    if (pickedDate != null && pickedTime != null) {
+      return "Выбранная дата: ${pickedDate.day}-${pickedDate.month}-${pickedDate.year}\nВыбранное время: ${pickedTime.hour}:${pickedTime.minute}";
+    } else {
+      return "";
+    }
+  }
+
+  Future<void> isShowTimePicker(DateTime pickedDate) {
+    if (pickedDate != null) {
+      return showTimePicker(context: context, initialTime: TimeOfDay.now())
+          .then((value) => setState(() {
+                pickedTime = value;
+              }));
+    } else {}
+  }
+
   Future<void> deadlineCalc(
       String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) async {
-    DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
-        pickedDate.day, pickedTime.hour, pickedTime.minute);
-    String deadlineMinute;
-    bool isBefore = deadline.isAfter(DateTime.now());
-    Duration diff = deadline.difference(DateTime.now());
-    if (isBefore) {
+    if (pickedDate == null && pickedTime == null) {
+      return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: primaryColor,
+            title: const Text('Ошибка', style: TextStyle(color: Colors.white)),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: const <Widget>[
+                  Text('Введите дату и время',
+                      style: TextStyle(color: Colors.white)),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK', style: TextStyle(color: Colors.white)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
+          pickedDate.day, pickedTime.hour, pickedTime.minute);
+      String deadlineMinute;
+      bool isAfter = deadline.isAfter(DateTime.now());
+      Duration diff = deadline.difference(DateTime.now());
       if (pickedTime.minute.toInt() <= 9) {
         deadlineMinute = "0" + pickedTime.minute.toString();
         String deadlineRes = (deadline.day.toString() +
@@ -69,19 +289,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             deadline.hour.toString() +
             ":" +
             deadline.minute.toString());
-        return await addTask(dropdownValue, deadlineRes);
+        return addTask(dropdownValue, deadlineRes);
       }
-    } else {
-      String deadlineRes = (deadline.day.toString() +
-          "." +
-          deadline.month.toString() +
-          "." +
-          deadline.year.toString() +
-          " в " +
-          deadline.hour.toString() +
-          ":" +
-          deadline.minute.toString());
-      return await addTask(dropdownValue, deadlineRes);
     }
   }
 
@@ -102,11 +311,12 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               contentPadding: EdgeInsets.only(left: 5),
               hintStyle: TextStyle(color: Colors.white),
               enabledBorder: UnderlineInputBorder(
-                borderSide:
-                    BorderSide(color: secondaryColorLight.withOpacity(0.45)),
+                borderSide: BorderSide(color: tagColor(dropdownValue)),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: secondaryColorLight),
+                borderSide: BorderSide(
+                  color: tagColor(dropdownValue),
+                ),
               ),
             ),
           ),
@@ -118,18 +328,21 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               hintStyle: TextStyle(color: Colors.white),
               contentPadding: EdgeInsets.only(left: 5),
               enabledBorder: UnderlineInputBorder(
-                borderSide:
-                    BorderSide(color: secondaryColorLight.withOpacity(0.45)),
+                borderSide: BorderSide(color: tagColor(dropdownValue)),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: secondaryColorLight),
+                borderSide: BorderSide(color: tagColor(dropdownValue)),
               ),
             ),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(5, 20, 0, 0),
             alignment: Alignment.centerLeft,
-            child: Text("Выберите тег:", style: TextStyle(color: Colors.white), textAlign: TextAlign.left,),
+            child: Text(
+              "Выберите тег:",
+              style: TextStyle(color: Colors.white),
+              textAlign: TextAlign.left,
+            ),
           ),
           Container(
             alignment: Alignment.centerLeft,
@@ -142,14 +355,17 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               elevation: 16,
               underline: Container(
                 height: 2,
-                color: secondaryColorLight,
+                color: tagColor(dropdownValue),
               ),
               onChanged: (String newValue) {
                 setState(() {
                   dropdownValue = newValue;
                 });
               },
-              items: nameToTagMap.keys.toList().where((element) => element != tagToNameMap[Tags.CLEAR]).map<DropdownMenuItem<String>>((String value) {
+              items: nameToTagMap.keys
+                  .toList()
+                  .where((element) => element != tagToNameMap[Tags.CLEAR])
+                  .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(
@@ -170,12 +386,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   initialDate: DateTime.now(),
                   firstDate: firstDate,
                   lastDate: lastDate,
-                ).then((value) => pickedDate = value).then((value) =>
-                    showTimePicker(
-                        context: context, initialTime: TimeOfDay.now())
-                        .then((value) => setState(() {
-                      pickedTime = value;
-                    })));
+                )
+                    .then((value) => pickedDate = value)
+                    .then((value) => isShowTimePicker(pickedDate));
               },
               child: Container(
                 margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
@@ -189,7 +402,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                     )
                   ],
                   borderRadius: BorderRadius.circular(12),
-                  color: secondaryColorLight,
+                  color: tagColor(dropdownValue),
                 ),
                 width: MediaQuery.of(context).size.width * 0.6,
                 height: 40,
@@ -203,7 +416,14 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
           Container(
             margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
             alignment: Alignment.center,
-            child: Text("Выбранное время: $pickedDate, $pickedTime", style: TextStyle(color: Colors.white), textAlign: TextAlign.center,),
+            child: Text(
+              choosedTimeVisible(pickedDate, pickedTime),
+              style: TextStyle(
+                color: choosedTimeColor(pickedDate, pickedTime),
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+            ),
           ),
           Spacer(),
           InkWell(
@@ -218,7 +438,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                         offset: Offset(0, 3),
                       )
                     ],
-                    color: secondaryColorLight,
+                    color: tagColor(dropdownValue),
                     borderRadius: BorderRadius.circular(12)),
                 width: MediaQuery.of(context).size.width * 0.4,
                 height: 40,

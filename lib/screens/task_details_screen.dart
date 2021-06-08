@@ -24,6 +24,22 @@ class TaskDetailsScreen extends StatelessWidget {
       Navigator.of(context).pop();
     }
 
+    dynamic tagColor() {
+      switch (task.tag) {
+        case Tags.DART:
+          return Colors.indigoAccent;
+          break;
+        case Tags.FLUTTER:
+          return Colors.deepPurpleAccent;
+          break;
+        case Tags.ALGORITHMS:
+          return Colors.cyanAccent.withOpacity(0.7);
+          break;
+        case Tags.CLEAR:
+          return primaryColor;
+      }
+    }
+
     void openTaskEditor() {
       Navigator.push(context, MaterialPageRoute(builder: (_) {
         return EditTaskScreen(
@@ -98,7 +114,7 @@ class TaskDetailsScreen extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(bottom: 20),
                 height: 2,
-                color: secondaryColorLight,
+                color: tagColor(),
               ),
               Container(
                 child: Text(task.text,
@@ -116,18 +132,21 @@ class TaskDetailsScreen extends StatelessWidget {
             Container(
               margin: EdgeInsets.only(left: 10),
               child: FloatingActionButton(
-                child: Icon(Icons.delete),
+                child: Icon(
+                  Icons.delete,
+                  color: primaryColor,
+                ),
                 onPressed: deleteCurrentTask,
-                backgroundColor: secondaryColorLight,
+                backgroundColor: tagColor(),
                 heroTag: null,
               ),
             ),
             Container(
               margin: EdgeInsets.only(left: 10),
               child: FloatingActionButton(
-                child: Icon(Icons.edit),
+                child: Icon(Icons.edit, color: primaryColor),
                 onPressed: openTaskEditor,
-                backgroundColor: secondaryColorLight,
+                backgroundColor: tagColor(),
                 heroTag: null,
               ),
             ),
