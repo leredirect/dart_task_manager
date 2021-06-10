@@ -145,11 +145,11 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               hintStyle: TextStyle(color: Colors.white),
               enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(
-                    color: Utils.tagColor(false, false, dropdownValue)),
+                    color: Utils.tagColor(isWhite: false, isDetail: false, drpv: dropdownValue)),
               ),
               focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(
-                  color: Utils.tagColor(false, false, dropdownValue),
+                  color: Utils.tagColor(isWhite: false, isDetail: false, drpv: dropdownValue),
                 ),
               ),
             ),
@@ -163,11 +163,11 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               contentPadding: EdgeInsets.only(left: 5),
               enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(
-                    color: Utils.tagColor(false, false, dropdownValue)),
+                    color: Utils.tagColor(isWhite: false, isDetail: false, drpv: dropdownValue)),
               ),
               focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(
-                    color: Utils.tagColor(false, false, dropdownValue)),
+                    color: Utils.tagColor(isWhite: false, isDetail: false, drpv: dropdownValue)),
               ),
             ),
           ),
@@ -191,7 +191,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               elevation: 16,
               underline: Container(
                 height: 2,
-                color: Utils.tagColor(false, false, dropdownValue),
+                color: Utils.tagColor(isWhite: false, isDetail: false, drpv: dropdownValue),
               ),
               onChanged: (String newValue) {
                 setState(() {
@@ -238,7 +238,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                     )
                   ],
                   borderRadius: BorderRadius.circular(12),
-                  color: Utils.tagColor(false, false, dropdownValue),
+                  color: Utils.tagColor(isWhite: false, isDetail: false, drpv: dropdownValue),
                 ),
                 width: MediaQuery.of(context).size.width * 0.6,
                 height: 40,
@@ -274,7 +274,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                         offset: Offset(0, 3),
                       )
                     ],
-                    color: Utils.tagColor(false, false, dropdownValue),
+                    color: Utils.tagColor(isWhite: false, isDetail: false, drpv: dropdownValue),
                     borderRadius: BorderRadius.circular(12)),
                 width: MediaQuery.of(context).size.width * 0.4,
                 height: 40,

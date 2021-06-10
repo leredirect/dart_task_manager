@@ -24,7 +24,7 @@ class TaskWidget extends StatelessWidget {
       child: InkWell(
         onTap: openTaskDetails,
         child: Container(
-          color: Utils.tagColor(false, true, null, task.tag),
+          color: Utils.tagColor(isWhite:false, isDetail: true, drpv: null, tag: task.tag),
           child: Column(
             children: [
               Container(

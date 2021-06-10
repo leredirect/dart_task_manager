@@ -47,12 +47,12 @@ class _HomeScreenState extends State<HomeScreen> {
               isExpanded: false,
               icon: Icon(
                 Icons.filter_alt,
-                color: Utils.tagColor(false, false, dropdownValue),
+                color: Utils.tagColor(isWhite: false, isDetail: false, drpv: dropdownValue),
               ),
               iconSize: 24,
               underline: Container(
                 height: 2,
-                color: Utils.tagColor(false, false, dropdownValue),
+                color: Utils.tagColor(isWhite: false, isDetail: false, drpv: dropdownValue),
               ),
               onChanged: (String newValue) {
                 setState(() {
@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(color: primaryColor),
         ),
         onPressed: createTask,
-        backgroundColor: Utils.tagColor(false, false, dropdownValue),
+        backgroundColor: Utils.tagColor(isWhite: false, isDetail: false, drpv: dropdownValue),
       ),
       backgroundColor: primaryColor,
     );
