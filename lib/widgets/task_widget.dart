@@ -1,7 +1,7 @@
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/task_details_screen.dart';
 import 'package:flutter/material.dart';
-
+import 'package:dart_task_manager/utils/utils.dart';
 import '../constants.dart';
 
 class TaskWidget extends StatelessWidget {
@@ -21,27 +21,12 @@ class TaskWidget extends StatelessWidget {
       ));
     }
 
-    dynamic tagColor() {
-      switch (task.tag) {
-        case Tags.DART:
-          return Colors.indigoAccent;
-          break;
-        case Tags.FLUTTER:
-          return Colors.deepPurpleAccent;
-          break;
-        case Tags.ALGORITHMS:
-          return Colors.cyanAccent.withOpacity(0.7);
-          break;
-        case Tags.CLEAR:
-          return primaryColor;
-      }
-    }
 
     return Container(
       child: InkWell(
         onTap: openTaskDetails,
         child: Container(
-          color: tagColor(),
+          color: Utils.tagColor(false, true, null, task.tag),
           child: Column(
             children: [
               Container(

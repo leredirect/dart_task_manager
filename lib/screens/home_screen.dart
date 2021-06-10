@@ -5,6 +5,7 @@ import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
+import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/task_list_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,22 +20,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String dropdownValue = tagToNameMap[Tags.CLEAR];
 
-  dynamic tagColor(String drp) {
-    switch (drp) {
-      case "Dart":
-        return Colors.indigoAccent;
-        break;
-      case "Flutter":
-        return Colors.deepPurpleAccent;
-        break;
-      case "Алгоритмы":
-        return Colors.cyanAccent.withOpacity(0.7);
-        break;
-      case "Нет фильтра":
-        return Colors.white;
-    }
-  }
-
   void createTask() {
     Navigator.push(context, MaterialPageRoute(
       builder: (_) {
@@ -47,8 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: primaryColor,
-        title: Text("TaskManager"),
+        backgroundColor: primaryColorLight,
+        title: Text("TaskManager", style: TextStyle(color: Colors.white),),
         actions: [
           Container(
             margin: EdgeInsets.only(right: 10),
@@ -59,12 +44,12 @@ class _HomeScreenState extends State<HomeScreen> {
               isExpanded: false,
               icon: Icon(
                 Icons.filter_alt,
-                color: tagColor(dropdownValue),
+                color: Utils.tagColor(false, false, dropdownValue),
               ),
               iconSize: 24,
               underline: Container(
                 height: 2,
-                color: tagColor(dropdownValue),
+                color: Utils.tagColor(false, false, dropdownValue),
               ),
               onChanged: (String newValue) {
                 setState(() {
@@ -92,7 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
-        print(filtState);
         return BlocBuilder<TaskListBloc, List<Task>>(
           builder: (context, state) {
             if (filtState != null) {
@@ -105,15 +89,15 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         );
       }),
-      backgroundColor: primaryColorDark,
       floatingActionButton: FloatingActionButton(
         child: Text(
           "+",
           style: TextStyle(color: primaryColor),
         ),
         onPressed: createTask,
-        backgroundColor: tagColor(dropdownValue),
+        backgroundColor: Utils.tagColor(false, false, dropdownValue),
       ),
+      backgroundColor: primaryColor,
     );
   }
 

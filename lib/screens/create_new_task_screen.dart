@@ -1,6 +1,7 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
+import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,39 +23,8 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   DateTime pickedDate;
   TimeOfDay pickedTime;
 
-  dynamic tagColor(String drp) {
-    switch (drp) {
-      case "Dart":
-        return Colors.indigoAccent;
-        break;
-      case "Flutter":
-        return Colors.deepPurpleAccent;
-        break;
-      case "Алгоритмы":
-        return Colors.cyanAccent.withOpacity(0.6);
-        break;
-      case "Сбросить":
-        return primaryColorLight;
-    }
-  }
 
-  dynamic choosedTimeColor(pickedDate, pickedTime) {
-    if (pickedDate != null && pickedTime != null) {
-      return Colors.white;
-    } else {
-      return primaryColorDark;
-    }
-  }
-
-  String choosedTimeVisible(pickedDate, pickedTime) {
-    if (pickedDate != null && pickedTime != null) {
-      return "Выбранная дата: ${pickedDate.day}-${pickedDate.month}-${pickedDate.year}\nВыбранное время: ${pickedTime.hour}:${pickedTime.minute}";
-    } else {
-      return "";
-    }
-  }
-
-  Future<void> isShowTimePicker(DateTime pickedDate) {
+  Future<void> showTaskTimePicker(DateTime pickedDate) {
     if (pickedDate != null) {
       return showTimePicker(context: context, initialTime: TimeOfDay.now())
           .then((value) => setState(() {
@@ -158,8 +128,12 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Новая задача"),
-        backgroundColor: primaryColor,
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(
+          "Новая задача",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: primaryColorLight,
       ),
       body: Column(
         children: [
@@ -171,11 +145,12 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               contentPadding: EdgeInsets.only(left: 5),
               hintStyle: TextStyle(color: Colors.white),
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: tagColor(dropdownValue)),
+                borderSide: BorderSide(
+                    color: Utils.tagColor(false, false, dropdownValue)),
               ),
               focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(
-                  color: tagColor(dropdownValue),
+                  color: Utils.tagColor(false, false, dropdownValue),
                 ),
               ),
             ),
@@ -188,10 +163,12 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               hintStyle: TextStyle(color: Colors.white),
               contentPadding: EdgeInsets.only(left: 5),
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: tagColor(dropdownValue)),
+                borderSide: BorderSide(
+                    color: Utils.tagColor(false, false, dropdownValue)),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: tagColor(dropdownValue)),
+                borderSide: BorderSide(
+                    color: Utils.tagColor(false, false, dropdownValue)),
               ),
             ),
           ),
@@ -215,7 +192,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               elevation: 16,
               underline: Container(
                 height: 2,
-                color: tagColor(dropdownValue),
+                color: Utils.tagColor(false, false, dropdownValue),
               ),
               onChanged: (String newValue) {
                 setState(() {
@@ -248,7 +225,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                   lastDate: lastDate,
                 )
                     .then((value) => pickedDate = value)
-                    .then((value) => isShowTimePicker(pickedDate));
+                    .then((value) => showTaskTimePicker(pickedDate));
               },
               child: Container(
                 margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
@@ -262,7 +239,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                     )
                   ],
                   borderRadius: BorderRadius.circular(12),
-                  color: tagColor(dropdownValue),
+                  color: Utils.tagColor(false, false, dropdownValue),
                 ),
                 width: MediaQuery.of(context).size.width * 0.6,
                 height: 40,
@@ -277,9 +254,9 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
             margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
             alignment: Alignment.center,
             child: Text(
-              choosedTimeVisible(pickedDate, pickedTime),
+              Utils.timeHint(pickedDate, pickedTime),
               style: TextStyle(
-                color: choosedTimeColor(pickedDate, pickedTime),
+                color: Colors.white,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,
@@ -298,7 +275,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                         offset: Offset(0, 3),
                       )
                     ],
-                    color: tagColor(dropdownValue),
+                    color: Utils.tagColor(false, false, dropdownValue),
                     borderRadius: BorderRadius.circular(12)),
                 width: MediaQuery.of(context).size.width * 0.4,
                 height: 40,
@@ -313,7 +290,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               ))
         ],
       ),
-      backgroundColor: primaryColorDark,
+      backgroundColor: primaryColor,
     );
   }
 
