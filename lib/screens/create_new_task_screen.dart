@@ -1,6 +1,7 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
+import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,14 +23,50 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   DateTime pickedDate;
   TimeOfDay pickedTime;
 
+  Future<void> showTaskTimePicker(DateTime pickedDate) {
+    if (pickedDate != null) {
+      return showTimePicker(context: context, initialTime: TimeOfDay.now())
+          .then((value) => setState(() {
+                pickedTime = value;
+              }));
+    } else {}
+  }
+
   Future<void> deadlineCalc(
       String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) async {
-    DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
-        pickedDate.day, pickedTime.hour, pickedTime.minute);
-    String deadlineMinute;
-    bool isAfter = deadline.isAfter(DateTime.now());
-    Duration diff = deadline.difference(DateTime.now());
-    if (isAfter) {
+    if (pickedDate == null && pickedTime == null) {
+      return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: primaryColor,
+            title: const Text('Ошибка', style: TextStyle(color: Colors.white)),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: const <Widget>[
+                  Text('Введите дату и время',
+                      style: TextStyle(color: Colors.white)),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK', style: TextStyle(color: Colors.white)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
+          pickedDate.day, pickedTime.hour, pickedTime.minute);
+      String deadlineMinute;
+      bool isAfter = deadline.isAfter(DateTime.now());
+      Duration diff = deadline.difference(DateTime.now());
       if (pickedTime.minute.toInt() <= 9) {
         deadlineMinute = "0" + pickedTime.minute.toString();
         String deadlineRes = (deadline.day.toString() +
@@ -54,8 +91,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
             deadline.minute.toString());
         return addTask(dropdownValue, deadlineRes);
       }
-    } else {
-      return addTask(dropdownValue, null);
     }
   }
 
@@ -92,8 +127,12 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Новая задача"),
-        backgroundColor: primaryColor,
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(
+          "Новая задача",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: primaryColorLight,
       ),
       body: Column(
         children: [
@@ -105,11 +144,13 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               contentPadding: EdgeInsets.only(left: 5),
               hintStyle: TextStyle(color: Colors.white),
               enabledBorder: UnderlineInputBorder(
-                borderSide:
-                    BorderSide(color: secondaryColorLight.withOpacity(0.45)),
+                borderSide: BorderSide(
+                    color: Utils.tagColor(false, false, dropdownValue)),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: secondaryColorLight),
+                borderSide: BorderSide(
+                  color: Utils.tagColor(false, false, dropdownValue),
+                ),
               ),
             ),
           ),
@@ -121,18 +162,23 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               hintStyle: TextStyle(color: Colors.white),
               contentPadding: EdgeInsets.only(left: 5),
               enabledBorder: UnderlineInputBorder(
-                borderSide:
-                    BorderSide(color: secondaryColorLight.withOpacity(0.45)),
+                borderSide: BorderSide(
+                    color: Utils.tagColor(false, false, dropdownValue)),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: secondaryColorLight),
+                borderSide: BorderSide(
+                    color: Utils.tagColor(false, false, dropdownValue)),
               ),
             ),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(5, 20, 0, 0),
             alignment: Alignment.centerLeft,
-            child: Text("Выберите тег:", style: TextStyle(color: Colors.white), textAlign: TextAlign.left,),
+            child: Text(
+              "Выберите тег:",
+              style: TextStyle(color: Colors.white),
+              textAlign: TextAlign.left,
+            ),
           ),
           Container(
             alignment: Alignment.centerLeft,
@@ -145,14 +191,17 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               elevation: 16,
               underline: Container(
                 height: 2,
-                color: secondaryColorLight,
+                color: Utils.tagColor(false, false, dropdownValue),
               ),
               onChanged: (String newValue) {
                 setState(() {
                   dropdownValue = newValue;
                 });
               },
-              items: nameToTagMap.keys.toList().where((element) => element != tagToNameMap[Tags.CLEAR]).map<DropdownMenuItem<String>>((String value) {
+              items: nameToTagMap.keys
+                  .toList()
+                  .where((element) => element != tagToNameMap[Tags.CLEAR])
+                  .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(
@@ -173,13 +222,9 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                   initialDate: DateTime.now(),
                   firstDate: firstDate,
                   lastDate: lastDate,
-                ).then((value) => pickedDate = value).then((value) =>
-                    showTimePicker(
-                            context: context, initialTime: TimeOfDay.now())
-                        .then((value) => setState(() {
-                      pickedTime = value;
-                    })));
-
+                )
+                    .then((value) => pickedDate = value)
+                    .then((value) => showTaskTimePicker(pickedDate));
               },
               child: Container(
                 margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
@@ -193,7 +238,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                     )
                   ],
                   borderRadius: BorderRadius.circular(12),
-                  color: secondaryColorLight,
+                  color: Utils.tagColor(false, false, dropdownValue),
                 ),
                 width: MediaQuery.of(context).size.width * 0.6,
                 height: 40,
@@ -207,7 +252,14 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
           Container(
             margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
             alignment: Alignment.center,
-            child: Text("Выбранное время: $pickedDate, $pickedTime", style: TextStyle(color: Colors.white), textAlign: TextAlign.center,),
+            child: Text(
+              Utils.timeHint(pickedDate, pickedTime),
+              style: TextStyle(
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+            ),
           ),
           Spacer(),
           InkWell(
@@ -222,7 +274,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                         offset: Offset(0, 3),
                       )
                     ],
-                    color: secondaryColorLight,
+                    color: Utils.tagColor(false, false, dropdownValue),
                     borderRadius: BorderRadius.circular(12)),
                 width: MediaQuery.of(context).size.width * 0.4,
                 height: 40,
@@ -237,7 +289,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               ))
         ],
       ),
-      backgroundColor: primaryColorDark,
+      backgroundColor: primaryColor,
     );
   }
 

@@ -37,12 +37,12 @@ final nameToTagMap = {
   "Flutter": Tags.FLUTTER,
   "Dart": Tags.DART,
   "Алгоритмы": Tags.ALGORITHMS,
-  "Сбросить" : Tags.CLEAR
+  "Нет фильтра": Tags.CLEAR
 };
 
 final tagToNameMap = {
   Tags.FLUTTER: "Flutter",
   Tags.DART: "Dart",
   Tags.ALGORITHMS: "Алгоритмы",
-  Tags.CLEAR: "Сбросить"
+  Tags.CLEAR: "Нет фильтра"
 };

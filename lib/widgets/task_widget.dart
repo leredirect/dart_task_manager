@@ -1,6 +1,6 @@
-import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/task_details_screen.dart';
+import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class TaskWidget extends StatelessWidget {
@@ -20,46 +20,26 @@ class TaskWidget extends StatelessWidget {
       ));
     }
 
-    MaterialColor tagColor() {
-      switch (task.tag) {
-        case Tags.DART:
-          return Colors.blueGrey;
-          break;
-        case Tags.FLUTTER:
-          return Colors.pink;
-          break;
-        case Tags.ALGORITHMS:
-          return Colors.cyan;
-          break;
-      }
-    }
-
     return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          InkWell(
-            onTap: openTaskDetails,
-            child: Container(
-              margin: EdgeInsets.fromLTRB(30, 10, 30, 0),
-              width: MediaQuery.of(context).size.width * 0.8,
-              alignment: Alignment.center,
-              height: MediaQuery.of(context).size.height * 0.05,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: tagColor()),
-                color: secondaryColorLight,
+      child: InkWell(
+        onTap: openTaskDetails,
+        child: Container(
+          color: Utils.tagColor(false, true, null, task.tag),
+          child: Column(
+            children: [
+              Container(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  task.name,
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(color: Colors.black, fontSize: 25),
+                ),
               ),
-              child: Center(
-                  child: Text(
-                task.name,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white),
-              )),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

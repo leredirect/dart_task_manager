@@ -1,6 +1,7 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
+import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,14 +40,50 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     Navigator.of(context).pop();
   }
 
+  Future<void> showTaskTimePicker(DateTime pickedDate) {
+    if (pickedDate != null) {
+      return showTimePicker(context: context, initialTime: TimeOfDay.now())
+          .then((value) => setState(() {
+                pickedTime = value;
+              }));
+    } else {}
+  }
+
   Future<void> deadlineCalc(
       String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) async {
-    DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
-        pickedDate.day, pickedTime.hour, pickedTime.minute);
-    String deadlineMinute;
-    bool isBefore = deadline.isAfter(DateTime.now());
-    Duration diff = deadline.difference(DateTime.now());
-    if (isBefore) {
+    if (pickedDate == null && pickedTime == null) {
+      return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: primaryColorLight,
+            title: const Text('Ошибка', style: TextStyle(color: Colors.white)),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: const <Widget>[
+                  Text('Введите дату и время',
+                      style: TextStyle(color: Colors.white)),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK', style: TextStyle(color: Colors.white)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
+          pickedDate.day, pickedTime.hour, pickedTime.minute);
+      String deadlineMinute;
+      bool isAfter = deadline.isAfter(DateTime.now());
+      Duration diff = deadline.difference(DateTime.now());
       if (pickedTime.minute.toInt() <= 9) {
         deadlineMinute = "0" + pickedTime.minute.toString();
         String deadlineRes = (deadline.day.toString() +
@@ -69,19 +106,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             deadline.hour.toString() +
             ":" +
             deadline.minute.toString());
-        return await addTask(dropdownValue, deadlineRes);
+        return addTask(dropdownValue, deadlineRes);
       }
-    } else {
-      String deadlineRes = (deadline.day.toString() +
-          "." +
-          deadline.month.toString() +
-          "." +
-          deadline.year.toString() +
-          " в " +
-          deadline.hour.toString() +
-          ":" +
-          deadline.minute.toString());
-      return await addTask(dropdownValue, deadlineRes);
     }
   }
 
@@ -89,7 +115,11 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Редактирование задачи"),
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(
+          "Редактирование задачи",
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: primaryColor,
       ),
       body: Column(
@@ -102,11 +132,13 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               contentPadding: EdgeInsets.only(left: 5),
               hintStyle: TextStyle(color: Colors.white),
               enabledBorder: UnderlineInputBorder(
-                borderSide:
-                    BorderSide(color: secondaryColorLight.withOpacity(0.45)),
+                borderSide: BorderSide(
+                    color: Utils.tagColor(false, false, dropdownValue)),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: secondaryColorLight),
+                borderSide: BorderSide(
+                  color: Utils.tagColor(false, false, dropdownValue),
+                ),
               ),
             ),
           ),
@@ -118,18 +150,23 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               hintStyle: TextStyle(color: Colors.white),
               contentPadding: EdgeInsets.only(left: 5),
               enabledBorder: UnderlineInputBorder(
-                borderSide:
-                    BorderSide(color: secondaryColorLight.withOpacity(0.45)),
+                borderSide: BorderSide(
+                    color: Utils.tagColor(false, false, dropdownValue)),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: secondaryColorLight),
+                borderSide: BorderSide(
+                    color: Utils.tagColor(false, false, dropdownValue)),
               ),
             ),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(5, 20, 0, 0),
             alignment: Alignment.centerLeft,
-            child: Text("Выберите тег:", style: TextStyle(color: Colors.white), textAlign: TextAlign.left,),
+            child: Text(
+              "Выберите тег:",
+              style: TextStyle(color: Colors.white),
+              textAlign: TextAlign.left,
+            ),
           ),
           Container(
             alignment: Alignment.centerLeft,
@@ -141,15 +178,17 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               iconSize: 24,
               elevation: 16,
               underline: Container(
-                height: 2,
-                color: secondaryColorLight,
-              ),
+                  height: 2,
+                  color: Utils.tagColor(false, false, dropdownValue)),
               onChanged: (String newValue) {
                 setState(() {
                   dropdownValue = newValue;
                 });
               },
-              items: nameToTagMap.keys.toList().where((element) => element != tagToNameMap[Tags.CLEAR]).map<DropdownMenuItem<String>>((String value) {
+              items: nameToTagMap.keys
+                  .toList()
+                  .where((element) => element != tagToNameMap[Tags.CLEAR])
+                  .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(
@@ -170,12 +209,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   initialDate: DateTime.now(),
                   firstDate: firstDate,
                   lastDate: lastDate,
-                ).then((value) => pickedDate = value).then((value) =>
-                    showTimePicker(
-                        context: context, initialTime: TimeOfDay.now())
-                        .then((value) => setState(() {
-                      pickedTime = value;
-                    })));
+                )
+                    .then((value) => pickedDate = value)
+                    .then((value) => showTaskTimePicker(pickedDate));
               },
               child: Container(
                 margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
@@ -189,7 +225,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                     )
                   ],
                   borderRadius: BorderRadius.circular(12),
-                  color: secondaryColorLight,
+                  color: Utils.tagColor(false, false, dropdownValue),
                 ),
                 width: MediaQuery.of(context).size.width * 0.6,
                 height: 40,
@@ -203,7 +239,12 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
           Container(
             margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
             alignment: Alignment.center,
-            child: Text("Выбранное время: $pickedDate, $pickedTime", style: TextStyle(color: Colors.white), textAlign: TextAlign.center,),
+            child: Text(
+              Utils.timeHint(pickedDate, pickedTime),
+              style: TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+            ),
           ),
           Spacer(),
           InkWell(
@@ -218,7 +259,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                         offset: Offset(0, 3),
                       )
                     ],
-                    color: secondaryColorLight,
+                    color: Utils.tagColor(false, false, dropdownValue),
                     borderRadius: BorderRadius.circular(12)),
                 width: MediaQuery.of(context).size.width * 0.4,
                 height: 40,
@@ -233,7 +274,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               ))
         ],
       ),
-      backgroundColor: primaryColorDark,
+      backgroundColor: primaryColor,
     );
   }
 

@@ -6,9 +6,8 @@ class FilterChecker extends FilterEvent {
   Tags tag;
 
   FilterChecker(this.tag);
-
-
 }
+
 class ClearFilter extends FilterEvent {
   Tags tag;
 

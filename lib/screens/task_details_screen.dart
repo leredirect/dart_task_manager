@@ -2,6 +2,7 @@ import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/task_edit_screen.dart';
+import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,10 +41,14 @@ class TaskDetailsScreen extends StatelessWidget {
     return BlocBuilder<TaskListBloc, List<Task>>(builder: (context, state) {
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: primaryColor,
-          title: Text("Детали задачи"),
+          iconTheme: IconThemeData(color: Colors.white),
+          backgroundColor: primaryColorLight,
+          title: Text(
+            "Детали задачи",
+            style: TextStyle(color: Colors.white),
+          ),
         ),
-        body: Center(
+        body: SingleChildScrollView(
           child: Column(
             children: [
               Container(
@@ -63,13 +68,6 @@ class TaskDetailsScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Container(
-                      //   margin: EdgeInsets.only(top: 5),
-                      //   child: Text(
-                      //     "Тэг: ${task.tag}",
-                      //     style: TextStyle(color: Colors.grey),
-                      //   ),
-                      // ),
                       Row(
                         children: [
                           Container(
@@ -98,7 +96,7 @@ class TaskDetailsScreen extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(bottom: 20),
                 height: 2,
-                color: secondaryColorLight,
+                color: Utils.tagColor(false, true, null, task.tag),
               ),
               Container(
                 child: Text(task.text,
@@ -109,30 +107,33 @@ class TaskDetailsScreen extends StatelessWidget {
             ],
           ),
         ),
-        backgroundColor: primaryColorDark,
         floatingActionButton: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
               margin: EdgeInsets.only(left: 10),
               child: FloatingActionButton(
-                child: Icon(Icons.delete),
+                child: Icon(
+                  Icons.delete,
+                  color: primaryColor,
+                ),
                 onPressed: deleteCurrentTask,
-                backgroundColor: secondaryColorLight,
+                backgroundColor: Utils.tagColor(false, true, null, task.tag),
                 heroTag: null,
               ),
             ),
             Container(
               margin: EdgeInsets.only(left: 10),
               child: FloatingActionButton(
-                child: Icon(Icons.edit),
+                child: Icon(Icons.edit, color: primaryColor),
                 onPressed: openTaskEditor,
-                backgroundColor: secondaryColorLight,
+                backgroundColor: Utils.tagColor(false, true, null, task.tag),
                 heroTag: null,
               ),
             ),
           ],
         ),
+        backgroundColor: primaryColor,
       );
     });
   }

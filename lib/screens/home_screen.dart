@@ -5,13 +5,12 @@ import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
+import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/task_list_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
-import 'package:enum_to_string/enum_to_string.dart';
-
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -19,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String dropdownValue = tagToNameMap[Tags.DART];
+  String dropdownValue = tagToNameMap[Tags.CLEAR];
 
   void createTask() {
     Navigator.push(context, MaterialPageRoute(
@@ -33,8 +32,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: primaryColor,
-        title: Text("TaskManager"),
+        backgroundColor: primaryColorLight,
+        title: Text(
+          "TaskManager",
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           Container(
             margin: EdgeInsets.only(right: 10),
@@ -43,25 +45,28 @@ class _HomeScreenState extends State<HomeScreen> {
               dropdownColor: primaryColorDark,
               value: dropdownValue,
               isExpanded: false,
-              icon: Icon(Icons.filter_alt, color: Colors.white,),
+              icon: Icon(
+                Icons.filter_alt,
+                color: Utils.tagColor(false, false, dropdownValue),
+              ),
               iconSize: 24,
               underline: Container(
                 height: 2,
-                color: secondaryColorLight,
+                color: Utils.tagColor(false, false, dropdownValue),
               ),
               onChanged: (String newValue) {
                 setState(() {
                   dropdownValue = newValue;
                   final result = nameToTagMap[dropdownValue];
-                  if (result == Tags.CLEAR){
+                  if (result == Tags.CLEAR) {
                     context.bloc<FilterBloc>().add(ClearFilter(result));
-                  }
-                  else {
+                  } else {
                     context.bloc<FilterBloc>().add(FilterChecker(result));
                   }
                 });
               },
-              items: nameToTagMap.keys.map<DropdownMenuItem<String>>((String value) {
+              items: nameToTagMap.keys
+                  .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(
@@ -74,29 +79,28 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: BlocBuilder<FilterBloc, Tags>(
-        builder: (context, filtState) {
-          print (filtState);
-          return BlocBuilder<TaskListBloc, List<Task>>(
-            builder: (context, state) {
-              if (filtState != null) {
-                List<Task> filtredState = state.where((element) =>
-                element.tag == filtState).toList();
-                return TaskListWidget(taskList: filtredState);
-              }
-              else {
-                return TaskListWidget(taskList: state);
-              }
-            },
-          );
-        }
-      ),
-      backgroundColor: primaryColorDark,
+      body: BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+        return BlocBuilder<TaskListBloc, List<Task>>(
+          builder: (context, state) {
+            if (filtState != null) {
+              List<Task> filtredState =
+                  state.where((element) => element.tag == filtState).toList();
+              return TaskListWidget(taskList: filtredState);
+            } else {
+              return TaskListWidget(taskList: state);
+            }
+          },
+        );
+      }),
       floatingActionButton: FloatingActionButton(
-        child: Text("+"),
+        child: Text(
+          "+",
+          style: TextStyle(color: primaryColor),
+        ),
         onPressed: createTask,
-        backgroundColor: secondaryColorLight,
+        backgroundColor: Utils.tagColor(false, false, dropdownValue),
       ),
+      backgroundColor: primaryColor,
     );
   }
 
