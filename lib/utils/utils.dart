@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 class Utils {
-  static Color tagColor(bool isWhite, bool isDetail, [String drp, Tags tag]) {
-    Tags drpEnum = nameToTagMap[drp];
+  static Color tagColor({bool isWhite, bool isDetail, String drpv, Tags tag}) {
+    Tags drpEnum = nameToTagMap[drpv];
     if (isWhite) {
       switch (drpEnum) {
         case Tags.DART:
@@ -53,9 +53,11 @@ class Utils {
     }
   }
 
-  static String timeHint(pickedDate, pickedTime) {
+  static String timeHint(pickedDate, pickedTime, {bool isEdit, Task task}) {
     if (pickedDate != null && pickedTime != null) {
       return "Выбранная дата: ${pickedDate.day}-${pickedDate.month}-${pickedDate.year}\nВыбранное время: ${pickedTime.hour}:${pickedTime.minute}";
+    } else if (isEdit) {
+      return "Выбрано ранее:\n${task.taskDeadline}";
     } else {
       return "Выберите время";
     }
