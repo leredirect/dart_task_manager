@@ -23,7 +23,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   DateTime pickedDate;
   TimeOfDay pickedTime;
 
-
   Future<void> showTaskTimePicker(DateTime pickedDate) {
     if (pickedDate != null) {
       return showTimePicker(context: context, initialTime: TimeOfDay.now())

@@ -115,10 +115,11 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(
-            color: Colors.white
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(
+          "Редактирование задачи",
+          style: TextStyle(color: Colors.white),
         ),
-        title: Text("Редактирование задачи", style: TextStyle(color: Colors.white),),
         backgroundColor: primaryColor,
       ),
       body: Column(
@@ -131,7 +132,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               contentPadding: EdgeInsets.only(left: 5),
               hintStyle: TextStyle(color: Colors.white),
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Utils.tagColor(false, false, dropdownValue)),
+                borderSide: BorderSide(
+                    color: Utils.tagColor(false, false, dropdownValue)),
               ),
               focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(
@@ -148,10 +150,12 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               hintStyle: TextStyle(color: Colors.white),
               contentPadding: EdgeInsets.only(left: 5),
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Utils.tagColor(false, false, dropdownValue)),
+                borderSide: BorderSide(
+                    color: Utils.tagColor(false, false, dropdownValue)),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Utils.tagColor(false, false, dropdownValue)),
+                borderSide: BorderSide(
+                    color: Utils.tagColor(false, false, dropdownValue)),
               ),
             ),
           ),
@@ -174,9 +178,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               iconSize: 24,
               elevation: 16,
               underline: Container(
-                height: 2,
-                color: Utils.tagColor(false, false, dropdownValue)
-              ),
+                  height: 2,
+                  color: Utils.tagColor(false, false, dropdownValue)),
               onChanged: (String newValue) {
                 setState(() {
                   dropdownValue = newValue;
@@ -238,9 +241,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             alignment: Alignment.center,
             child: Text(
               Utils.timeHint(pickedDate, pickedTime),
-              style: TextStyle(
-                color: Colors.white
-              ),
+              style: TextStyle(color: Colors.white),
               textAlign: TextAlign.center,
               maxLines: 2,
             ),

@@ -33,7 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColorLight,
-        title: Text("TaskManager", style: TextStyle(color: Colors.white),),
+        title: Text(
+          "TaskManager",
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           Container(
             margin: EdgeInsets.only(right: 10),

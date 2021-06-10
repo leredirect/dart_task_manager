@@ -55,12 +55,9 @@ class Utils {
 
   static String timeHint(pickedDate, pickedTime) {
     if (pickedDate != null && pickedTime != null) {
-      return "Выбранная дата: ${pickedDate.day}-${pickedDate.month}-${pickedDate
-          .year}\nВыбранное время: ${pickedTime.hour}:${pickedTime.minute}";
+      return "Выбранная дата: ${pickedDate.day}-${pickedDate.month}-${pickedDate.year}\nВыбранное время: ${pickedTime.hour}:${pickedTime.minute}";
     } else {
       return "Выберите время";
     }
   }
-
-
 }

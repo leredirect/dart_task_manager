@@ -25,7 +25,6 @@ class TaskDetailsScreen extends StatelessWidget {
       Navigator.of(context).pop();
     }
 
-
     void openTaskEditor() {
       Navigator.push(context, MaterialPageRoute(builder: (_) {
         return EditTaskScreen(
@@ -42,11 +41,12 @@ class TaskDetailsScreen extends StatelessWidget {
     return BlocBuilder<TaskListBloc, List<Task>>(builder: (context, state) {
       return Scaffold(
         appBar: AppBar(
-          iconTheme: IconThemeData(
-              color: Colors.white
-          ),
+          iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: primaryColorLight,
-          title: Text("Детали задачи", style: TextStyle(color: Colors.white),),
+          title: Text(
+            "Детали задачи",
+            style: TextStyle(color: Colors.white),
+          ),
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -68,13 +68,6 @@ class TaskDetailsScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Container(
-                      //   margin: EdgeInsets.only(top: 5),
-                      //   child: Text(
-                      //     "Тэг: ${task.tag}",
-                      //     style: TextStyle(color: Colors.grey),
-                      //   ),
-                      // ),
                       Row(
                         children: [
                           Container(

@@ -1,8 +1,7 @@
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/task_details_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:dart_task_manager/utils/utils.dart';
-import '../constants.dart';
+import 'package:flutter/material.dart';
 
 class TaskWidget extends StatelessWidget {
   final Task task;
@@ -20,7 +19,6 @@ class TaskWidget extends StatelessWidget {
         },
       ));
     }
-
 
     return Container(
       child: InkWell(

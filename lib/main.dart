@@ -1,11 +1,10 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
-import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/screens/home_screen.dart';
-import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+
 import 'bloc/filter_bloc/filter_bloc.dart';
 import 'models/task.dart';
 
