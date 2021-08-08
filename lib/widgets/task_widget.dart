@@ -1,5 +1,7 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/task_details_screen.dart';
+import 'package:dart_task_manager/screens/task_details_screen_noActions.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -12,14 +14,26 @@ class TaskWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Utils.statusBarColor();
     void openTaskDetails() {
-      Navigator.push(context, MaterialPageRoute(
-        builder: (_) {
-          return TaskDetailsScreen(
-            task: task,
-          );
-        },
-      ));
-    }
+      var connectivityResult = Connectivity().checkConnectivity().then((value) {
+        if (value == ConnectivityResult.none) {
+          Navigator.push(context, MaterialPageRoute(
+              builder: (_) {
+                return TaskDetailsScreenNoActions(
+                  task: task,
+                );
+              }
+          ));
+        }
+        else{
+          Navigator.push(context, MaterialPageRoute(
+              builder: (_) {
+                return TaskDetailsScreen(
+                  task: task,
+                );
+              }
+          ));
+        }
+      });}
 
     return Container(
       decoration: BoxDecoration(
@@ -28,8 +42,7 @@ class TaskWidget extends StatelessWidget {
             topLeft: Radius.circular(10),
             topRight: Radius.circular(10),
             bottomLeft: Radius.circular(10),
-            bottomRight: Radius.circular(10)
-        ),
+            bottomRight: Radius.circular(10)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.5),
@@ -43,7 +56,8 @@ class TaskWidget extends StatelessWidget {
         onTap: openTaskDetails,
         child: Container(
           padding: EdgeInsets.all(3),
-          color: Utils.tagColor(isWhite:false, isDetail: true, drpv: null, tag: task.tag),
+          color: Utils.tagColor(
+              isWhite: false, isDetail: true, drpv: null, tag: task.tag),
           child: Column(
             children: [
               Container(
@@ -53,7 +67,10 @@ class TaskWidget extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.left,
-                  style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w400),
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w400),
                 ),
               ),
               SizedBox(
@@ -74,7 +91,10 @@ class TaskWidget extends StatelessWidget {
                   maxLines: 5,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.left,
-                  style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w300),
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w300),
                 ),
               ),
               Spacer(),
@@ -85,7 +105,10 @@ class TaskWidget extends StatelessWidget {
                   maxLines: 4,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.left,
-                  style: TextStyle(color: Colors.black.withOpacity(0.5), fontSize: 12, fontStyle: FontStyle.italic),
+                  style: TextStyle(
+                      color: Colors.black.withOpacity(0.5),
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic),
                 ),
               ),
             ],

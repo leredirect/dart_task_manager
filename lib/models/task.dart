@@ -61,7 +61,7 @@ final nameToTagMap = {
   "Dart": Tags.DART,
   "Алгоритмы": Tags.ALGORITHMS,
   "Нет фильтра": Tags.CLEAR,
-  "Истекла": Tags.EXPIRED,
+  "Истекшие": Tags.EXPIRED,
 };
 
 final tagToNameMap = {
@@ -69,5 +69,5 @@ final tagToNameMap = {
   Tags.DART: "Dart",
   Tags.ALGORITHMS: "Алгоритмы",
   Tags.CLEAR: "Нет фильтра",
-  Tags.EXPIRED: "Истекла",
+  Tags.EXPIRED: "Истекшие",
 };

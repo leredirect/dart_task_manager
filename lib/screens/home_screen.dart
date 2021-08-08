@@ -14,6 +14,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:hive/hive.dart';
 
@@ -23,7 +24,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String dropdownValue = tagToNameMap[Tags.CLEAR];
+  String currentFilter = tagToNameMap[Tags.CLEAR];
 
   void createTask() {
     Navigator.push(context, MaterialPageRoute(
@@ -37,6 +38,47 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    SpeedDialChild speedDialChild(Tags tag, Color color, bool isClear) {
+      if (isClear) {
+        return SpeedDialChild(
+          labelWidget: Container(
+            padding: EdgeInsets.only(bottom: 3, top: 3, left: 5, right: 5),
+            margin: EdgeInsets.only(bottom: 20),
+            color: color,
+            child: Text(
+              tagToNameMap[tag],
+              style: TextStyle(
+                  fontWeight: FontWeight.w300, letterSpacing: 2, fontSize: 18),
+            ),
+          ),
+          label: tagToNameMap[tag],
+          onTap: () {
+            currentFilter = tagToNameMap[tag];
+            context.read<FilterBloc>().add(ClearFilter(tag));
+          },
+          labelBackgroundColor: color,
+        );
+      } else {
+        return SpeedDialChild(
+          labelWidget: Container(
+            padding: EdgeInsets.only(bottom: 3, top: 3, left: 5, right: 5),
+            color: color,
+            child: Text(
+              tagToNameMap[tag],
+              style: TextStyle(
+                  fontWeight: FontWeight.w300, letterSpacing: 2, fontSize: 18),
+            ),
+          ),
+          label: tagToNameMap[tag],
+          onTap: () {
+            currentFilter = tagToNameMap[tag];
+            context.read<FilterBloc>().add(FilterChecker(tag));
+          },
+          labelBackgroundColor: color,
+        );
+      }
+    }
+
     void isOnline() async {
       var internet = await (Connectivity().checkConnectivity());
       switch (internet) {
@@ -57,63 +99,29 @@ class _HomeScreenState extends State<HomeScreen> {
           break;
       }
     }
-
     isOnline();
     Utils.statusBarColor();
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       appBar: AppBar(
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarIconBrightness: Brightness.light,
         ),
         backwardsCompatibility: false,
         backgroundColor: primaryColorLight,
-        title: Text(
-          "TaskManager",
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          Container(
-            margin: EdgeInsets.only(right: 10),
-            child: DropdownButton<String>(
-              style: TextStyle(color: Colors.white, fontSize: 16),
-              dropdownColor: primaryColorDark,
-              value: dropdownValue,
-              isExpanded: false,
-              icon: Icon(
-                Icons.filter_alt,
-                color: Utils.tagColor(
-                    isWhite: false, isDetail: false, drpv: dropdownValue),
-              ),
-              iconSize: 24,
-              underline: Container(
-                height: 2,
-                color: Utils.tagColor(
-                    isWhite: false, isDetail: false, drpv: dropdownValue),
-              ),
-              onChanged: (String newValue) {
-                setState(() {
-                  dropdownValue = newValue;
-                  final result = nameToTagMap[dropdownValue];
-                  if (result == Tags.CLEAR) {
-                    context.read<FilterBloc>().add(ClearFilter(result));
-                  } else {
-                    context.read<FilterBloc>().add(FilterChecker(result));
-                  }
-                });
-              },
-              items: nameToTagMap.keys
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
-                    style: TextStyle(color: Colors.white),
-                  ),
-                );
-              }).toList(),
+        title: Row(
+          children: [
+            Text(
+              "DTM",
+              style: TextStyle(color: Colors.white),
             ),
-          ),
-        ],
+            Spacer(),
+            Visibility(visible: !isOnlineVar, child: Text(
+              "Оффлайн",
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),)
+          ],
+        ),
       ),
       body: BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
         return BlocBuilder<TaskListBloc, List<Task>>(
@@ -142,52 +150,75 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         );
       }),
-      floatingActionButton: Visibility(
-        visible: isOnlineVar,
-        child: FloatingActionButton(
-          child: Text(
-            "+",
-            style: TextStyle(color: primaryColor),
-          ),
-          onPressed: createTask,
-          backgroundColor: Utils.tagColor(
-              isWhite: false, isDetail: false, drpv: dropdownValue),
+      floatingActionButton: Container(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Visibility(
+              visible: isOnlineVar,
+              child: FloatingActionButton(
+                child: Text(
+                  "+",
+                  style: TextStyle(color: primaryColor),
+                ),
+                onPressed: createTask,
+                backgroundColor: Utils.tagColor(
+                    isWhite: false, isDetail: false, drpv: currentFilter),
+              ),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            SpeedDial(
+              child: Icon(Icons.filter_list),
+              overlayColor: Colors.black.withOpacity(0.8),
+              childMargin: EdgeInsets.only(top: 3, bottom: 3),
+              childPadding: EdgeInsets.all(3),
+              children: [
+                speedDialChild(Tags.CLEAR, clearColor, true),
+                speedDialChild(Tags.FLUTTER, flutterColor, false),
+                speedDialChild(Tags.DART, dartColor, false),
+                speedDialChild(Tags.ALGORITHMS, algosColor, false),
+                speedDialChild(Tags.EXPIRED, Colors.grey, false),
+              ],
+              backgroundColor: Utils.tagColor(
+                  isWhite: false, isDetail: false, drpv: currentFilter),
+            ),
+          ],
         ),
       ),
       backgroundColor: primaryColor,
     );
   }
 
-  void snackBarDisplay() {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      duration: Duration(minutes: 10),
-      content: Text('Отсутствует подключение к сети. Режим просмотра.'),
-      action: SnackBarAction(
-        label: 'Повторить',
-        onPressed: () {
-          var connectivityResult =
-              Connectivity().checkConnectivity().then((value) {
-            if (value == ConnectivityResult.none) {
-              snackBarDisplay();
-              print("here");
-            } else {
-              print("exit");
-             setState(() {
-
-             });
-            }
-          });
-        },
-      ),
-    ));
-  }
+  // void snackBarDisplay() {
+  //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //     duration: Duration(minutes: 10),
+  //     content: Text('Нет подключения. Режим просмотра.'),
+  //     action: SnackBarAction(
+  //       label: 'Повторить',
+  //       onPressed: () {
+  //         var connectivityResult =
+  //             Connectivity().checkConnectivity().then((value) {
+  //           if (value == ConnectivityResult.none) {
+  //             snackBarDisplay();
+  //             print("here");
+  //           } else {
+  //             print("exit");
+  //             setState(() {});
+  //           }
+  //         });
+  //       },
+  //     ),
+  //   ));
+  // }
 
   @override
   void initState() {
     super.initState();
     var connectivityResult = Connectivity().checkConnectivity().then((value) {
       if (value == ConnectivityResult.none) {
-        snackBarDisplay();
+        //snackBarDisplay();
         print("none");
         Hive.openBox('taskList').then((listBox) {
           if (listBox.get('task') == null) {

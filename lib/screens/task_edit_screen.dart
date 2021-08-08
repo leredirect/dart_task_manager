@@ -212,7 +212,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   },
                   items: nameToTagMap.keys
                       .toList()
-                      .where((element) => element != tagToNameMap[Tags.CLEAR])
+                      .where((element) => element != tagToNameMap[Tags.CLEAR] && element != tagToNameMap[Tags.EXPIRED])
                       .map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,

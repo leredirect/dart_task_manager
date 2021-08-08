@@ -12,30 +12,14 @@ import 'package:hive/hive.dart';
 
 import '../constants.dart';
 
-class TaskDetailsScreen extends StatelessWidget {
+class TaskDetailsScreenNoActions extends StatelessWidget {
   final Task task;
 
-  const TaskDetailsScreen({Key key, this.task}) : super(key: key);
+  const TaskDetailsScreenNoActions({Key key, this.task}) : super(key: key);
 
   @override
 
   Widget build(BuildContext context) {
-    Future<void> deleteCurrentTask() async {
-      context.read<TaskListBloc>().add(DeleteTaskEvent(task));
-      var listBox = await Hive.openBox<List<Task>>('taskList');
-      listBox.put('task', context.read<TaskListBloc>().state);
-      listBox.close();
-      Repository().deleteTask(task);
-      Navigator.of(context).pop();
-    }
-
-    void openTaskEditor() {
-      Navigator.push(context, MaterialPageRoute(builder: (_) {
-        return EditTaskScreen(
-          task: task,
-        );
-      }));
-    }
 
     String deadlineDisplay(String deadline) {
       String result = "Дедлайн: $deadline";
@@ -116,34 +100,6 @@ class TaskDetailsScreen extends StatelessWidget {
               ),
             ],
           ),
-        ),
-        floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Container(
-              margin: EdgeInsets.only(left: 10),
-              child: FloatingActionButton(
-                child: Icon(
-                  Icons.delete,
-                  color: primaryColor,
-                ),
-                onPressed: deleteCurrentTask,
-                backgroundColor: Utils.tagColor(
-                    isWhite: false, isDetail: true, drpv: null, tag: task.tag),
-                heroTag: null,
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(left: 10),
-              child: FloatingActionButton(
-                child: Icon(Icons.edit, color: primaryColor),
-                onPressed: openTaskEditor,
-                backgroundColor: Utils.tagColor(
-                    isWhite: false, isDetail: true, drpv: null, tag: task.tag),
-                heroTag: null,
-              ),
-            ),
-          ],
         ),
         backgroundColor: primaryColor,
       );

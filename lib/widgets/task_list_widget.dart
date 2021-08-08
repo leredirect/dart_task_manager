@@ -46,9 +46,9 @@ class TaskListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return
       AnimationConfiguration.synchronized(
-        duration: const Duration(milliseconds: 5000),
+        duration: const Duration(milliseconds: 500),
         child: SlideAnimation(
-          verticalOffset: 50.0,
+          horizontalOffset: 50.0,
           child: FadeInAnimation(
             child:
             GridView.count(
