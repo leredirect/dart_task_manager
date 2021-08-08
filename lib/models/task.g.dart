@@ -21,8 +21,10 @@ class TagsAdapter extends TypeAdapter<Tags> {
         return Tags.ALGORITHMS;
       case 3:
         return Tags.CLEAR;
+      case 4:
+        return Tags.EXPIRED;
       default:
-        return null;
+        return Tags.DART;
     }
   }
 
@@ -40,6 +42,9 @@ class TagsAdapter extends TypeAdapter<Tags> {
         break;
       case Tags.CLEAR:
         writer.writeByte(3);
+        break;
+      case Tags.EXPIRED:
+        writer.writeByte(4);
         break;
     }
   }
