@@ -1,15 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dart_task_manager/bloc/filter_bloc/filter_bloc.dart';
 import 'package:dart_task_manager/bloc/filter_bloc/filter_event.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/task.dart';
+import 'package:dart_task_manager/repository/repo.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/task_list_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:hive/hive.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,10 +33,39 @@ class _HomeScreenState extends State<HomeScreen> {
     ));
   }
 
+  bool isOnlineVar;
+
   @override
   Widget build(BuildContext context) {
+    void isOnline() async {
+      var internet = await (Connectivity().checkConnectivity());
+      switch (internet) {
+        case ConnectivityResult.wifi:
+          setState(() {
+            isOnlineVar = true;
+          });
+          break;
+        case ConnectivityResult.mobile:
+          setState(() {
+            isOnlineVar = true;
+          });
+          break;
+        case ConnectivityResult.none:
+          setState(() {
+            isOnlineVar = false;
+          });
+          break;
+      }
+    }
+
+    isOnline();
+    Utils.statusBarColor();
     return Scaffold(
       appBar: AppBar(
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarIconBrightness: Brightness.light,
+        ),
+        backwardsCompatibility: false,
         backgroundColor: primaryColorLight,
         title: Text(
           "TaskManager",
@@ -47,21 +81,23 @@ class _HomeScreenState extends State<HomeScreen> {
               isExpanded: false,
               icon: Icon(
                 Icons.filter_alt,
-                color: Utils.tagColor(isWhite: false, isDetail: false, drpv: dropdownValue),
+                color: Utils.tagColor(
+                    isWhite: false, isDetail: false, drpv: dropdownValue),
               ),
               iconSize: 24,
               underline: Container(
                 height: 2,
-                color: Utils.tagColor(isWhite: false, isDetail: false, drpv: dropdownValue),
+                color: Utils.tagColor(
+                    isWhite: false, isDetail: false, drpv: dropdownValue),
               ),
               onChanged: (String newValue) {
                 setState(() {
                   dropdownValue = newValue;
                   final result = nameToTagMap[dropdownValue];
                   if (result == Tags.CLEAR) {
-                    context.bloc<FilterBloc>().add(ClearFilter(result));
+                    context.read<FilterBloc>().add(ClearFilter(result));
                   } else {
-                    context.bloc<FilterBloc>().add(FilterChecker(result));
+                    context.read<FilterBloc>().add(FilterChecker(result));
                   }
                 });
               },
@@ -85,36 +121,95 @@ class _HomeScreenState extends State<HomeScreen> {
             if (filtState != null) {
               List<Task> filtredState =
                   state.where((element) => element.tag == filtState).toList();
-              return TaskListWidget(taskList: filtredState);
+              return AnimationConfiguration.synchronized(
+                //duration: const Duration(milliseconds: 5000),
+                child: SlideAnimation(
+                  verticalOffset: 50.0,
+                  child: FadeInAnimation(
+                      child: TaskListWidget(taskList: filtredState)),
+                ),
+              );
             } else {
-              return TaskListWidget(taskList: state);
+              return AnimationConfiguration.synchronized(
+                //duration: const Duration(milliseconds: 5000),
+                child: SlideAnimation(
+                  verticalOffset: 50.0,
+                  child:
+                      FadeInAnimation(child: TaskListWidget(taskList: state)),
+                ),
+              );
             }
           },
         );
       }),
-      floatingActionButton: FloatingActionButton(
-        child: Text(
-          "+",
-          style: TextStyle(color: primaryColor),
+      floatingActionButton: Visibility(
+        visible: isOnlineVar,
+        child: FloatingActionButton(
+          child: Text(
+            "+",
+            style: TextStyle(color: primaryColor),
+          ),
+          onPressed: createTask,
+          backgroundColor: Utils.tagColor(
+              isWhite: false, isDetail: false, drpv: dropdownValue),
         ),
-        onPressed: createTask,
-        backgroundColor: Utils.tagColor(isWhite: false, isDetail: false, drpv: dropdownValue),
       ),
       backgroundColor: primaryColor,
     );
   }
 
+  void snackBarDisplay() {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      duration: Duration(minutes: 10),
+      content: Text('Отсутствует подключение к сети. Режим просмотра.'),
+      action: SnackBarAction(
+        label: 'Повторить',
+        onPressed: () {
+          var connectivityResult =
+              Connectivity().checkConnectivity().then((value) {
+            if (value == ConnectivityResult.none) {
+              snackBarDisplay();
+              print("here");
+            } else {
+              print("exit");
+             setState(() {
+
+             });
+            }
+          });
+        },
+      ),
+    ));
+  }
+
   @override
   void initState() {
-    Hive.openBox('taskList').then((listBox) {
-      if (listBox.get('task') == null) {
-        List<Task> taskList = [];
-        listBox.put('task', taskList);
+    super.initState();
+    var connectivityResult = Connectivity().checkConnectivity().then((value) {
+      if (value == ConnectivityResult.none) {
+        snackBarDisplay();
+        print("none");
+        Hive.openBox('taskList').then((listBox) {
+          if (listBox.get('task') == null) {
+            List<Task> taskList = [];
+            listBox.put('task', taskList);
+          } else {
+            List<Task> hiveTasks = listBox.get('task').cast<Task>();
+            context.read<TaskListBloc>().add(HiveChecker(hiveTasks));
+          }
+          listBox.close();
+        });
       } else {
-        List<Task> hiveTasks = listBox.get('task').cast<Task>();
-        context.bloc<TaskListBloc>().add(HiveChecker(hiveTasks));
+        List<Task> tasks = [];
+        Stream<QuerySnapshot> collection = Repository().getStream();
+        collection.first.then((value) {
+          value.docs.forEach((element) {
+            tasks.add(Task.fromJson(element.data()));
+          });
+          context.read<TaskListBloc>().add(HiveChecker(tasks));
+        });
+        print("connected");
       }
-      listBox.close();
     });
   }
 }

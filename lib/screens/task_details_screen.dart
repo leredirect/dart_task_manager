@@ -1,10 +1,12 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
+import 'package:dart_task_manager/repository/repo.dart';
 import 'package:dart_task_manager/screens/task_edit_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 
@@ -18,10 +20,11 @@ class TaskDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future<void> deleteCurrentTask() async {
-      context.bloc<TaskListBloc>().add(DeleteTaskEvent(task));
+      context.read<TaskListBloc>().add(DeleteTaskEvent(task));
       var listBox = await Hive.openBox<List<Task>>('taskList');
-      listBox.put('task', context.bloc<TaskListBloc>().state);
+      listBox.put('task', context.read<TaskListBloc>().state);
       listBox.close();
+      Repository().deleteTask(task);
       Navigator.of(context).pop();
     }
 
@@ -39,8 +42,13 @@ class TaskDetailsScreen extends StatelessWidget {
     }
 
     return BlocBuilder<TaskListBloc, List<Task>>(builder: (context, state) {
+      Utils.statusBarColor();
       return Scaffold(
         appBar: AppBar(
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarIconBrightness: Brightness.light,
+          ),
+          backwardsCompatibility: false,
           iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: primaryColorLight,
           title: Text(
@@ -96,7 +104,8 @@ class TaskDetailsScreen extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(bottom: 20),
                 height: 2,
-                color: Utils.tagColor(isWhite:false, isDetail: true, drpv: null, tag: task.tag),
+                color: Utils.tagColor(
+                    isWhite: false, isDetail: true, drpv: null, tag: task.tag),
               ),
               Container(
                 child: Text(task.text,
@@ -118,7 +127,8 @@ class TaskDetailsScreen extends StatelessWidget {
                   color: primaryColor,
                 ),
                 onPressed: deleteCurrentTask,
-                backgroundColor: Utils.tagColor(isWhite:false, isDetail: true, drpv: null, tag: task.tag),
+                backgroundColor: Utils.tagColor(
+                    isWhite: false, isDetail: true, drpv: null, tag: task.tag),
                 heroTag: null,
               ),
             ),
@@ -127,7 +137,8 @@ class TaskDetailsScreen extends StatelessWidget {
               child: FloatingActionButton(
                 child: Icon(Icons.edit, color: primaryColor),
                 onPressed: openTaskEditor,
-                backgroundColor: Utils.tagColor(isWhite:false, isDetail: true, drpv: null, tag: task.tag),
+                backgroundColor: Utils.tagColor(
+                    isWhite: false, isDetail: true, drpv: null, tag: task.tag),
                 heroTag: null,
               ),
             ),

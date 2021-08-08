@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:dart_task_manager/models/task.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../constants.dart';
 
@@ -62,4 +63,12 @@ class Utils {
       return "Выберите время";
     }
   }
+
+  static void statusBarColor() {
+
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+          statusBarColor: Color(0xff2A2A2A), // status bar color
+          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: Brightness.light));
+    }
 }

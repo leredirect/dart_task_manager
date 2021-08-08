@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "80918559668",
+    "project_id": "dart-task-manager",
+    "storage_bucket": "dart-task-manager.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:80918559668:android:88b213d4c7efecae9110e1",
+        "android_client_info": {
+          "package_name": "com.gatovolabs.dart_task_manager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "80918559668-dp9j3hrpqo2kbgm90h30c69s64q7n5i2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA30TyFsm8v1iY0jwb7j2YUFM6iDqE3Bjk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "80918559668-dp9j3hrpqo2kbgm90h30c69s64q7n5i2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
