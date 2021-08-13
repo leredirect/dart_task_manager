@@ -16,7 +16,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:hive/hive.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -35,10 +34,33 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   bool isOnlineVar;
+  void myStream () {
+    // StreamBuilder<QuerySnapshot>(
+    //     stream: Repository().getStream(),
+    //     builder: (context, snapshot) {
+    //       print('here');
+    //       List<Task> tasks = [];
+    //       snapshot.data.docs.forEach((element) {
+    //         tasks.add(Task.fromJson(element.data()));
+    //       });
+    //       context.read<TaskListBloc>().add(HiveChecker(tasks));
+    //     });
+
+    List<Task> tasks = [];
+    Stream<QuerySnapshot> collection = Repository().getStream();
+    collection.first.then((value) {
+      value.docs.forEach((element) {
+        tasks.add(Task.fromJson(element.data()));
+      });
+      context.read<TaskListBloc>().add(HiveChecker(tasks));
+    });
+    print("connected");
+    snackBarDisplay();
+  }
 
   @override
   Widget build(BuildContext context) {
-    SpeedDialChild speedDialChild(Tags tag, Color color, bool isClear) {
+    SpeedDialChild mySpeedDialChild(Tags tag, Color color, bool isClear) {
       if (isClear) {
         return SpeedDialChild(
           labelWidget: Container(
@@ -99,11 +121,18 @@ class _HomeScreenState extends State<HomeScreen> {
           break;
       }
     }
+
     isOnline();
     Utils.statusBarColor();
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       appBar: AppBar(
+        actions: [
+          IconButton(onPressed: () {
+            myStream();
+          },
+              icon: Icon(Icons.wifi_protected_setup))
+        ],
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarIconBrightness: Brightness.light,
         ),
@@ -116,10 +145,13 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(color: Colors.white),
             ),
             Spacer(),
-            Visibility(visible: !isOnlineVar, child: Text(
-              "Оффлайн",
-              style: TextStyle(color: Colors.grey, fontSize: 14),
-            ),)
+            Visibility(
+              visible: !isOnlineVar,
+              child: Text(
+                "Оффлайн",
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+            )
           ],
         ),
       ),
@@ -157,9 +189,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Visibility(
               visible: isOnlineVar,
               child: FloatingActionButton(
-                child: Text(
-                  "+",
-                  style: TextStyle(color: primaryColor),
+                child: Icon(
+                  Icons.add,
+                  color: primaryColor,
                 ),
                 onPressed: createTask,
                 backgroundColor: Utils.tagColor(
@@ -175,11 +207,11 @@ class _HomeScreenState extends State<HomeScreen> {
               childMargin: EdgeInsets.only(top: 3, bottom: 3),
               childPadding: EdgeInsets.all(3),
               children: [
-                speedDialChild(Tags.CLEAR, clearColor, true),
-                speedDialChild(Tags.FLUTTER, flutterColor, false),
-                speedDialChild(Tags.DART, dartColor, false),
-                speedDialChild(Tags.ALGORITHMS, algosColor, false),
-                speedDialChild(Tags.EXPIRED, Colors.grey, false),
+                mySpeedDialChild(Tags.CLEAR, clearColor, true),
+                mySpeedDialChild(Tags.FLUTTER, flutterColor, false),
+                mySpeedDialChild(Tags.DART, dartColor, false),
+                mySpeedDialChild(Tags.ALGORITHMS, algosColor, false),
+                mySpeedDialChild(Tags.EXPIRED, Colors.grey, false),
               ],
               backgroundColor: Utils.tagColor(
                   isWhite: false, isDetail: false, drpv: currentFilter),
@@ -191,56 +223,49 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // void snackBarDisplay() {
-  //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //     duration: Duration(minutes: 10),
-  //     content: Text('Нет подключения. Режим просмотра.'),
-  //     action: SnackBarAction(
-  //       label: 'Повторить',
-  //       onPressed: () {
-  //         var connectivityResult =
-  //             Connectivity().checkConnectivity().then((value) {
-  //           if (value == ConnectivityResult.none) {
-  //             snackBarDisplay();
-  //             print("here");
-  //           } else {
-  //             print("exit");
-  //             setState(() {});
-  //           }
-  //         });
-  //       },
-  //     ),
-  //   ));
-  // }
+  void snackBarDisplay() {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      duration: Duration(seconds: 5),
+      content: Text('Обновлено.'),
+      action: SnackBarAction(
+        label: 'Повторить',
+        onPressed: () {
+          var connectivityResult =
+              Connectivity().checkConnectivity().then((value) {
+            if (value == ConnectivityResult.none) {
+            //  snackBarDisplay();
+              print("here");
+            } else {
+              print("exit");
+              setState(() {});
+            }
+          });
+        },
+      ),
+    ));
+  }
 
   @override
   void initState() {
     super.initState();
-    var connectivityResult = Connectivity().checkConnectivity().then((value) {
-      if (value == ConnectivityResult.none) {
-        //snackBarDisplay();
-        print("none");
-        Hive.openBox('taskList').then((listBox) {
-          if (listBox.get('task') == null) {
-            List<Task> taskList = [];
-            listBox.put('task', taskList);
-          } else {
-            List<Task> hiveTasks = listBox.get('task').cast<Task>();
-            context.read<TaskListBloc>().add(HiveChecker(hiveTasks));
-          }
-          listBox.close();
-        });
-      } else {
-        List<Task> tasks = [];
-        Stream<QuerySnapshot> collection = Repository().getStream();
-        collection.first.then((value) {
-          value.docs.forEach((element) {
-            tasks.add(Task.fromJson(element.data()));
-          });
-          context.read<TaskListBloc>().add(HiveChecker(tasks));
-        });
-        print("connected");
-      }
-    });
+    // var connectivityResult = Connectivity().checkConnectivity().then((value) {
+    //    if (value == ConnectivityResult.none) {
+    //      //snackBarDisplay();
+    //      print("none");
+    //      Hive.openBox('taskList').then((listBox) {
+    //        if (listBox.get('task') == null) {
+    //          List<Task> taskList = [];
+    //          listBox.put('task', taskList);
+    //        } else {
+    //          List<Task> hiveTasks = listBox.get('task').cast<Task>();
+    //          context.read<TaskListBloc>().add(HiveChecker(hiveTasks));
+    //        }
+    //        listBox.close();
+    //      });
+    //    } else {
+    //
+    //      print("connected");
+    //    }
+    //});
   }
 }

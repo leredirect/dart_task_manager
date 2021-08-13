@@ -21,15 +21,15 @@ class Repository {
     return collection.add(task.toJson());
   }
 
-  Future<DocumentReference> deleteTask(Task task){
-    return collection.where("id", isEqualTo : task.id).get().then((value){value.docs.forEach((element){
+  Future<DocumentReference> deleteTask(Task task)  {
+     return collection.where("id", isEqualTo : task.id).get().then((value){value.docs.forEach((element) {
         collection.doc(element.id).delete();
       });
     });
   }
-  Future<DocumentReference> editTask(Task task){
+  Future<DocumentReference> editTask(Task task)  {
     return collection.where("id", isEqualTo : task.id).get().then((value){value.docs.forEach((element){
-      collection.doc(element.id).update(task.toJson());
+       collection.doc(element.id).update(task.toJson());
     });
     });
   }
