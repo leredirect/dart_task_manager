@@ -31,3 +31,9 @@ class HiveChecker extends TaskListEvent {
 
   HiveChecker(this.tasks);
 }
+
+class DeleteAllTasksEvent extends TaskListEvent {
+  List<Task> tasks;
+
+  DeleteAllTasksEvent(this.tasks);
+}
