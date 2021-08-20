@@ -1,10 +1,14 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
+import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
+import 'package:dart_task_manager/repository/repo.dart';
+import 'package:dart_task_manager/screens/task_edit_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 
 import '../constants.dart';
 
@@ -14,7 +18,9 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
   const TaskDetailsScreenNoActions({Key key, this.task}) : super(key: key);
 
   @override
+
   Widget build(BuildContext context) {
+
     String deadlineDisplay(String deadline) {
       String result = "Дедлайн: $deadline";
       return result;
@@ -29,7 +35,7 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
           ),
           backwardsCompatibility: false,
           iconTheme: IconThemeData(color: Colors.white),
-          backgroundColor: backgroundColor,
+          backgroundColor: primaryColorLight,
           title: Text(
             "Детали задачи",
             style: TextStyle(color: Colors.white),
@@ -95,7 +101,7 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
             ],
           ),
         ),
-        backgroundColor: backgroundColor,
+        backgroundColor: primaryColor,
       );
     });
   }

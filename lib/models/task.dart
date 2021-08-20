@@ -36,9 +36,10 @@ class Task {
     text = json['text'];
     tag = Tags.values.elementAt(json['tag'] as int);
     taskCreateTime = json['taskCreateTime'];
-    taskDeadline = json['taskDeadline'] as String;
-    id = json['id'] as int;
+    taskDeadline = json['taskDeadLine'];
+    id = json['id'];
   }
+
 }
 
 @HiveType(typeId: 1)
