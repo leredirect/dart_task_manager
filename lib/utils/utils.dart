@@ -21,7 +21,7 @@ class Utils {
           return algosColor;
           break;
         case Tags.CLEAR:
-          return primaryColorLight;
+          return backgroundColor;
       }
     } else if (isDetail) {
       switch (tag) {
@@ -35,7 +35,7 @@ class Utils {
           return algosColor;
           break;
         case Tags.CLEAR:
-          return primaryColor;
+          return backgroundColor;
       }
     } else {
       switch (drpEnum) {
@@ -65,10 +65,25 @@ class Utils {
   }
 
   static void statusBarColor() {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Color(0xff2A2A2A), // status bar color
+        statusBarBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.light));
+  }
 
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-          statusBarColor: Color(0xff2A2A2A), // status bar color
-          statusBarBrightness: Brightness.light,
-          statusBarIconBrightness: Brightness.light));
+  static void taskFromBaseDisplay(List<Task> tasks){
+    print("Прилетело с базы тасок: ${tasks.length}" );
+    for (int i = 0; i < tasks.length; i++){
+      print("#${i}\nID: ${tasks[i].id}\nИмя: ${tasks[i].name}\nТекст: ${tasks[i].text}\nСоздана: ${tasks[i].taskCreateTime}\nДедлайн: ${tasks[i].taskDeadline}\n============================================");
     }
+  }
+
+}
+
+void snackBarNotification(context, String text) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    backgroundColor: snackBarColor,
+    duration: Duration(seconds: 3),
+    content: Text(text),
+  ));
 }

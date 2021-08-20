@@ -44,26 +44,24 @@ class TaskListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-      AnimationConfiguration.synchronized(
-        duration: const Duration(milliseconds: 500),
-        child: SlideAnimation(
-          horizontalOffset: 50.0,
-          child: FadeInAnimation(
-            child:
-            GridView.count(
-              padding: EdgeInsets.fromLTRB(
-                  gridAxisParameters(), gridAxisParameters(),
-                  gridAxisParameters(), gridAxisParameters()),
-              mainAxisSpacing: gridAxisParameters(),
-              crossAxisSpacing: gridAxisParameters(),
-              crossAxisCount: gridAxisCount(),
-              children: taskList.map((e) => TaskWidget(task: e)).toList(),
-            ),
+    return AnimationConfiguration.synchronized(
+      duration: const Duration(milliseconds: 500),
+      child: SlideAnimation(
+        horizontalOffset: 50.0,
+        child: FadeInAnimation(
+          child: GridView.count(
+            padding: EdgeInsets.fromLTRB(
+                gridAxisParameters(),
+                gridAxisParameters(),
+                gridAxisParameters(),
+                gridAxisParameters()),
+            mainAxisSpacing: gridAxisParameters(),
+            crossAxisSpacing: gridAxisParameters(),
+            crossAxisCount: gridAxisCount(),
+            children: taskList.map((e) => TaskWidget(task: e)).toList(),
           ),
         ),
-      );
+      ),
+    );
   }
 }
-
-

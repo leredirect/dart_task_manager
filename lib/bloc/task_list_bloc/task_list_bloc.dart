@@ -27,6 +27,10 @@ class TaskListBloc extends Bloc<TaskListEvent, List<Task>> {
       yield tasks;
     } else if (event is HiveChecker) {
       yield event.tasks;
+    } else if (event is DeleteTaskEvent) {
+      List<Task> tasks = List.from(state);
+      tasks.clear();
+      yield tasks;
     }
   }
 }

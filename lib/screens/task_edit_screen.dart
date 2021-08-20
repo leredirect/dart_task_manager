@@ -28,19 +28,25 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   TimeOfDay pickedTime;
 
   Future<void> addTask(String taskTag, String deadline) async {
+    widget.task.taskDeadline = deadline;
     String taskName = _nameController.text;
     String taskText = _textController.text;
     widget.task.name = taskName;
     widget.task.text = taskText;
     widget.task.tag = nameToTagMap[taskTag];
-    widget.task.taskDeadline = deadline;
+
     context.read<TaskListBloc>().add(EditTaskEvent(widget.task));
     context.read<TaskListBloc>().add(EditTaskCheckEvent(widget.task));
     var listBox = await Hive.openBox<List<Task>>('taskList');
     listBox.put('task', context.read<TaskListBloc>().state);
     listBox.close();
-    Repository().editTask(widget.task);
-    Navigator.of(context).pop();
+    try {
+      await Repository().editTask(widget.task);
+      Navigator.of(context).pop();
+    } on Exception catch (e) {
+      snackBarNotification(context, e.toString());
+      Navigator.of(context).pushNamedAndRemoveUntil("/", (_) => false);
+    }
   }
 
   Future<void> showTaskTimePicker(DateTime pickedDate) {
@@ -55,32 +61,34 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   Future<void> deadlineCalc(
       String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) async {
     if (pickedDate == null && pickedTime == null) {
-      return showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: primaryColorLight,
-            title: const Text('Ошибка', style: TextStyle(color: Colors.white)),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: const <Widget>[
-                  Text('Введите дату и время',
-                      style: TextStyle(color: Colors.white)),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK', style: TextStyle(color: Colors.white)),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+      String deadlineRes = widget.task.taskDeadline.toString();
+      return addTask(dropdownValue, deadlineRes);
+      // return showDialog<void>(
+      //   context: context,
+      //   barrierDismissible: false,
+      //   builder: (BuildContext context) {
+      //     return AlertDialog(
+      //       backgroundColor: backgroundColor,
+      //       title: const Text('Ошибка', style: TextStyle(color: Colors.white)),
+      //       content: SingleChildScrollView(
+      //         child: ListBody(
+      //           children: const <Widget>[
+      //             Text('Введите дату и время',
+      //                 style: TextStyle(color: Colors.white)),
+      //           ],
+      //         ),
+      //       ),
+      //       actions: <Widget>[
+      //         TextButton(
+      //           child: Text('OK', style: TextStyle(color: Colors.white)),
+      //           onPressed: () {
+      //             Navigator.of(context).pop();
+      //           },
+      //         ),
+      //       ],
+      //     );
+      // },
+      // );
     } else {
       DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
           pickedDate.day, pickedTime.hour, pickedTime.minute);
@@ -130,7 +138,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
               "Редактирование задачи",
               style: TextStyle(color: Colors.white),
             ),
-            backgroundColor: primaryColor,
+            backgroundColor: backgroundColor,
           ),
           body: Column(
             children: [
@@ -195,7 +203,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 margin: EdgeInsets.fromLTRB(5, 0, 0, 0),
                 child: DropdownButton<String>(
                   style: TextStyle(color: Colors.white, fontSize: 16),
-                  dropdownColor: primaryColorDark,
+                  dropdownColor: backgroundColor,
                   value: dropdownValue,
                   iconSize: 24,
                   elevation: 16,
@@ -212,7 +220,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   },
                   items: nameToTagMap.keys
                       .toList()
-                      .where((element) => element != tagToNameMap[Tags.CLEAR] && element != tagToNameMap[Tags.EXPIRED])
+                      .where((element) =>
+                          element != tagToNameMap[Tags.CLEAR] &&
+                          element != tagToNameMap[Tags.EXPIRED])
                       .map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -309,7 +319,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   ))
             ],
           ),
-          backgroundColor: primaryColor,
+          backgroundColor: backgroundColor,
         ));
   }
 
