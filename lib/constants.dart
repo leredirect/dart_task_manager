@@ -3,10 +3,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 //colors
-
-const backgroundColor = Color(0xff353E46);
+const primaryColor = Color(0xff2A2A2A);
+const primaryColorLight = Color(0xff414141);
+const primaryColorDark = Color(0xff121212);
+const dartColor = Color(0xFF91A1F8);
+const flutterColor = Color(0xffCB8DFC);
+const algosColor = Color(0xff7BE0CE);
 const clearColor = Color(0xffE4DBDB);
-const dartColor = Color(0xFF5C7FA8);
-const flutterColor = Color(0xffA878AC);
-const algosColor = Color(0xff756DA7);
-const snackBarColor = Color(0xff3C4852);
