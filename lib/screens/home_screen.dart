@@ -164,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context, state) {
             if (filtState != null) {
               List<Task> filtredState =
-                  state.where((element) => element.tag == filtState).toList();
+                  state.where((element) => Tags.values[element.tags.first] == filtState).toList();
               return AnimationConfiguration.synchronized(
                 //duration: const Duration(milliseconds: 5000),
                 child: SlideAnimation(
