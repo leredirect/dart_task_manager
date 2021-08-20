@@ -1,4 +1,3 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/screens/home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -9,7 +8,6 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'bloc/filter_bloc/filter_bloc.dart';
-import 'constants.dart';
 import 'models/task.dart';
 
 Future<void> main() async {
@@ -20,7 +18,8 @@ Future<void> main() async {
     final appDocumentDir = await getApplicationDocumentsDirectory();
     Hive
       ..init(appDocumentDir.path)
-      ..registerAdapter(TaskAdapter())..registerAdapter(TagsAdapter());
+      ..registerAdapter(TaskAdapter())
+      ..registerAdapter(TagsAdapter());
     runApp(MyApp());
   });
 }
@@ -33,21 +32,19 @@ class MyApp extends StatelessWidget {
           BlocProvider<TaskListBloc>(create: (context) => TaskListBloc()),
           BlocProvider<FilterBloc>(create: (context) => FilterBloc())
         ],
-        child: MaterialApp(
-            title: 'Flutter Demo',
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              primarySwatch: Colors.grey,
-              visualDensity: VisualDensity.adaptivePlatformDensity,
-            ),
-            home: AnnotatedRegion<SystemUiOverlayStyle>(
-                value: SystemUiOverlayStyle.light,
-                child: SafeArea(
-                    child: Scaffold(
-                      body: HomeScreen(),
-                    )
-                )
+        child: AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle.light,
+            child: MaterialApp(
+              initialRoute: '/',
+              routes: {
+                '/': (context) => const HomeScreen(),
+              },
+              title: 'Flutter Demo',
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                primarySwatch: Colors.grey,
+                visualDensity: VisualDensity.adaptivePlatformDensity,
+              ),
             )));
   }
 }
-
