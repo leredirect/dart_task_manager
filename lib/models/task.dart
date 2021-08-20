@@ -9,7 +9,7 @@ class Task {
   @HiveField(1)
   String text = "";
   @HiveField(2)
-  List tags;
+  Tags tag;
   @HiveField(3)
   String taskCreateTime;
   @HiveField(4)
@@ -17,14 +17,14 @@ class Task {
   @HiveField(5)
   int id;
 
-  Task(this.name, this.text, this.tags, this.taskCreateTime, this.taskDeadline,
+  Task(this.name, this.text, this.tag, this.taskCreateTime, this.taskDeadline,
       this.id);
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       "name": this.name,
       "text": this.text,
-      "tag": this.tags,
+      "tag": this.tag.index,
       "taskCreateTime": this.taskCreateTime,
       "taskDeadline": this.taskDeadline,
       "id": this.id
@@ -34,7 +34,7 @@ class Task {
   Task.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     text = json['text'];
-    tags = json['tag'];
+    tag = Tags.values.elementAt(json['tag'] as int);
     taskCreateTime = json['taskCreateTime'];
     taskDeadline = json['taskDeadline'] as String;
     id = json['id'] as int;

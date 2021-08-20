@@ -55,7 +55,7 @@ class TaskWidget extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.all(3),
           color: Utils.tagColor(
-              isWhite: false, isDetail: true, drpv: null, tag: Tags.values[task.tags.first]),
+              isWhite: false, isDetail: true, drpv: null, tag: task.tag),
           child: Column(
             children: [
               Container(

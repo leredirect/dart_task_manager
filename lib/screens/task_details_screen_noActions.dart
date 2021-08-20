@@ -55,15 +55,6 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Тэги: ${Utils.tagsDisplay(task.tags)}",
-                          textAlign: TextAlign.right,
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
                       Row(
                         children: [
                           Container(
@@ -93,7 +84,7 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
                 margin: EdgeInsets.only(bottom: 20),
                 height: 2,
                 color: Utils.tagColor(
-                    isWhite: false, isDetail: true, drpv: null, tag: Tags.values[task.tags.first]),
+                    isWhite: false, isDetail: true, drpv: null, tag: task.tag),
               ),
               Container(
                 child: Text(task.text,

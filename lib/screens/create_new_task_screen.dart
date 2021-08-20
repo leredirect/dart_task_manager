@@ -5,12 +5,10 @@ import 'package:dart_task_manager/repository/repo.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
-import 'package:smart_select/smart_select.dart';
 
 import '../constants.dart';
 
@@ -30,27 +28,14 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   Future<void> showTaskTimePicker(DateTime pickedDate) {
     if (pickedDate != null) {
       return showTimePicker(context: context, initialTime: TimeOfDay.now())
-          .then((value) =>
-          setState(() {
-            pickedTime = value;
-          }));
+          .then((value) => setState(() {
+                pickedTime = value;
+              }));
     } else {}
   }
 
-  List<int> tagValue = [0];
-  List<S2Choice<int>> s2tags = [
-    S2Choice<int>(value: 0, title: 'Dart'),
-    S2Choice<int>(value: 1, title: 'Flutter'),
-    S2Choice<int>(value: 2, title: 'Алгоритмы'),
-  ];
-  List<S2Choice<int>> s2options = [
-    S2Choice<int>(value: 0, title: 'Dart'),
-    S2Choice<int>(value: 1, title: 'Flutter'),
-    S2Choice<int>(value: 2, title: 'Алгоритмы'),
-  ];
-
-  Future<void> deadlineCalc(String dropdownValue, DateTime pickedDate,
-      TimeOfDay pickedTime) async {
+  Future<void> deadlineCalc(
+      String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) async {
     if (pickedDate == null && pickedTime == null) {
       return showDialog<void>(
         context: context,
@@ -95,7 +80,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
             deadline.hour.toString() +
             ":" +
             deadlineMinute);
-        return await addTask(dropdownValue, deadlineRes, tagValue);
+        return await addTask(dropdownValue, deadlineRes);
       } else {
         String deadlineRes = (deadline.day.toString() +
             "." +
@@ -106,12 +91,13 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
             deadline.hour.toString() +
             ":" +
             deadline.minute.toString());
-        return addTask(dropdownValue, deadlineRes, tagValue);
+        return addTask(dropdownValue, deadlineRes);
       }
     }
   }
 
-  Future<void> addTask(String tag, String deadline, tagValue) async {
+  Future<void> addTask(String tag, String deadline) async {
+    print(deadline + "\nТУТ дедлайн");
     String taskName = _nameController.text;
     String taskText = _textController.text;
     String taskCreateTime = DateFormat.d().format(DateTime.now()) +
@@ -121,7 +107,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
         DateFormat.y().format(DateTime.now()) +
         " в " +
         DateFormat.Hm().format(DateTime.now());
-
+    Tags tagValue = nameToTagMap[tag];
     var idBox = await Hive.openBox<int>('id_box');
     int id = idBox.get('id');
     if (id == null) {
@@ -131,15 +117,11 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
       idBox.put('id', id + 1);
     }
     Task task =
-    Task(taskName, taskText, tagValue, taskCreateTime, deadline, id);
-    print(
-        "${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task
-            .taskDeadline}");
+        Task(taskName, taskText, tagValue, taskCreateTime, deadline, id);
+print("${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.taskDeadline}");
     context.read<TaskListBloc>().add(AddTaskEvent(task));
     var listBox = await Hive.openBox<List<Task>>('taskList');
-    listBox.put('task', context
-        .read<TaskListBloc>()
-        .state);
+    listBox.put('task', context.read<TaskListBloc>().state);
     listBox.close();
     Navigator.of(context).pop();
     Repository repository = new Repository();
@@ -213,37 +195,49 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 ),
               ),
             ),
-
-            SmartSelect<int>.multiple(
-              modalConfig: S2ModalConfig(
-
+            Container(
+              margin: EdgeInsets.fromLTRB(5, 20, 0, 0),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Выберите тег:",
+                style: TextStyle(color: Colors.white),
+                textAlign: TextAlign.left,
               ),
-              modalTitle: "Выберите тэг:",
-              placeholder: "Выберите один или несколько тэгов",
-              choiceStyle: S2ChoiceStyle(
-                titleStyle: TextStyle(color: Colors.black),
-                color: backgroundColor,
-                activeColor: backgroundColor,
-                activeAccentColor: clearColor,
-                accentColor: clearColor,
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              margin: EdgeInsets.fromLTRB(5, 0, 0, 0),
+              child: DropdownButton<String>(
+                style: TextStyle(color: Colors.white, fontSize: 16),
+                dropdownColor: backgroundColor,
+                value: dropdownValue,
+                iconSize: 24,
+                elevation: 16,
+                underline: Container(
+                  height: 2,
+                  color: Utils.tagColor(
+                      isWhite: false, isDetail: false, drpv: dropdownValue),
+                ),
+                onChanged: (String newValue) {
+                  setState(() {
+                    dropdownValue = newValue;
+                  });
+                },
+                items: nameToTagMap.keys
+                    .toList()
+                    .where((element) =>
+                        element != tagToNameMap[Tags.CLEAR] &&
+                        element != tagToNameMap[Tags.EXPIRED])
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList(),
               ),
-                modalStyle: S2ModalStyle(
-                  backgroundColor: backgroundColor,
-                ),
-                modalHeaderStyle: S2ModalHeaderStyle(
-                  backgroundColor: backgroundColor,
-                  textStyle: TextStyle(color: clearColor)
-                ),
-                choiceType: S2ChoiceType.chips,
-                choiceLayout: S2ChoiceLayout.grid,
-                modalType: S2ModalType.bottomSheet,
-                value: tagValue,
-                choiceItems: s2options,
-                onChange: (state) {
-                  setState(() => tagValue = state.value);
-                  print(tagValue);
-                }
-
             ),
             InkWell(
                 onTap: () {
@@ -274,17 +268,14 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                     color: Utils.tagColor(
                         isWhite: false, isDetail: false, drpv: dropdownValue),
                   ),
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width * 0.6,
+                  width: MediaQuery.of(context).size.width * 0.6,
                   height: 40,
                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   child: Center(
                       child: Text(
-                        "Задать время на выполнение",
-                        style: TextStyle(color: Colors.white),
-                      )),
+                    "Задать время на выполнение",
+                    style: TextStyle(color: Colors.white),
+                  )),
                 )),
             Container(
               margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
@@ -315,18 +306,15 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                       color: Utils.tagColor(
                           isWhite: false, isDetail: false, drpv: dropdownValue),
                       borderRadius: BorderRadius.circular(12)),
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width * 0.4,
+                  width: MediaQuery.of(context).size.width * 0.4,
                   height: 40,
                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   margin: EdgeInsets.only(bottom: 50),
                   child: Center(
                       child: Text(
-                        "Подтвердить",
-                        style: TextStyle(color: Colors.white),
-                      )),
+                    "Подтвердить",
+                    style: TextStyle(color: Colors.white),
+                  )),
                   // color: Colors.redAccent,
                 ))
           ],
