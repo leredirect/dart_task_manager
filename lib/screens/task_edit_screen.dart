@@ -28,12 +28,14 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   TimeOfDay pickedTime;
 
   Future<void> addTask(String taskTag, String deadline) async {
+    List<int> tags = [];
+    tags.add(nameToTagMap[taskTag].index);
     widget.task.taskDeadline = deadline;
     String taskName = _nameController.text;
     String taskText = _textController.text;
     widget.task.name = taskName;
     widget.task.text = taskText;
-    widget.task.tag = nameToTagMap[taskTag];
+    widget.task.tags = tags;
 
     context.read<TaskListBloc>().add(EditTaskEvent(widget.task));
     context.read<TaskListBloc>().add(EditTaskCheckEvent(widget.task));
@@ -334,7 +336,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   void initState() {
     super.initState();
     dropdownValue =
-        nameToTagMap.keys.firstWhere((k) => nameToTagMap[k] == widget.task.tag);
+        nameToTagMap.keys.firstWhere((k) => nameToTagMap[k] == widget.task.tags.first);
     _nameController.text = widget.task.name;
     _textController.text = widget.task.text;
   }

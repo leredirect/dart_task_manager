@@ -77,7 +77,19 @@ class Utils {
       print("#${i}\nID: ${tasks[i].id}\nИмя: ${tasks[i].name}\nТекст: ${tasks[i].text}\nСоздана: ${tasks[i].taskCreateTime}\nДедлайн: ${tasks[i].taskDeadline}\n============================================");
     }
   }
+ static String tagsDisplay(List tags){
+   String result = "";
+    for (int i = 0; i < tags.length; i++){
+      if (tags.length - 1 == i){
+        result = result + tagToNameMap[Tags.values[tags[i]]];
+      } else{
+        result = result + tagToNameMap[Tags.values[tags[i]]] + ", ";
+      }
 
+    }
+    print (result);
+    return result;
+ }
 }
 
 void snackBarNotification(context, String text) {
