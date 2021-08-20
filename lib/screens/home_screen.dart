@@ -16,8 +16,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:hive/hive.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _HomeScreenState();
 }
@@ -96,18 +99,24 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void myStream() {
     List<Task> tasks = [];
-    Stream<QuerySnapshot> collection = Repository().getStream();
-    collection.first.then((value) {
+    Future<QuerySnapshot> collection = Repository().getStream();
+    collection.asStream().first.then((value) {
       value.docs.forEach((element) {
         tasks.add(Task.fromJson(element.data()));
+        Utils.taskFromBaseDisplay(tasks);
+        Hive.openBox('taskList').then((value) {
+          value.put('task', tasks);
+          value.close();
+        });
+        context.read<TaskListBloc>().add(HiveChecker(tasks));
       });
-      context.read<TaskListBloc>().add(HiveChecker(tasks));
     });
-    print("connected");
-    snackBarDisplay();
+    snackBarNotification(context, "Обновлено");
   }
 
+  bool isOnlineVar;
 
   @override
   Widget build(BuildContext context) {
@@ -221,5 +230,31 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    List<Task> tasks = [];
+    Future<QuerySnapshot> collection = Repository().getStream();
+    collection.asStream().first.then((value) {
+      value.docs.forEach((element) {
+        tasks.add(Task.fromJson(element.data()));
+      });
+      context.read<TaskListBloc>().add(HiveChecker(tasks));
+    });
+    var connectivityResult = Connectivity().checkConnectivity().then((value) {
+      if (value == ConnectivityResult.none) {
+        snackBarNotification(
+            context, "Отсутствует подключение к сети. Режим чтения.");
+        Hive.openBox('taskList').then((value) {
+          if (value.get('task') == null) {
+            List<Task> taskList = [];
+            value.put('task', taskList);
+          } else {
+            List<Task> hiveTasks = value.get('task').cast<Task>();
+            context.read<TaskListBloc>().add(HiveChecker(hiveTasks));
+          }
+          value.close();
+        });
+      } else {
+        myStream();
+      }
+    });
   }
 }

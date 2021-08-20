@@ -18,15 +18,20 @@ class TaskDetailsScreen extends StatelessWidget {
   const TaskDetailsScreen({Key key, this.task}) : super(key: key);
 
   @override
-
   Widget build(BuildContext context) {
     Future<void> deleteCurrentTask() async {
       context.read<TaskListBloc>().add(DeleteTaskEvent(task));
       var listBox = await Hive.openBox<List<Task>>('taskList');
       listBox.put('task', context.read<TaskListBloc>().state);
       listBox.close();
-      Repository().deleteTask(task);
-      Navigator.of(context).pop();
+
+      try {
+        await Repository().deleteTask(task);
+        Navigator.of(context).pop();
+      } on Exception catch (e) {
+        snackBarNotification(context, e.toString());
+        Navigator.of(context).pushNamedAndRemoveUntil("/", (_) => false);
+      }
     }
 
     void openTaskEditor() {
@@ -38,6 +43,7 @@ class TaskDetailsScreen extends StatelessWidget {
     }
 
     String deadlineDisplay(String deadline) {
+      print(task.taskDeadline);
       String result = "Дедлайн: $deadline";
       return result;
     }
@@ -51,7 +57,7 @@ class TaskDetailsScreen extends StatelessWidget {
           ),
           backwardsCompatibility: false,
           iconTheme: IconThemeData(color: Colors.white),
-          backgroundColor: primaryColorLight,
+          backgroundColor: backgroundColor,
           title: Text(
             "Детали задачи",
             style: TextStyle(color: Colors.white),
@@ -125,7 +131,7 @@ class TaskDetailsScreen extends StatelessWidget {
               child: FloatingActionButton(
                 child: Icon(
                   Icons.delete,
-                  color: primaryColor,
+                  color: backgroundColor,
                 ),
                 onPressed: deleteCurrentTask,
                 backgroundColor: Utils.tagColor(
@@ -136,7 +142,7 @@ class TaskDetailsScreen extends StatelessWidget {
             Container(
               margin: EdgeInsets.only(left: 10),
               child: FloatingActionButton(
-                child: Icon(Icons.edit, color: primaryColor),
+                child: Icon(Icons.edit, color: backgroundColor),
                 onPressed: openTaskEditor,
                 backgroundColor: Utils.tagColor(
                     isWhite: false, isDetail: true, drpv: null, tag: task.tag),
@@ -145,7 +151,7 @@ class TaskDetailsScreen extends StatelessWidget {
             ),
           ],
         ),
-        backgroundColor: primaryColor,
+        backgroundColor: backgroundColor,
       );
     });
   }

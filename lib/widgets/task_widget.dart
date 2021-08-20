@@ -18,24 +18,20 @@ class TaskWidget extends StatelessWidget {
     void openTaskDetails() {
       var connectivityResult = Connectivity().checkConnectivity().then((value) {
         if (value == ConnectivityResult.none) {
-          Navigator.push(context, MaterialPageRoute(
-              builder: (_) {
-                return TaskDetailsScreenNoActions(
-                  task: task,
-                );
-              }
-          ));
+          Navigator.push(context, MaterialPageRoute(builder: (_) {
+            return TaskDetailsScreenNoActions(
+              task: task,
+            );
+          }));
+        } else {
+          Navigator.push(context, MaterialPageRoute(builder: (_) {
+            return TaskDetailsScreen(
+              task: task,
+            );
+          }));
         }
-        else{
-          Navigator.push(context, MaterialPageRoute(
-              builder: (_) {
-                return TaskDetailsScreen(
-                  task: task,
-                );
-              }
-          ));
-        }
-      });}
+      });
+    }
 
     return Container(
       decoration: BoxDecoration(

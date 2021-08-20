@@ -42,7 +42,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            backgroundColor: primaryColor,
+            backgroundColor: backgroundColor,
             title: const Text('Ошибка', style: TextStyle(color: Colors.white)),
             content: SingleChildScrollView(
               child: ListBody(
@@ -97,6 +97,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   }
 
   Future<void> addTask(String tag, String deadline) async {
+    print(deadline + "\nТУТ дедлайн");
     String taskName = _nameController.text;
     String taskText = _textController.text;
     String taskCreateTime = DateFormat.d().format(DateTime.now()) +
@@ -117,13 +118,12 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     }
     Task task =
         Task(taskName, taskText, tagValue, taskCreateTime, deadline, id);
-
+print("${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.taskDeadline}");
     context.read<TaskListBloc>().add(AddTaskEvent(task));
     var listBox = await Hive.openBox<List<Task>>('taskList');
     listBox.put('task', context.read<TaskListBloc>().state);
     listBox.close();
     Navigator.of(context).pop();
-    print(task.toJson());
     Repository repository = new Repository();
     repository.addTask(task);
   }
@@ -144,7 +144,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
             "Новая задача",
             style: TextStyle(color: Colors.white),
           ),
-          backgroundColor: primaryColorLight,
+          backgroundColor: backgroundColor,
         ),
         body: Column(
           children: [
@@ -209,7 +209,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               margin: EdgeInsets.fromLTRB(5, 0, 0, 0),
               child: DropdownButton<String>(
                 style: TextStyle(color: Colors.white, fontSize: 16),
-                dropdownColor: primaryColorDark,
+                dropdownColor: backgroundColor,
                 value: dropdownValue,
                 iconSize: 24,
                 elevation: 16,
@@ -225,7 +225,9 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 },
                 items: nameToTagMap.keys
                     .toList()
-                    .where((element) => element != tagToNameMap[Tags.CLEAR] && element != tagToNameMap[Tags.EXPIRED])
+                    .where((element) =>
+                        element != tagToNameMap[Tags.CLEAR] &&
+                        element != tagToNameMap[Tags.EXPIRED])
                     .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
@@ -317,7 +319,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 ))
           ],
         ),
-        backgroundColor: primaryColor,
+        backgroundColor: backgroundColor,
       ),
     );
   }
