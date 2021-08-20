@@ -5,6 +5,8 @@ import 'package:dart_task_manager/screens/task_details_screen_noActions.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/material.dart';
 
+import '../constants.dart';
+
 class TaskWidget extends StatelessWidget {
   final Task task;
 
@@ -16,24 +18,20 @@ class TaskWidget extends StatelessWidget {
     void openTaskDetails() {
       var connectivityResult = Connectivity().checkConnectivity().then((value) {
         if (value == ConnectivityResult.none) {
-          Navigator.push(context, MaterialPageRoute(
-              builder: (_) {
-                return TaskDetailsScreenNoActions(
-                  task: task,
-                );
-              }
-          ));
+          Navigator.push(context, MaterialPageRoute(builder: (_) {
+            return TaskDetailsScreenNoActions(
+              task: task,
+            );
+          }));
+        } else {
+          Navigator.push(context, MaterialPageRoute(builder: (_) {
+            return TaskDetailsScreen(
+              task: task,
+            );
+          }));
         }
-        else{
-          Navigator.push(context, MaterialPageRoute(
-              builder: (_) {
-                return TaskDetailsScreen(
-                  task: task,
-                );
-              }
-          ));
-        }
-      });}
+      });
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -68,16 +66,16 @@ class TaskWidget extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.left,
                   style: TextStyle(
-                      color: Colors.black,
+                      color: clearColor,
                       fontSize: 20,
-                      fontWeight: FontWeight.w400),
+                      fontWeight: FontWeight.w300),
                 ),
               ),
               SizedBox(
                 height: 10,
               ),
               Container(
-                color: Colors.black,
+                color: clearColor,
                 width: 200,
                 height: 1,
               ),
@@ -92,9 +90,9 @@ class TaskWidget extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.left,
                   style: TextStyle(
-                      color: Colors.black,
+                      color: clearColor,
                       fontSize: 14,
-                      fontWeight: FontWeight.w300),
+                      fontWeight: FontWeight.w200),
                 ),
               ),
               Spacer(),
@@ -106,9 +104,10 @@ class TaskWidget extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.left,
                   style: TextStyle(
-                      color: Colors.black.withOpacity(0.5),
+                      color: clearColor.withOpacity(0.7),
                       fontSize: 12,
-                      fontStyle: FontStyle.italic),
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.w300),
                 ),
               ),
             ],
