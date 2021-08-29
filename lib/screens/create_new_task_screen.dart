@@ -37,7 +37,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   }
 
   List<int> tagValue = [0];
-  int priorityValue = 0;
+  Priorities priorityValue = Priorities.LOW;
   List<S2Choice<int>> s2Options = Utils.s2TagsList();
   List<S2Choice<int>> s2Priority = Utils.s2PriorityList();
 
@@ -105,7 +105,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   }
 
   Future<void> addTask(String tag, String deadline, List<int> tagValue) async {
-    Priorities priority = Priorities.values[priorityValue];
+    Priorities priority = priorityValue;
     List<Tags> tags = tagValue.map((e) => Tags.values[e]).toList();
     String taskName = _nameController.text;
     String taskText = _textController.text;
@@ -277,10 +277,10 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 choiceType: S2ChoiceType.chips,
                 choiceLayout: S2ChoiceLayout.grid,
                 modalType: S2ModalType.bottomSheet,
-                value: priorityValue,
+                value: priorityValue.index,
                 choiceItems: s2Priority,
                 onChange: (state) {
-                  setState(() => priorityValue = state.value);
+                  setState(() => priorityValue = Priorities.values[state.value]);
                   print(priorityValue);
                 }),
             InkWell(

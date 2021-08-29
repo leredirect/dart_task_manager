@@ -29,7 +29,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   TimeOfDay pickedTime;
 
   List<int> tagValue = [0];
-  int priorityValue;
+  Priorities priorityValue;
   List<S2Choice<int>> s2options = Utils.s2TagsList();
   List<S2Choice<int>> s2Priority = Utils.s2PriorityList();
 
@@ -41,7 +41,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     widget.task.name = taskName;
     widget.task.text = taskText;
     widget.task.tags = tags;
-    widget.task.priority = Priorities.values[priorityValue];
+    widget.task.priority = priorityValue;
     context.read<TaskListBloc>().add(EditTaskEvent(widget.task));
     context.read<TaskListBloc>().add(EditTaskCheckEvent(widget.task));
     var listBox = await Hive.openBox<List<Task>>('taskList');
@@ -244,10 +244,10 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 choiceType: S2ChoiceType.chips,
                 choiceLayout: S2ChoiceLayout.grid,
                 modalType: S2ModalType.bottomSheet,
-                value: priorityValue,
+                value: priorityValue.index,
                 choiceItems: s2Priority,
                 onChange: (state) {
-                  setState(() => priorityValue = state.value);
+                  setState(() => priorityValue = Priorities.values[state.value]);
                   print(priorityValue);
                 }),
             InkWell(
@@ -357,8 +357,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       tags.add(e.index);
     });
     tagValue = tags;
-    Priorities selectedPriority = nameToPriorityMap[widget.task.priority];
-    priorityValue = selectedPriority.index;
+    Priorities selectedPriority = widget.task.priority;
+    priorityValue = selectedPriority;
     _nameController.text = widget.task.name;
     _textController.text = widget.task.text;
   }

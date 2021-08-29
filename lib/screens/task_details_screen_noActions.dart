@@ -1,11 +1,14 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
+import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
+import 'package:dart_task_manager/repository/repo.dart';
+import 'package:dart_task_manager/screens/task_edit_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:hive/hive.dart';
 
 import '../constants.dart';
 
@@ -16,6 +19,28 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future<void> deleteCurrentTask() async {
+      context.read<TaskListBloc>().add(DeleteTaskEvent(task));
+      var listBox = await Hive.openBox<List<Task>>('taskList');
+      listBox.put('task', context.read<TaskListBloc>().state);
+      listBox.close();
+
+      try {
+        await Repository().deleteTask(task);
+        Navigator.of(context).pop();
+      } on Exception catch (e) {
+        snackBarNotification(context, e.toString());
+        Navigator.of(context).pushNamedAndRemoveUntil("/", (_) => false);
+      }
+    }
+
+    void openTaskEditor() {
+      Navigator.push(context, MaterialPageRoute(builder: (_) {
+        return EditTaskScreen(
+          task: task,
+        );
+      }));
+    }
 
     String deadlineDisplay(String deadline) {
       print(task.taskDeadline);
@@ -58,17 +83,18 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Тэги: ${Utils.tagsDisplay(task.tags)}",
-                          textAlign: TextAlign.right,
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
                       Row(
                         children: [
+                          Container(
+                            margin: EdgeInsets.only(top: 20),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Тэги: ${Utils.tagsDisplay(task.tags)}",
+                              textAlign: TextAlign.right,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          Spacer(),
                           Container(
                             margin: EdgeInsets.only(top: 20),
                             alignment: Alignment.centerLeft,
@@ -78,17 +104,30 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
-                          Spacer(),
                         ],
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "${deadlineDisplay(task.taskDeadline)}",
-                          textAlign: TextAlign.right,
-                          style: TextStyle(color: Colors.grey),
-                        ),
+                      Row(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(top: 20),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Приоритет: ${priorityToNameMap[task.priority]}",
+                              textAlign: TextAlign.right,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          Spacer(),
+                          Container(
+                            margin: EdgeInsets.only(top: 20),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "${deadlineDisplay(task.taskDeadline)}",
+                              textAlign: TextAlign.right,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   )),
