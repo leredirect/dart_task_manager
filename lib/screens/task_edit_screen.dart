@@ -41,7 +41,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     widget.task.name = taskName;
     widget.task.text = taskText;
     widget.task.tags = tags;
-
+    widget.task.priority = Priorities.values[priorityValue];
     context.read<TaskListBloc>().add(EditTaskEvent(widget.task));
     context.read<TaskListBloc>().add(EditTaskCheckEvent(widget.task));
     var listBox = await Hive.openBox<List<Task>>('taskList');

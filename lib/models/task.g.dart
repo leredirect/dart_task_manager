@@ -121,7 +121,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       fields[3] as String,
       fields[4] as String,
       fields[5] as int,
-      fields[6] as String,
+      fields[6] as Priorities,
     );
   }
 

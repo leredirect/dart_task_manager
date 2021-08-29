@@ -105,7 +105,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   }
 
   Future<void> addTask(String tag, String deadline, List<int> tagValue) async {
-    String priority = priorityToNameMap[Priorities.values[priorityValue]];
+    Priorities priority = Priorities.values[priorityValue];
     List<Tags> tags = tagValue.map((e) => Tags.values[e]).toList();
     String taskName = _nameController.text;
     String taskText = _textController.text;

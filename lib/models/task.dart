@@ -17,7 +17,7 @@ class Task {
   @HiveField(5)
   int id;
   @HiveField(6)
-  String priority;
+  Priorities priority;
 
   Task(this.name, this.text, this.tags, this.taskCreateTime, this.taskDeadline,
       this.id, this.priority);
@@ -30,7 +30,7 @@ class Task {
       "taskCreateTime": this.taskCreateTime,
       "taskDeadline": this.taskDeadline,
       "id": this.id,
-      "priority": this.priority
+      "priority": priorityToNameMap[this.priority],
     };
   }
 
@@ -41,11 +41,10 @@ class Task {
     json['tag'].forEach((e) {
       tags.add(Tags.values[e]);
     });
-
     taskCreateTime = json['taskCreateTime'];
     taskDeadline = json['taskDeadline'] as String;
     id = json['id'] as int;
-    priority = json['priority'];
+    priority = nameToPriorityMap[json['priority']];
   }
 }
 
