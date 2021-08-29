@@ -5,10 +5,12 @@ import 'package:dart_task_manager/repository/repo.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:smart_select/smart_select.dart';
 
 import '../constants.dart';
 
@@ -33,6 +35,9 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
               }));
     } else {}
   }
+
+  List<int> tagValue = [0];
+  List<S2Choice<int>> s2options = Utils.s2TagsList();
 
   Future<void> deadlineCalc(
       String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) async {
@@ -80,7 +85,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
             deadline.hour.toString() +
             ":" +
             deadlineMinute);
-        return await addTask(dropdownValue, deadlineRes);
+        return await addTask(dropdownValue, deadlineRes, tagValue);
       } else {
         String deadlineRes = (deadline.day.toString() +
             "." +
@@ -91,13 +96,14 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
             deadline.hour.toString() +
             ":" +
             deadline.minute.toString());
-        return addTask(dropdownValue, deadlineRes);
+        return addTask(dropdownValue, deadlineRes, tagValue);
       }
     }
   }
 
-  Future<void> addTask(String tag, String deadline) async {
-    print(deadline + "\nТУТ дедлайн");
+  Future<void> addTask(String tag, String deadline, List<int> tagValue) async {
+
+    List<Tags> tags = tagValue.map((e) => Tags.values[e]).toList();
     String taskName = _nameController.text;
     String taskText = _textController.text;
     String taskCreateTime = DateFormat.d().format(DateTime.now()) +
@@ -107,7 +113,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
         DateFormat.y().format(DateTime.now()) +
         " в " +
         DateFormat.Hm().format(DateTime.now());
-    Tags tagValue = nameToTagMap[tag];
+
     var idBox = await Hive.openBox<int>('id_box');
     int id = idBox.get('id');
     if (id == null) {
@@ -116,9 +122,10 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
       int id = idBox.get('id');
       idBox.put('id', id + 1);
     }
-    Task task =
-        Task(taskName, taskText, tagValue, taskCreateTime, deadline, id);
-print("${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.taskDeadline}");
+    Task task = Task(
+        taskName, taskText, tags, taskCreateTime, deadline, id);
+    print(
+        "${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.taskDeadline}, ${task.tags.toString()}");
     context.read<TaskListBloc>().add(AddTaskEvent(task));
     var listBox = await Hive.openBox<List<Task>>('taskList');
     listBox.put('task', context.read<TaskListBloc>().state);
@@ -158,15 +165,21 @@ print("${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.ta
                 hintStyle: TextStyle(color: Colors.white),
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                      color: Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: dropdownValue)),
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[Tags.values[tagValue.first]])),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Utils.tagColor(
-                        isWhite: false, isDetail: false, drpv: dropdownValue),
+                    color: tagValue.isEmpty
+                        ? clearColor.withOpacity(0.5)
+                        : Utils.tagColor(
+                            isWhite: false,
+                            isDetail: false,
+                            drpv: tagToNameMap[Tags.values[tagValue.first]]),
                   ),
                 ),
               ),
@@ -181,64 +194,58 @@ print("${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.ta
                 contentPadding: EdgeInsets.only(left: 5),
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                      color: Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: dropdownValue)),
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[Tags.values[tagValue.first]])),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                      color: Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: dropdownValue)),
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[Tags.values[tagValue.first]])),
                 ),
               ),
             ),
-            Container(
-              margin: EdgeInsets.fromLTRB(5, 20, 0, 0),
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Выберите тег:",
-                style: TextStyle(color: Colors.white),
-                textAlign: TextAlign.left,
-              ),
-            ),
-            Container(
-              alignment: Alignment.centerLeft,
-              margin: EdgeInsets.fromLTRB(5, 0, 0, 0),
-              child: DropdownButton<String>(
-                style: TextStyle(color: Colors.white, fontSize: 16),
-                dropdownColor: backgroundColor,
-                value: dropdownValue,
-                iconSize: 24,
-                elevation: 16,
-                underline: Container(
-                  height: 2,
-                  color: Utils.tagColor(
-                      isWhite: false, isDetail: false, drpv: dropdownValue),
-                ),
-                onChanged: (String newValue) {
-                  setState(() {
-                    dropdownValue = newValue;
-                  });
-                },
-                items: nameToTagMap.keys
-                    .toList()
-                    .where((element) =>
-                        element != tagToNameMap[Tags.CLEAR] &&
-                        element != tagToNameMap[Tags.EXPIRED])
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style: TextStyle(color: Colors.white),
-                    ),
+            SmartSelect<int>.multiple(
+                tileBuilder: (context, state) {
+                  return S2Tile.fromState(
+                    state,
+                    title: Text("Выберите тег:",
+                        style: TextStyle(color: Colors.white)),
+                    padding:
+                        EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
                   );
-                }).toList(),
-              ),
-            ),
+                },
+                title: "Выберите тег:",
+                placeholder: "Выберите один или несколько тэгов",
+                choiceStyle: S2ChoiceStyle(
+                  titleStyle: TextStyle(color: Colors.black),
+                  color: backgroundColor,
+                  activeColor: backgroundColor,
+                  activeAccentColor: clearColor,
+                  accentColor: clearColor,
+                ),
+                modalStyle: S2ModalStyle(
+                  backgroundColor: backgroundColor,
+                ),
+                modalHeaderStyle: S2ModalHeaderStyle(
+                    backgroundColor: backgroundColor,
+                    textStyle: TextStyle(color: clearColor)),
+                choiceType: S2ChoiceType.chips,
+                choiceLayout: S2ChoiceLayout.grid,
+                modalType: S2ModalType.bottomSheet,
+                value: tagValue,
+                choiceItems: s2options,
+                onChange: (state) {
+                  setState(() => tagValue = state.value);
+                  print(tagValue);
+                }),
             InkWell(
                 onTap: () {
                   DateTime now = DateTime.now();
@@ -265,8 +272,12 @@ print("${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.ta
                       )
                     ],
                     borderRadius: BorderRadius.circular(12),
-                    color: Utils.tagColor(
-                        isWhite: false, isDetail: false, drpv: dropdownValue),
+                    color: tagValue.isEmpty
+                        ? clearColor.withOpacity(0.5)
+                        : Utils.tagColor(
+                            isWhite: false,
+                            isDetail: false,
+                            drpv: tagToNameMap[Tags.values[tagValue.first]]),
                   ),
                   width: MediaQuery.of(context).size.width * 0.6,
                   height: 40,
@@ -303,8 +314,12 @@ print("${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.ta
                           offset: Offset(0, 3),
                         )
                       ],
-                      color: Utils.tagColor(
-                          isWhite: false, isDetail: false, drpv: dropdownValue),
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[Tags.values[tagValue.first]]),
                       borderRadius: BorderRadius.circular(12)),
                   width: MediaQuery.of(context).size.width * 0.4,
                   height: 40,
@@ -315,7 +330,7 @@ print("${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.ta
                     "Подтвердить",
                     style: TextStyle(color: Colors.white),
                   )),
-                  // color: Colors.redAccent,
+
                 ))
           ],
         ),

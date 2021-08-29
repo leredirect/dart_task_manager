@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+
 import '../constants.dart';
 
 class TaskDetailsScreenNoActions extends StatelessWidget {
@@ -15,7 +16,9 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     String deadlineDisplay(String deadline) {
+      print(task.taskDeadline);
       String result = "Дедлайн: $deadline";
       return result;
     }
@@ -55,6 +58,15 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
                           ),
                         ),
                       ),
+                      Container(
+                        margin: EdgeInsets.only(top: 20),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Тэги: ${Utils.tagsDisplay(task.tags)}",
+                          textAlign: TextAlign.right,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
                       Row(
                         children: [
                           Container(
@@ -84,7 +96,10 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
                 margin: EdgeInsets.only(bottom: 20),
                 height: 2,
                 color: Utils.tagColor(
-                    isWhite: false, isDetail: true, drpv: null, tag: task.tag),
+                    isWhite: false,
+                    isDetail: true,
+                    drpv: null,
+                    tag: task.tags.first),
               ),
               Container(
                 child: Text(task.text,

@@ -3,10 +3,24 @@ import 'dart:ui';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:smart_select/smart_select.dart';
 
 import '../constants.dart';
 
 class Utils {
+
+  static List<S2Choice<int>> s2TagsList (){
+    List<S2Choice<int>> s2Options = [];
+    List<Tags> tags = new List.from(Tags.values);
+    print(tags);
+    tags.removeWhere((element) => (element == Tags.EXPIRED) | (element == Tags.CLEAR));
+    print(tags);
+    for (int i = 0; i< tags.length; i++){
+      s2Options.add(S2Choice<int>(value: i, title: tagToNameMap[tags[i]]));
+    }
+    return s2Options;
+  }
+
   static Color tagColor({bool isWhite, bool isDetail, String drpv, Tags tag}) {
     Tags drpEnum = nameToTagMap[drpv];
     if (isWhite) {
@@ -66,18 +80,31 @@ class Utils {
 
   static void statusBarColor() {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: Color(0xff2A2A2A), // status bar color
+        statusBarColor: backgroundColor,
         statusBarBrightness: Brightness.light,
         statusBarIconBrightness: Brightness.light));
   }
 
-  static void taskFromBaseDisplay(List<Task> tasks){
-    print("Прилетело с базы тасок: ${tasks.length}" );
-    for (int i = 0; i < tasks.length; i++){
-      print("#${i}\nID: ${tasks[i].id}\nИмя: ${tasks[i].name}\nТекст: ${tasks[i].text}\nСоздана: ${tasks[i].taskCreateTime}\nДедлайн: ${tasks[i].taskDeadline}\n============================================");
+  static void taskFromBaseDisplay(List<Task> tasks) {
+    print("Прилетело с базы тасок: ${tasks.length}");
+    for (int i = 0; i < tasks.length; i++) {
+      print(
+          "#${i}\nID: ${tasks[i].id}\nИмя: ${tasks[i].name}\nТекст: ${tasks[i].text}\nСоздана: ${tasks[i].taskCreateTime}\nДедлайн: ${tasks[i].taskDeadline}\n============================================");
     }
   }
 
+  static String tagsDisplay(List tags) {
+    String result = "";
+    for (int i = 0; i < tags.length; i++) {
+      if (tags.length - 1 == i) {
+        result = result + tagToNameMap[tags[i]];
+      } else {
+        result = result + tagToNameMap[tags[i]] + ", ";
+      }
+    }
+    print(result);
+    return result;
+  }
 }
 
 void snackBarNotification(context, String text) {

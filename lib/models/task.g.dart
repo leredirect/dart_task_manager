@@ -73,7 +73,7 @@ class TaskAdapter extends TypeAdapter<Task> {
     return Task(
       fields[0] as String,
       fields[1] as String,
-      fields[2] as Tags,
+      (fields[2] as List)?.cast<Tags>(),
       fields[3] as String,
       fields[4] as String,
       fields[5] as int,
@@ -89,7 +89,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(1)
       ..write(obj.text)
       ..writeByte(2)
-      ..write(obj.tag)
+      ..write(obj.tags)
       ..writeByte(3)
       ..write(obj.taskCreateTime)
       ..writeByte(4)

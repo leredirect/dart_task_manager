@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
+import 'package:smart_select/smart_select.dart';
 
 import '../constants.dart';
 
@@ -27,19 +28,26 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   DateTime pickedDate;
   TimeOfDay pickedTime;
 
+  List<int> tagValue = [0];
+  List<S2Choice<int>> s2options = Utils.s2TagsList();
+
   Future<void> addTask(String taskTag, String deadline) async {
+
+    List<Tags> tags = tagValue.map((e) => Tags.values[e]).toList();
     widget.task.taskDeadline = deadline;
     String taskName = _nameController.text;
     String taskText = _textController.text;
     widget.task.name = taskName;
     widget.task.text = taskText;
-    widget.task.tag = nameToTagMap[taskTag];
+    widget.task.tags = tags;
 
     context.read<TaskListBloc>().add(EditTaskEvent(widget.task));
     context.read<TaskListBloc>().add(EditTaskCheckEvent(widget.task));
     var listBox = await Hive.openBox<List<Task>>('taskList');
     listBox.put('task', context.read<TaskListBloc>().state);
     listBox.close();
+    print(
+        "${widget.task.id}, ${widget.task.name}, ${widget.task.text}, ${widget.task.taskCreateTime}, ${widget.task.taskDeadline}, ${widget.task.tags.toString()}");
     try {
       await Repository().editTask(widget.task);
       Navigator.of(context).pop();
@@ -63,32 +71,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     if (pickedDate == null && pickedTime == null) {
       String deadlineRes = widget.task.taskDeadline.toString();
       return addTask(dropdownValue, deadlineRes);
-      // return showDialog<void>(
-      //   context: context,
-      //   barrierDismissible: false,
-      //   builder: (BuildContext context) {
-      //     return AlertDialog(
-      //       backgroundColor: backgroundColor,
-      //       title: const Text('Ошибка', style: TextStyle(color: Colors.white)),
-      //       content: SingleChildScrollView(
-      //         child: ListBody(
-      //           children: const <Widget>[
-      //             Text('Введите дату и время',
-      //                 style: TextStyle(color: Colors.white)),
-      //           ],
-      //         ),
-      //       ),
-      //       actions: <Widget>[
-      //         TextButton(
-      //           child: Text('OK', style: TextStyle(color: Colors.white)),
-      //           onPressed: () {
-      //             Navigator.of(context).pop();
-      //           },
-      //         ),
-      //       ],
-      //     );
-      // },
-      // );
     } else {
       DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
           pickedDate.day, pickedTime.hour, pickedTime.minute);
@@ -126,202 +108,205 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   Widget build(BuildContext context) {
     Utils.statusBarColor();
     return GestureDetector(
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        child: Scaffold(
-          appBar: AppBar(
-            systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarIconBrightness: Brightness.light,
-            ),
-            backwardsCompatibility: false,
-            iconTheme: IconThemeData(color: Colors.white),
-            title: Text(
-              "Редактирование задачи",
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: backgroundColor,
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarIconBrightness: Brightness.light,
           ),
-          body: Column(
-            children: [
-              TextField(
-                focusNode: FocusNode(debugLabel: "name_edit"),
-                controller: _nameController,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: "Название задачи",
-                  contentPadding: EdgeInsets.only(left: 5),
-                  hintStyle: TextStyle(color: Colors.white),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Utils.tagColor(
-                            isWhite: false,
-                            isDetail: false,
-                            drpv: dropdownValue)),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Utils.tagColor(
-                          isWhite: false, isDetail: false, drpv: dropdownValue),
-                    ),
-                  ),
-                ),
-              ),
-              TextField(
-                focusNode: FocusNode(debugLabel: "text_edit"),
-                controller: _textController,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: "Условия задачи",
-                  hintStyle: TextStyle(color: Colors.white),
-                  contentPadding: EdgeInsets.only(left: 5),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Utils.tagColor(
-                            isWhite: false,
-                            isDetail: false,
-                            drpv: dropdownValue)),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Utils.tagColor(
-                            isWhite: false,
-                            isDetail: false,
-                            drpv: dropdownValue)),
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.fromLTRB(5, 20, 0, 0),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Выберите тег:",
-                  style: TextStyle(color: Colors.white),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              Container(
-                alignment: Alignment.centerLeft,
-                margin: EdgeInsets.fromLTRB(5, 0, 0, 0),
-                child: DropdownButton<String>(
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                  dropdownColor: backgroundColor,
-                  value: dropdownValue,
-                  iconSize: 24,
-                  elevation: 16,
-                  underline: Container(
-                      height: 2,
-                      color: Utils.tagColor(
+          backwardsCompatibility: false,
+          iconTheme: IconThemeData(color: Colors.white),
+          title: Text(
+            "Новая задача",
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: backgroundColor,
+        ),
+        body: Column(
+          children: [
+            TextField(
+              focusNode: FocusNode(debugLabel: "name"),
+              controller: _nameController,
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: "Название задачи",
+                contentPadding: EdgeInsets.only(left: 5),
+                hintStyle: TextStyle(color: Colors.white),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
                           isWhite: false,
                           isDetail: false,
-                          drpv: dropdownValue)),
-                  onChanged: (String newValue) {
-                    setState(() {
-                      dropdownValue = newValue;
-                    });
-                  },
-                  items: nameToTagMap.keys
-                      .toList()
-                      .where((element) =>
-                          element != tagToNameMap[Tags.CLEAR] &&
-                          element != tagToNameMap[Tags.EXPIRED])
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                        value,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
-                  }).toList(),
+                          drpv: tagToNameMap[Tags.values[tagValue.first]])),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: tagValue.isEmpty
+                        ? clearColor.withOpacity(0.5)
+                        : Utils.tagColor(
+                        isWhite: false,
+                        isDetail: false,
+                        drpv: tagToNameMap[Tags.values[tagValue.first]]),
+                  ),
                 ),
               ),
-              InkWell(
-                  onTap: () {
-                    DateTime now = DateTime.now();
-                    var lastDate = now.add(const Duration(days: 60));
-                    var firstDate = now.subtract(const Duration(days: 5));
-                    showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: firstDate,
-                      lastDate: lastDate,
-                    )
-                        .then((value) => pickedDate = value)
-                        .then((value) => showTaskTimePicker(pickedDate));
-                  },
-                  child: Container(
-                    margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
-                    decoration: BoxDecoration(
+            ),
+            TextField(
+              focusNode: FocusNode(debugLabel: "text"),
+              controller: _textController,
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: "Условия задачи",
+                hintStyle: TextStyle(color: Colors.white),
+                contentPadding: EdgeInsets.only(left: 5),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                          isWhite: false,
+                          isDetail: false,
+                          drpv: tagToNameMap[Tags.values[tagValue.first]])),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                          isWhite: false,
+                          isDetail: false,
+                          drpv: tagToNameMap[Tags.values[tagValue.first]])),
+                ),
+              ),
+            ),
+            SmartSelect<int>.multiple(
+                tileBuilder: (context, state) {
+                  return S2Tile.fromState(
+                    state,
+                    title: Text("Выберите тег:",
+                        style: TextStyle(color: Colors.white)),
+                    padding:
+                    EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
+                  );
+                },
+                title: "Выберите тег:",
+                placeholder: "Выберите один или несколько тегов",
+                choiceStyle: S2ChoiceStyle(
+                  titleStyle: TextStyle(color: Colors.black),
+                  color: backgroundColor,
+                  activeColor: backgroundColor,
+                  activeAccentColor: clearColor,
+                  accentColor: clearColor,
+                ),
+                modalStyle: S2ModalStyle(
+                  backgroundColor: backgroundColor,
+                ),
+                modalHeaderStyle: S2ModalHeaderStyle(
+                    backgroundColor: backgroundColor,
+                    textStyle: TextStyle(color: clearColor)),
+                choiceType: S2ChoiceType.chips,
+                choiceLayout: S2ChoiceLayout.grid,
+                modalType: S2ModalType.bottomSheet,
+                value: tagValue,
+                choiceItems: s2options,
+                onChange: (state) {
+                  setState(() => tagValue = state.value);
+                  print(tagValue);
+                }),
+            InkWell(
+                onTap: () {
+                  DateTime now = DateTime.now();
+                  var lastDate = now.add(const Duration(days: 60));
+                  var firstDate = now.subtract(const Duration(days: 5));
+                  showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: firstDate,
+                    lastDate: lastDate,
+                  )
+                      .then((value) => pickedDate = value)
+                      .then((value) => showTaskTimePicker(pickedDate));
+                },
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.4),
+                        spreadRadius: 1,
+                        blurRadius: 7,
+                        offset: Offset(0, 3),
+                      )
+                    ],
+                    borderRadius: BorderRadius.circular(12),
+                    color: tagValue.isEmpty
+                        ? clearColor.withOpacity(0.5)
+                        : Utils.tagColor(
+                        isWhite: false,
+                        isDetail: false,
+                        drpv: tagToNameMap[Tags.values[tagValue.first]]),
+                  ),
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  height: 40,
+                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  child: Center(
+                      child: Text(
+                        "Задать время на выполнение",
+                        style: TextStyle(color: Colors.white),
+                      )),
+                )),
+            Container(
+              margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
+              alignment: Alignment.center,
+              child: Text(
+                Utils.timeHint(pickedDate, pickedTime, isEdit: false),
+                style: TextStyle(
+                  color: Colors.white24,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+              ),
+            ),
+            Spacer(),
+            InkWell(
+                onTap: () =>
+                    deadlineCalc(dropdownValue, pickedDate, pickedTime),
+                child: Container(
+                  decoration: BoxDecoration(
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.4),
+                          color: Colors.black.withOpacity(0.5),
                           spreadRadius: 1,
                           blurRadius: 7,
                           offset: Offset(0, 3),
                         )
                       ],
-                      borderRadius: BorderRadius.circular(12),
-                      color: Utils.tagColor(
-                          isWhite: false, isDetail: false, drpv: dropdownValue),
-                    ),
-                    width: MediaQuery.of(context).size.width * 0.6,
-                    height: 40,
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                    child: Center(
-                        child: Text(
-                      "Задать время на выполнение",
-                      style: TextStyle(color: Colors.white),
-                    )),
-                  )),
-              Container(
-                margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
-                alignment: Alignment.center,
-                child: Text(
-                  Utils.timeHint(
-                    pickedDate,
-                    pickedTime,
-                    isEdit: true,
-                    task: widget.task,
-                  ),
-                  style: TextStyle(color: Colors.white),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                ),
-              ),
-              Spacer(),
-              InkWell(
-                  onTap: () =>
-                      deadlineCalc(dropdownValue, pickedDate, pickedTime),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            spreadRadius: 1,
-                            blurRadius: 7,
-                            offset: Offset(0, 3),
-                          )
-                        ],
-                        color: Utils.tagColor(
-                            isWhite: false,
-                            isDetail: false,
-                            drpv: dropdownValue),
-                        borderRadius: BorderRadius.circular(12)),
-                    width: MediaQuery.of(context).size.width * 0.4,
-                    height: 40,
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                    margin: EdgeInsets.only(bottom: 50),
-                    child: Center(
-                        child: Text(
-                      "Подтвердить",
-                      style: TextStyle(color: Colors.white),
-                    )),
-                    // color: Colors.redAccent,
-                  ))
-            ],
-          ),
-          backgroundColor: backgroundColor,
-        ));
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                          isWhite: false,
+                          isDetail: false,
+                          drpv: tagToNameMap[Tags.values[tagValue.first]]),
+                      borderRadius: BorderRadius.circular(12)),
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  height: 40,
+                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  margin: EdgeInsets.only(bottom: 50),
+                  child: Center(
+                      child: Text(
+                        "Подтвердить",
+                        style: TextStyle(color: Colors.white),
+                      )),
+                ))
+          ],
+        ),
+        backgroundColor: backgroundColor,
+      ),
+    );
   }
+
 
   @override
   void dispose() {
@@ -333,8 +318,11 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   @override
   void initState() {
     super.initState();
-    dropdownValue =
-        nameToTagMap.keys.firstWhere((k) => nameToTagMap[k] == widget.task.tag);
+    List<int> tags = [];
+    widget.task.tags.forEach((e){
+      tags.add(e.index);
+    });
+    tagValue = tags;
     _nameController.text = widget.task.name;
     _textController.text = widget.task.text;
   }
