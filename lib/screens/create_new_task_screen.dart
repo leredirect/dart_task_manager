@@ -37,7 +37,10 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   }
 
   List<int> tagValue = [0];
-  List<S2Choice<int>> s2options = Utils.s2TagsList();
+  int priorityValue = 0;
+  List<S2Choice<int>> s2Options = Utils.s2TagsList();
+  List<S2Choice<int>> s2Priority = Utils.s2PriorityList();
+
 
   Future<void> deadlineCalc(
       String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) async {
@@ -102,7 +105,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   }
 
   Future<void> addTask(String tag, String deadline, List<int> tagValue) async {
-
+    String priority = priorityToNameMap[Priorities.values[priorityValue]];
     List<Tags> tags = tagValue.map((e) => Tags.values[e]).toList();
     String taskName = _nameController.text;
     String taskText = _textController.text;
@@ -122,10 +125,10 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
       int id = idBox.get('id');
       idBox.put('id', id + 1);
     }
-    Task task = Task(
-        taskName, taskText, tags, taskCreateTime, deadline, id);
+    Task task =
+        Task(taskName, taskText, tags, taskCreateTime, deadline, id, priority);
     print(
-        "${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.taskDeadline}, ${task.tags.toString()}");
+        "${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.taskDeadline}, ${task.priority}, ${task.tags.toString()}");
     context.read<TaskListBloc>().add(AddTaskEvent(task));
     var listBox = await Hive.openBox<List<Task>>('taskList');
     listBox.put('task', context.read<TaskListBloc>().state);
@@ -241,10 +244,44 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 choiceLayout: S2ChoiceLayout.grid,
                 modalType: S2ModalType.bottomSheet,
                 value: tagValue,
-                choiceItems: s2options,
+                choiceItems: s2Options,
                 onChange: (state) {
                   setState(() => tagValue = state.value);
                   print(tagValue);
+                }),
+            SmartSelect<int>.single(
+                tileBuilder: (context, state) {
+                  return S2Tile.fromState(
+                    state,
+                    title: Text("Выберите приоритет:",
+                        style: TextStyle(color: Colors.white)),
+                    padding:
+                        EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
+                  );
+                },
+                title: "Выберите приоритет",
+                placeholder: "Выберите один или несколько тэгов",
+                choiceStyle: S2ChoiceStyle(
+                  titleStyle: TextStyle(color: Colors.black),
+                  color: backgroundColor,
+                  activeColor: backgroundColor,
+                  activeAccentColor: clearColor,
+                  accentColor: clearColor,
+                ),
+                modalStyle: S2ModalStyle(
+                  backgroundColor: backgroundColor,
+                ),
+                modalHeaderStyle: S2ModalHeaderStyle(
+                    backgroundColor: backgroundColor,
+                    textStyle: TextStyle(color: clearColor)),
+                choiceType: S2ChoiceType.chips,
+                choiceLayout: S2ChoiceLayout.grid,
+                modalType: S2ModalType.bottomSheet,
+                value: priorityValue,
+                choiceItems: s2Priority,
+                onChange: (state) {
+                  setState(() => priorityValue = state.value);
+                  print(priorityValue);
                 }),
             InkWell(
                 onTap: () {
@@ -330,7 +367,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                     "Подтвердить",
                     style: TextStyle(color: Colors.white),
                   )),
-
                 ))
           ],
         ),

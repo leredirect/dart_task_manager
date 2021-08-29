@@ -29,10 +29,11 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   TimeOfDay pickedTime;
 
   List<int> tagValue = [0];
+  int priorityValue;
   List<S2Choice<int>> s2options = Utils.s2TagsList();
+  List<S2Choice<int>> s2Priority = Utils.s2PriorityList();
 
   Future<void> addTask(String taskTag, String deadline) async {
-
     List<Tags> tags = tagValue.map((e) => Tags.values[e]).toList();
     widget.task.taskDeadline = deadline;
     String taskName = _nameController.text;
@@ -137,18 +138,18 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                       color: tagValue.isEmpty
                           ? clearColor.withOpacity(0.5)
                           : Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: tagToNameMap[Tags.values[tagValue.first]])),
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[Tags.values[tagValue.first]])),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
                     color: tagValue.isEmpty
                         ? clearColor.withOpacity(0.5)
                         : Utils.tagColor(
-                        isWhite: false,
-                        isDetail: false,
-                        drpv: tagToNameMap[Tags.values[tagValue.first]]),
+                            isWhite: false,
+                            isDetail: false,
+                            drpv: tagToNameMap[Tags.values[tagValue.first]]),
                   ),
                 ),
               ),
@@ -166,18 +167,18 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                       color: tagValue.isEmpty
                           ? clearColor.withOpacity(0.5)
                           : Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: tagToNameMap[Tags.values[tagValue.first]])),
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[Tags.values[tagValue.first]])),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
                       color: tagValue.isEmpty
                           ? clearColor.withOpacity(0.5)
                           : Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: tagToNameMap[Tags.values[tagValue.first]])),
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[Tags.values[tagValue.first]])),
                 ),
               ),
             ),
@@ -188,7 +189,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                     title: Text("Выберите тег:",
                         style: TextStyle(color: Colors.white)),
                     padding:
-                    EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
+                        EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
                   );
                 },
                 title: "Выберите тег:",
@@ -214,6 +215,40 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 onChange: (state) {
                   setState(() => tagValue = state.value);
                   print(tagValue);
+                }),
+            SmartSelect<int>.single(
+                tileBuilder: (context, state) {
+                  return S2Tile.fromState(
+                    state,
+                    title: Text("Выберите приоритет:",
+                        style: TextStyle(color: Colors.white)),
+                    padding:
+                        EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
+                  );
+                },
+                title: "Выберите приоритет",
+                placeholder: "Выберите один или несколько тегов",
+                choiceStyle: S2ChoiceStyle(
+                  titleStyle: TextStyle(color: Colors.black),
+                  color: backgroundColor,
+                  activeColor: backgroundColor,
+                  activeAccentColor: clearColor,
+                  accentColor: clearColor,
+                ),
+                modalStyle: S2ModalStyle(
+                  backgroundColor: backgroundColor,
+                ),
+                modalHeaderStyle: S2ModalHeaderStyle(
+                    backgroundColor: backgroundColor,
+                    textStyle: TextStyle(color: clearColor)),
+                choiceType: S2ChoiceType.chips,
+                choiceLayout: S2ChoiceLayout.grid,
+                modalType: S2ModalType.bottomSheet,
+                value: priorityValue,
+                choiceItems: s2Priority,
+                onChange: (state) {
+                  setState(() => priorityValue = state.value);
+                  print(priorityValue);
                 }),
             InkWell(
                 onTap: () {
@@ -244,18 +279,18 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                     color: tagValue.isEmpty
                         ? clearColor.withOpacity(0.5)
                         : Utils.tagColor(
-                        isWhite: false,
-                        isDetail: false,
-                        drpv: tagToNameMap[Tags.values[tagValue.first]]),
+                            isWhite: false,
+                            isDetail: false,
+                            drpv: tagToNameMap[Tags.values[tagValue.first]]),
                   ),
                   width: MediaQuery.of(context).size.width * 0.6,
                   height: 40,
                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   child: Center(
                       child: Text(
-                        "Задать время на выполнение",
-                        style: TextStyle(color: Colors.white),
-                      )),
+                    "Задать время на выполнение",
+                    style: TextStyle(color: Colors.white),
+                  )),
                 )),
             Container(
               margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
@@ -286,9 +321,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                       color: tagValue.isEmpty
                           ? clearColor.withOpacity(0.5)
                           : Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: tagToNameMap[Tags.values[tagValue.first]]),
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[Tags.values[tagValue.first]]),
                       borderRadius: BorderRadius.circular(12)),
                   width: MediaQuery.of(context).size.width * 0.4,
                   height: 40,
@@ -296,9 +331,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   margin: EdgeInsets.only(bottom: 50),
                   child: Center(
                       child: Text(
-                        "Подтвердить",
-                        style: TextStyle(color: Colors.white),
-                      )),
+                    "Подтвердить",
+                    style: TextStyle(color: Colors.white),
+                  )),
                 ))
           ],
         ),
@@ -306,7 +341,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       ),
     );
   }
-
 
   @override
   void dispose() {
@@ -319,10 +353,12 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   void initState() {
     super.initState();
     List<int> tags = [];
-    widget.task.tags.forEach((e){
+    widget.task.tags.forEach((e) {
       tags.add(e.index);
     });
     tagValue = tags;
+    Priorities selectedPriority = nameToPriorityMap[widget.task.priority];
+    priorityValue = selectedPriority.index;
     _nameController.text = widget.task.name;
     _textController.text = widget.task.text;
   }

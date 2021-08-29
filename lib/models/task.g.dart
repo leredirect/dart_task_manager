@@ -60,6 +60,50 @@ class TagsAdapter extends TypeAdapter<Tags> {
           typeId == other.typeId;
 }
 
+class PrioritiesAdapter extends TypeAdapter<Priorities> {
+  @override
+  final int typeId = 2;
+
+  @override
+  Priorities read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return Priorities.HIGH;
+      case 1:
+        return Priorities.MEDIUM;
+      case 2:
+        return Priorities.LOW;
+      default:
+        return Priorities.HIGH;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, Priorities obj) {
+    switch (obj) {
+      case Priorities.HIGH:
+        writer.writeByte(0);
+        break;
+      case Priorities.MEDIUM:
+        writer.writeByte(1);
+        break;
+      case Priorities.LOW:
+        writer.writeByte(2);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PrioritiesAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class TaskAdapter extends TypeAdapter<Task> {
   @override
   final int typeId = 0;
@@ -77,13 +121,14 @@ class TaskAdapter extends TypeAdapter<Task> {
       fields[3] as String,
       fields[4] as String,
       fields[5] as int,
+      fields[6] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -95,7 +140,9 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(4)
       ..write(obj.taskDeadline)
       ..writeByte(5)
-      ..write(obj.id);
+      ..write(obj.id)
+      ..writeByte(6)
+      ..write(obj.priority);
   }
 
   @override
