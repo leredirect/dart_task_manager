@@ -105,7 +105,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   }
 
   Future<void> addTask(String tag, String deadline, List<int> tagValue) async {
-    Priorities priority = priorityValue;
     List<Tags> tags = tagValue.map((e) => Tags.values[e]).toList();
     String taskName = _nameController.text;
     String taskText = _textController.text;
@@ -126,7 +125,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
       idBox.put('id', id + 1);
     }
     Task task =
-        Task(taskName, taskText, tags, taskCreateTime, deadline, id, priority);
+        Task(taskName, taskText, tags, taskCreateTime, deadline, id, priorityValue);
     print(
         "${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.taskDeadline}, ${task.priority}, ${task.tags.toString()}");
     context.read<TaskListBloc>().add(AddTaskEvent(task));
