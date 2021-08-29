@@ -19,29 +19,6 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> deleteCurrentTask() async {
-      context.read<TaskListBloc>().add(DeleteTaskEvent(task));
-      var listBox = await Hive.openBox<List<Task>>('taskList');
-      listBox.put('task', context.read<TaskListBloc>().state);
-      listBox.close();
-
-      try {
-        await Repository().deleteTask(task);
-        Navigator.of(context).pop();
-      } on Exception catch (e) {
-        snackBarNotification(context, e.toString());
-        Navigator.of(context).pushNamedAndRemoveUntil("/", (_) => false);
-      }
-    }
-
-    void openTaskEditor() {
-      Navigator.push(context, MaterialPageRoute(builder: (_) {
-        return EditTaskScreen(
-          task: task,
-        );
-      }));
-    }
-
     String deadlineDisplay(String deadline) {
       print(task.taskDeadline);
       String result = "Дедлайн: $deadline";
