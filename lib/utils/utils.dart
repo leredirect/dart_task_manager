@@ -66,30 +66,31 @@ class Utils {
 
   static void statusBarColor() {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: Color(0xff2A2A2A), // status bar color
+        statusBarColor: backgroundColor, // status bar color
         statusBarBrightness: Brightness.light,
         statusBarIconBrightness: Brightness.light));
   }
 
-  static void taskFromBaseDisplay(List<Task> tasks){
-    print("Прилетело с базы тасок: ${tasks.length}" );
-    for (int i = 0; i < tasks.length; i++){
-      print("#${i}\nID: ${tasks[i].id}\nИмя: ${tasks[i].name}\nТекст: ${tasks[i].text}\nСоздана: ${tasks[i].taskCreateTime}\nДедлайн: ${tasks[i].taskDeadline}\n============================================");
+  static void taskFromBaseDisplay(List<Task> tasks) {
+    print("Прилетело с базы тасок: ${tasks.length}");
+    for (int i = 0; i < tasks.length; i++) {
+      print(
+          "#${i}\nID: ${tasks[i].id}\nИмя: ${tasks[i].name}\nТекст: ${tasks[i].text}\nСоздана: ${tasks[i].taskCreateTime}\nДедлайн: ${tasks[i].taskDeadline}\n============================================");
     }
   }
- static String tagsDisplay(List tags){
-   String result = "";
-    for (int i = 0; i < tags.length; i++){
-      if (tags.length - 1 == i){
-        result = result + tagToNameMap[Tags.values[tags[i]]];
-      } else{
-        result = result + tagToNameMap[Tags.values[tags[i]]] + ", ";
-      }
 
+  static String tagsDisplay(List tags) {
+    String result = "";
+    for (int i = 0; i < tags.length; i++) {
+      if (tags.length - 1 == i) {
+        result = result + tagToNameMap[tags[i]];
+      } else {
+        result = result + tagToNameMap[tags[i]] + ", ";
+      }
     }
-    print (result);
+    print(result);
     return result;
- }
+  }
 }
 
 void snackBarNotification(context, String text) {

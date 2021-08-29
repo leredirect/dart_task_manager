@@ -50,6 +50,8 @@ class TaskListWidget extends StatelessWidget {
         horizontalOffset: 50.0,
         child: FadeInAnimation(
           child: GridView.count(
+            childAspectRatio: ((MediaQuery.of(context).size.width - 90) / 2) /
+                (MediaQuery.of(context).size.height / 4.9),
             padding: EdgeInsets.fromLTRB(
                 gridAxisParameters(),
                 gridAxisParameters(),

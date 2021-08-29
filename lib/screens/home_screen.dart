@@ -163,10 +163,11 @@ class _HomeScreenState extends State<HomeScreen> {
         return BlocBuilder<TaskListBloc, List<Task>>(
           builder: (context, state) {
             if (filtState != null) {
-              List<Task> filtredState =
-                  state.where((element) => Tags.values[element.tags.first] == filtState).toList();
+              List<Task> filtredState = state
+                  .where(
+                      (element) => element.tags.contains(filtState))
+                  .toList();
               return AnimationConfiguration.synchronized(
-                //duration: const Duration(milliseconds: 5000),
                 child: SlideAnimation(
                   verticalOffset: 50.0,
                   child: FadeInAnimation(
@@ -175,7 +176,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             } else {
               return AnimationConfiguration.synchronized(
-                //duration: const Duration(milliseconds: 5000),
                 child: SlideAnimation(
                   verticalOffset: 50.0,
                   child:
@@ -212,10 +212,11 @@ class _HomeScreenState extends State<HomeScreen> {
               childPadding: EdgeInsets.all(3),
               children: [
                 mySpeedDialChild(Tags.CLEAR, clearColor, true, currentFilter),
-                mySpeedDialChild(Tags.FLUTTER, flutterColor, false, currentFilter),
+                mySpeedDialChild(
+                    Tags.FLUTTER, flutterColor, false, currentFilter),
                 mySpeedDialChild(Tags.DART, dartColor, false, currentFilter),
-                mySpeedDialChild(Tags.ALGORITHMS, algosColor, false, currentFilter),
-                //mySpeedDialChild(Tags.EXPIRED, Colors.grey, false, currentFilter),
+                mySpeedDialChild(
+                    Tags.ALGORITHMS, algosColor, false, currentFilter),
               ],
               backgroundColor: Utils.tagColor(
                   isWhite: false, isDetail: false, drpv: currentFilter),

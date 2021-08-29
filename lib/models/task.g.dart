@@ -73,7 +73,7 @@ class TaskAdapter extends TypeAdapter<Task> {
     return Task(
       fields[0] as String,
       fields[1] as String,
-      (fields[2] as List)?.cast<dynamic>(),
+      (fields[2] as List)?.cast<Tags>(),
       fields[3] as String,
       fields[4] as String,
       fields[5] as int,

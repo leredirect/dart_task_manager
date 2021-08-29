@@ -121,7 +121,10 @@ class TaskDetailsScreen extends StatelessWidget {
                 margin: EdgeInsets.only(bottom: 20),
                 height: 2,
                 color: Utils.tagColor(
-                    isWhite: false, isDetail: true, drpv: null, tag: Tags.values[task.tags.first]),
+                    isWhite: false,
+                    isDetail: true,
+                    drpv: null,
+                    tag: task.tags.first),
               ),
               Container(
                 child: Text(task.text,
@@ -144,7 +147,10 @@ class TaskDetailsScreen extends StatelessWidget {
                 ),
                 onPressed: deleteCurrentTask,
                 backgroundColor: Utils.tagColor(
-                    isWhite: false, isDetail: true, drpv: null, tag: Tags.values[task.tags.first]),
+                    isWhite: false,
+                    isDetail: true,
+                    drpv: null,
+                    tag: task.tags.first),
                 heroTag: null,
               ),
             ),
@@ -154,7 +160,10 @@ class TaskDetailsScreen extends StatelessWidget {
                 child: Icon(Icons.edit, color: backgroundColor),
                 onPressed: openTaskEditor,
                 backgroundColor: Utils.tagColor(
-                    isWhite: false, isDetail: true, drpv: null, tag: Tags.values[task.tags.first]),
+                    isWhite: false,
+                    isDetail: true,
+                    drpv: null,
+                    tag: task.tags.first),
                 heroTag: null,
               ),
             ),

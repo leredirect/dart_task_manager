@@ -14,6 +14,21 @@ class TaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var circlesIterable = task.tags.map((e) {
+      return Container(
+          width: 15,
+          height: 15,
+          margin: EdgeInsets.only(top: 10, left: 5, right: 5),
+          decoration: BoxDecoration(
+            color: Utils.tagColor(
+                isWhite: false,
+                isDetail: false,
+                drpv: tagToNameMap[e]),
+            shape: BoxShape.circle,
+          ));
+    });
+    List<Widget> circles = circlesIterable.toList();
+
     Utils.statusBarColor();
     void openTaskDetails() {
       var connectivityResult = Connectivity().checkConnectivity().then((value) {
@@ -33,87 +48,117 @@ class TaskWidget extends StatelessWidget {
       });
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(10),
-            bottomLeft: Radius.circular(10),
-            bottomRight: Radius.circular(10)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.5),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: InkWell(
-        onTap: openTaskDetails,
-        child: Container(
-          padding: EdgeInsets.all(3),
-          color: Utils.tagColor(
-              isWhite: false, isDetail: true, drpv: null, tag: Tags.values[task.tags.first]),
-          child: Column(
-            children: [
-              Container(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  task.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
+    return Column(
+      children: [
+        Expanded(
+          child: Container(
+            //height: MediaQuery.of(context).size.width/ 2.7,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: InkWell(
+              onTap: openTaskDetails,
+              child: Container(
+                padding: EdgeInsets.all(3),
+                color: Utils.tagColor(
+                    isWhite: false,
+                    isDetail: true,
+                    drpv: null,
+                    tag: task.tags.first),
+                child: Column(
+                  children: [
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        task.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: clearColor,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w300),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
                       color: clearColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w300),
+                      width: 200,
+                      height: 1,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        task.text,
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: clearColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w200),
+                      ),
+                    ),
+                    Spacer(),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        task.taskCreateTime,
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: clearColor.withOpacity(0.7),
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w300),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(
-                height: 10,
-              ),
-              Container(
-                color: clearColor,
-                width: 200,
-                height: 1,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Container(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  task.text,
-                  maxLines: 5,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      color: clearColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w200),
-                ),
-              ),
-              Spacer(),
-              Container(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  task.taskCreateTime,
-                  maxLines: 4,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      color: clearColor.withOpacity(0.7),
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w300),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
-      ),
+        Row(
+          children: circles,
+        )
+        // ListView.builder(
+        //     scrollDirection: Axis.horizontal,
+        //     padding: const EdgeInsets.all(8),
+        //     itemCount: task.tags.length,
+        //     itemBuilder: (BuildContext context, int index) {
+        //       return Container(
+        //           width: 15,
+        //           height: 15,
+        //           margin: EdgeInsets.only(left: 5, right: 5),
+        //           decoration: BoxDecoration(
+        //             color: Utils.tagColor(
+        //                 isWhite: false,
+        //                 isDetail: false,
+        //                 drpv: tagToNameMap[Tags.values[task.tags[index]]]),
+        //             shape: BoxShape.circle,
+        //           ));
+        //     })
+      ],
     );
   }
 }

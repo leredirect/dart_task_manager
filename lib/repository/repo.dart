@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dart_task_manager/models/task.dart';
-import 'package:dart_task_manager/screens/home_screen.dart';
-import 'package:dart_task_manager/utils/utils.dart';
 
 class Repository {
   static final Repository _repository = Repository._internal();
@@ -13,11 +11,9 @@ class Repository {
   }
 
   final CollectionReference collection =
-      //    FirebaseFirestore.instance.collection('tasks');
       FirebaseFirestore.instance.collection("tasks");
 
   Future<QuerySnapshot> getStream() {
-    // return collection.snapshots();
     return collection.get();
   }
 

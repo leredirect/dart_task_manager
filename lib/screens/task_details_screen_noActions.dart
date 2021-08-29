@@ -1,10 +1,14 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
+import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
+import 'package:dart_task_manager/repository/repo.dart';
+import 'package:dart_task_manager/screens/task_edit_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 
 import '../constants.dart';
 
@@ -15,7 +19,9 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     String deadlineDisplay(String deadline) {
+      print(task.taskDeadline);
       String result = "Дедлайн: $deadline";
       return result;
     }
@@ -93,7 +99,10 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
                 margin: EdgeInsets.only(bottom: 20),
                 height: 2,
                 color: Utils.tagColor(
-                    isWhite: false, isDetail: true, drpv: null, tag: Tags.values[task.tags.first]),
+                    isWhite: false,
+                    isDetail: true,
+                    drpv: null,
+                    tag: task.tags.first),
               ),
               Container(
                 child: Text(task.text,

@@ -30,18 +30,18 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   Future<void> showTaskTimePicker(DateTime pickedDate) {
     if (pickedDate != null) {
       return showTimePicker(context: context, initialTime: TimeOfDay.now())
-          .then((value) =>
-          setState(() {
-            pickedTime = value;
-          }));
+          .then((value) => setState(() {
+                pickedTime = value;
+              }));
     } else {}
   }
 
   List<int> tagValue = [0];
-  List<S2Choice<int>> s2tags = [
-    S2Choice<int>(value: 0, title: 'Dart'),
-    S2Choice<int>(value: 1, title: 'Flutter'),
-    S2Choice<int>(value: 2, title: 'Алгоритмы'),
+  int priorityValue = 0;
+  List<S2Choice<int>> s2priority = [
+    S2Choice<int>(value: 0, title: 'Высокий'),
+    S2Choice<int>(value: 1, title: 'Средний'),
+    S2Choice<int>(value: 2, title: 'Низкий'),
   ];
   List<S2Choice<int>> s2options = [
     S2Choice<int>(value: 0, title: 'Dart'),
@@ -49,8 +49,8 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     S2Choice<int>(value: 2, title: 'Алгоритмы'),
   ];
 
-  Future<void> deadlineCalc(String dropdownValue, DateTime pickedDate,
-      TimeOfDay pickedTime) async {
+  Future<void> deadlineCalc(
+      String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) async {
     if (pickedDate == null && pickedTime == null) {
       return showDialog<void>(
         context: context,
@@ -111,7 +111,9 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     }
   }
 
-  Future<void> addTask(String tag, String deadline, tagValue) async {
+  Future<void> addTask(String tag, String deadline, List<int> tagValue) async {
+
+    List<Tags> tags = tagValue.map((e) => Tags.values[e]).toList();
     String taskName = _nameController.text;
     String taskText = _textController.text;
     String taskCreateTime = DateFormat.d().format(DateTime.now()) +
@@ -130,16 +132,13 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
       int id = idBox.get('id');
       idBox.put('id', id + 1);
     }
-    Task task =
-    Task(taskName, taskText, tagValue, taskCreateTime, deadline, id);
+    Task task = Task(
+        taskName, taskText, tags, taskCreateTime, deadline, id);
     print(
-        "${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task
-            .taskDeadline}");
+        "${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.taskDeadline}, ${task.tags.toString()}");
     context.read<TaskListBloc>().add(AddTaskEvent(task));
     var listBox = await Hive.openBox<List<Task>>('taskList');
-    listBox.put('task', context
-        .read<TaskListBloc>()
-        .state);
+    listBox.put('task', context.read<TaskListBloc>().state);
     listBox.close();
     Navigator.of(context).pop();
     Repository repository = new Repository();
@@ -176,15 +175,21 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 hintStyle: TextStyle(color: Colors.white),
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                      color: Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: dropdownValue)),
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[Tags.values[tagValue.first]])),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Utils.tagColor(
-                        isWhite: false, isDetail: false, drpv: dropdownValue),
+                    color: tagValue.isEmpty
+                        ? clearColor.withOpacity(0.5)
+                        : Utils.tagColor(
+                            isWhite: false,
+                            isDetail: false,
+                            drpv: tagToNameMap[Tags.values[tagValue.first]]),
                   ),
                 ),
               ),
@@ -199,41 +204,49 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 contentPadding: EdgeInsets.only(left: 5),
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                      color: Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: dropdownValue)),
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[Tags.values[tagValue.first]])),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                      color: Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: dropdownValue)),
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[Tags.values[tagValue.first]])),
                 ),
               ),
             ),
-
             SmartSelect<int>.multiple(
-              modalConfig: S2ModalConfig(
-
-              ),
-              modalTitle: "Выберите тэг:",
-              placeholder: "Выберите один или несколько тэгов",
-              choiceStyle: S2ChoiceStyle(
-                titleStyle: TextStyle(color: Colors.black),
-                color: backgroundColor,
-                activeColor: backgroundColor,
-                activeAccentColor: clearColor,
-                accentColor: clearColor,
-              ),
+                tileBuilder: (context, state) {
+                  return S2Tile.fromState(
+                    state,
+                    title: Text("Выберите тэг:",
+                        style: TextStyle(color: Colors.white)),
+                    padding:
+                        EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
+                  );
+                },
+                title: "Выберите тэг:",
+                placeholder: "Выберите один или несколько тэгов",
+                choiceStyle: S2ChoiceStyle(
+                  titleStyle: TextStyle(color: Colors.black),
+                  color: backgroundColor,
+                  activeColor: backgroundColor,
+                  activeAccentColor: clearColor,
+                  accentColor: clearColor,
+                ),
                 modalStyle: S2ModalStyle(
                   backgroundColor: backgroundColor,
                 ),
                 modalHeaderStyle: S2ModalHeaderStyle(
-                  backgroundColor: backgroundColor,
-                  textStyle: TextStyle(color: clearColor)
-                ),
+                    backgroundColor: backgroundColor,
+                    textStyle: TextStyle(color: clearColor)),
                 choiceType: S2ChoiceType.chips,
                 choiceLayout: S2ChoiceLayout.grid,
                 modalType: S2ModalType.bottomSheet,
@@ -242,9 +255,41 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 onChange: (state) {
                   setState(() => tagValue = state.value);
                   print(tagValue);
-                }
-
-            ),
+                }),
+            SmartSelect<int>.single(
+                tileBuilder: (context, state) {
+                  return S2Tile.fromState(
+                    state,
+                    title: Text("Выберите приоритет:",
+                        style: TextStyle(color: Colors.white)),
+                    padding:
+                        EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
+                  );
+                },
+                title: "Выберите приоритет",
+                placeholder: "Выберите один или несколько тэгов",
+                choiceStyle: S2ChoiceStyle(
+                  titleStyle: TextStyle(color: Colors.black),
+                  color: backgroundColor,
+                  activeColor: backgroundColor,
+                  activeAccentColor: clearColor,
+                  accentColor: clearColor,
+                ),
+                modalStyle: S2ModalStyle(
+                  backgroundColor: backgroundColor,
+                ),
+                modalHeaderStyle: S2ModalHeaderStyle(
+                    backgroundColor: backgroundColor,
+                    textStyle: TextStyle(color: clearColor)),
+                choiceType: S2ChoiceType.chips,
+                choiceLayout: S2ChoiceLayout.grid,
+                modalType: S2ModalType.bottomSheet,
+                value: priorityValue,
+                choiceItems: s2priority,
+                onChange: (state) {
+                  setState(() => priorityValue = state.value);
+                  print(priorityValue);
+                }),
             InkWell(
                 onTap: () {
                   DateTime now = DateTime.now();
@@ -271,20 +316,21 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                       )
                     ],
                     borderRadius: BorderRadius.circular(12),
-                    color: Utils.tagColor(
-                        isWhite: false, isDetail: false, drpv: dropdownValue),
+                    color: tagValue.isEmpty
+                        ? clearColor.withOpacity(0.5)
+                        : Utils.tagColor(
+                            isWhite: false,
+                            isDetail: false,
+                            drpv: tagToNameMap[Tags.values[tagValue.first]]),
                   ),
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width * 0.6,
+                  width: MediaQuery.of(context).size.width * 0.6,
                   height: 40,
                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   child: Center(
                       child: Text(
-                        "Задать время на выполнение",
-                        style: TextStyle(color: Colors.white),
-                      )),
+                    "Задать время на выполнение",
+                    style: TextStyle(color: Colors.white),
+                  )),
                 )),
             Container(
               margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
@@ -312,22 +358,23 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                           offset: Offset(0, 3),
                         )
                       ],
-                      color: Utils.tagColor(
-                          isWhite: false, isDetail: false, drpv: dropdownValue),
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[Tags.values[tagValue.first]]),
                       borderRadius: BorderRadius.circular(12)),
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width * 0.4,
+                  width: MediaQuery.of(context).size.width * 0.4,
                   height: 40,
                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   margin: EdgeInsets.only(bottom: 50),
                   child: Center(
                       child: Text(
-                        "Подтвердить",
-                        style: TextStyle(color: Colors.white),
-                      )),
-                  // color: Colors.redAccent,
+                    "Подтвердить",
+                    style: TextStyle(color: Colors.white),
+                  )),
+
                 ))
           ],
         ),
