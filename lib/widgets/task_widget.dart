@@ -52,7 +52,6 @@ class TaskWidget extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            //height: MediaQuery.of(context).size.width/ 2.7,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.only(
@@ -141,23 +140,6 @@ class TaskWidget extends StatelessWidget {
         Row(
           children: circles,
         )
-        // ListView.builder(
-        //     scrollDirection: Axis.horizontal,
-        //     padding: const EdgeInsets.all(8),
-        //     itemCount: task.tags.length,
-        //     itemBuilder: (BuildContext context, int index) {
-        //       return Container(
-        //           width: 15,
-        //           height: 15,
-        //           margin: EdgeInsets.only(left: 5, right: 5),
-        //           decoration: BoxDecoration(
-        //             color: Utils.tagColor(
-        //                 isWhite: false,
-        //                 isDetail: false,
-        //                 drpv: tagToNameMap[Tags.values[task.tags[index]]]),
-        //             shape: BoxShape.circle,
-        //           ));
-        //     })
       ],
     );
   }

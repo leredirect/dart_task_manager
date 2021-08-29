@@ -2,8 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-//colors
-
 const backgroundColor = Color(0xff353E46);
 const clearColor = Color(0xffE4DBDB);
 const dartColor = Color(0xFF5C7FA8);

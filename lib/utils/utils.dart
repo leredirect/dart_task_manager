@@ -3,10 +3,24 @@ import 'dart:ui';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:smart_select/smart_select.dart';
 
 import '../constants.dart';
 
 class Utils {
+
+  static List<S2Choice<int>> s2TagsList (){
+    List<S2Choice<int>> s2Options = [];
+    List<Tags> tags = new List.from(Tags.values);
+    print(tags);
+    tags.removeWhere((element) => (element == Tags.EXPIRED) | (element == Tags.CLEAR));
+    print(tags);
+    for (int i = 0; i< tags.length; i++){
+      s2Options.add(S2Choice<int>(value: i, title: tagToNameMap[tags[i]]));
+    }
+    return s2Options;
+  }
+
   static Color tagColor({bool isWhite, bool isDetail, String drpv, Tags tag}) {
     Tags drpEnum = nameToTagMap[drpv];
     if (isWhite) {
@@ -66,7 +80,7 @@ class Utils {
 
   static void statusBarColor() {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: backgroundColor, // status bar color
+        statusBarColor: backgroundColor,
         statusBarBrightness: Brightness.light,
         statusBarIconBrightness: Brightness.light));
   }

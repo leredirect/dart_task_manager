@@ -37,17 +37,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   }
 
   List<int> tagValue = [0];
-  int priorityValue = 0;
-  List<S2Choice<int>> s2priority = [
-    S2Choice<int>(value: 0, title: 'Высокий'),
-    S2Choice<int>(value: 1, title: 'Средний'),
-    S2Choice<int>(value: 2, title: 'Низкий'),
-  ];
-  List<S2Choice<int>> s2options = [
-    S2Choice<int>(value: 0, title: 'Dart'),
-    S2Choice<int>(value: 1, title: 'Flutter'),
-    S2Choice<int>(value: 2, title: 'Алгоритмы'),
-  ];
+  List<S2Choice<int>> s2options = Utils.s2TagsList();
 
   Future<void> deadlineCalc(
       String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) async {
@@ -226,13 +216,13 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 tileBuilder: (context, state) {
                   return S2Tile.fromState(
                     state,
-                    title: Text("Выберите тэг:",
+                    title: Text("Выберите тег:",
                         style: TextStyle(color: Colors.white)),
                     padding:
                         EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
                   );
                 },
-                title: "Выберите тэг:",
+                title: "Выберите тег:",
                 placeholder: "Выберите один или несколько тэгов",
                 choiceStyle: S2ChoiceStyle(
                   titleStyle: TextStyle(color: Colors.black),
@@ -255,40 +245,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 onChange: (state) {
                   setState(() => tagValue = state.value);
                   print(tagValue);
-                }),
-            SmartSelect<int>.single(
-                tileBuilder: (context, state) {
-                  return S2Tile.fromState(
-                    state,
-                    title: Text("Выберите приоритет:",
-                        style: TextStyle(color: Colors.white)),
-                    padding:
-                        EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
-                  );
-                },
-                title: "Выберите приоритет",
-                placeholder: "Выберите один или несколько тэгов",
-                choiceStyle: S2ChoiceStyle(
-                  titleStyle: TextStyle(color: Colors.black),
-                  color: backgroundColor,
-                  activeColor: backgroundColor,
-                  activeAccentColor: clearColor,
-                  accentColor: clearColor,
-                ),
-                modalStyle: S2ModalStyle(
-                  backgroundColor: backgroundColor,
-                ),
-                modalHeaderStyle: S2ModalHeaderStyle(
-                    backgroundColor: backgroundColor,
-                    textStyle: TextStyle(color: clearColor)),
-                choiceType: S2ChoiceType.chips,
-                choiceLayout: S2ChoiceLayout.grid,
-                modalType: S2ModalType.bottomSheet,
-                value: priorityValue,
-                choiceItems: s2priority,
-                onChange: (state) {
-                  setState(() => priorityValue = state.value);
-                  print(priorityValue);
                 }),
             InkWell(
                 onTap: () {

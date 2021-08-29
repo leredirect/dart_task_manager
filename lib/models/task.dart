@@ -16,8 +16,8 @@ class Task {
   String taskDeadline;
   @HiveField(5)
   int id;
-  @HiveField(6)
 
+  @HiveField(6)
   Task(this.name, this.text, this.tags, this.taskCreateTime, this.taskDeadline,
       this.id);
 
@@ -36,11 +36,10 @@ class Task {
     name = json['name'];
     text = json['text'];
     tags = [];
-    json['tag'].forEach((e){
+    json['tag'].forEach((e) {
       tags.add(Tags.values[e]);
     });
 
-    //tags = json['tag'].map((e) => Tags.values[e as int]).toList();
     taskCreateTime = json['taskCreateTime'];
     taskDeadline = json['taskDeadline'] as String;
     id = json['id'] as int;
