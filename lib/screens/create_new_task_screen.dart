@@ -36,7 +36,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     } else {}
   }
 
-  List<int> tagValue = [0];
+  List<Tags> tagValue = [];
   Priorities priorityValue = Priorities.LOW;
   List<S2Choice<int>> s2Options = Utils.s2TagsList();
   List<S2Choice<int>> s2Priority = Utils.s2PriorityList();
@@ -104,8 +104,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     }
   }
 
-  Future<void> addTask(String tag, String deadline, List<int> tagValue) async {
-    List<Tags> tags = tagValue.map((e) => Tags.values[e]).toList();
+  Future<void> addTask(String tag, String deadline, List<Tags> tagValue) async {
     String taskName = _nameController.text;
     String taskText = _textController.text;
     String taskCreateTime = DateFormat.d().format(DateTime.now()) +
@@ -125,7 +124,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
       idBox.put('id', id + 1);
     }
     Task task =
-        Task(taskName, taskText, tags, taskCreateTime, deadline, id, priorityValue);
+        Task(taskName, taskText, tagValue, taskCreateTime, deadline, id, priorityValue);
     print(
         "${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.taskDeadline}, ${task.priority}, ${task.tags.toString()}");
     context.read<TaskListBloc>().add(AddTaskEvent(task));
@@ -172,7 +171,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                           : Utils.tagColor(
                               isWhite: false,
                               isDetail: false,
-                              drpv: tagToNameMap[Tags.values[tagValue.first]])),
+                              drpv: tagToNameMap[tagValue.first])),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
@@ -181,7 +180,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                         : Utils.tagColor(
                             isWhite: false,
                             isDetail: false,
-                            drpv: tagToNameMap[Tags.values[tagValue.first]]),
+                            drpv: tagToNameMap[tagValue.first]),
                   ),
                 ),
               ),
@@ -201,7 +200,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                           : Utils.tagColor(
                               isWhite: false,
                               isDetail: false,
-                              drpv: tagToNameMap[Tags.values[tagValue.first]])),
+                              drpv: tagToNameMap[tagValue.first])),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
@@ -210,7 +209,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                           : Utils.tagColor(
                               isWhite: false,
                               isDetail: false,
-                              drpv: tagToNameMap[Tags.values[tagValue.first]])),
+                              drpv: tagToNameMap[tagValue.first])),
                 ),
               ),
             ),
@@ -242,10 +241,12 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 choiceType: S2ChoiceType.chips,
                 choiceLayout: S2ChoiceLayout.grid,
                 modalType: S2ModalType.bottomSheet,
-                value: tagValue,
+                value: tagValue.map((e) => e.index).toList(),
                 choiceItems: s2Options,
                 onChange: (state) {
-                  setState(() => tagValue = state.value);
+                  setState(() => state.value.forEach((e) {
+                    tagValue.add(Tags.values[e]);
+                  }));
                   print(tagValue);
                 }),
             SmartSelect<int>.single(
@@ -313,7 +314,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                         : Utils.tagColor(
                             isWhite: false,
                             isDetail: false,
-                            drpv: tagToNameMap[Tags.values[tagValue.first]]),
+                            drpv: tagToNameMap[tagValue.first]),
                   ),
                   width: MediaQuery.of(context).size.width * 0.6,
                   height: 40,
@@ -355,7 +356,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                           : Utils.tagColor(
                               isWhite: false,
                               isDetail: false,
-                              drpv: tagToNameMap[Tags.values[tagValue.first]]),
+                              drpv: tagToNameMap[tagValue.first]),
                       borderRadius: BorderRadius.circular(12)),
                   width: MediaQuery.of(context).size.width * 0.4,
                   height: 40,
