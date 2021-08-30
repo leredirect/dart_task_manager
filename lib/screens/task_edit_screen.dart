@@ -27,20 +27,20 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   String dropdownValue;
   DateTime pickedDate;
   TimeOfDay pickedTime;
+  Priorities priorityValue;
+  List<Tags> tagValue;
 
-  List<int> tagValue = [0];
   List<S2Choice<int>> s2options = Utils.s2TagsList();
+  List<S2Choice<int>> s2Priority = Utils.s2PriorityList();
 
-  Future<void> addTask(String taskTag, String deadline) async {
-
-    List<Tags> tags = tagValue.map((e) => Tags.values[e]).toList();
+  Future<void> addTask(String taskTag, String deadline, List<Tags> tags) async {
     widget.task.taskDeadline = deadline;
     String taskName = _nameController.text;
     String taskText = _textController.text;
     widget.task.name = taskName;
     widget.task.text = taskText;
     widget.task.tags = tags;
-
+    widget.task.priority = priorityValue;
     context.read<TaskListBloc>().add(EditTaskEvent(widget.task));
     context.read<TaskListBloc>().add(EditTaskCheckEvent(widget.task));
     var listBox = await Hive.openBox<List<Task>>('taskList');
@@ -70,7 +70,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       String dropdownValue, DateTime pickedDate, TimeOfDay pickedTime) async {
     if (pickedDate == null && pickedTime == null) {
       String deadlineRes = widget.task.taskDeadline.toString();
-      return addTask(dropdownValue, deadlineRes);
+      return addTask(dropdownValue, deadlineRes, tagValue);
     } else {
       DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
           pickedDate.day, pickedTime.hour, pickedTime.minute);
@@ -88,7 +88,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             deadline.hour.toString() +
             ":" +
             deadlineMinute);
-        return await addTask(dropdownValue, deadlineRes);
+        return await addTask(dropdownValue, deadlineRes, tagValue);
       } else {
         String deadlineRes = (deadline.day.toString() +
             "." +
@@ -99,7 +99,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             deadline.hour.toString() +
             ":" +
             deadline.minute.toString());
-        return addTask(dropdownValue, deadlineRes);
+        return addTask(dropdownValue, deadlineRes, tagValue);
       }
     }
   }
@@ -137,18 +137,18 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                       color: tagValue.isEmpty
                           ? clearColor.withOpacity(0.5)
                           : Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: tagToNameMap[Tags.values[tagValue.first]])),
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[tagValue.first])),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
                     color: tagValue.isEmpty
                         ? clearColor.withOpacity(0.5)
                         : Utils.tagColor(
-                        isWhite: false,
-                        isDetail: false,
-                        drpv: tagToNameMap[Tags.values[tagValue.first]]),
+                            isWhite: false,
+                            isDetail: false,
+                            drpv: tagToNameMap[tagValue.first]),
                   ),
                 ),
               ),
@@ -166,18 +166,18 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                       color: tagValue.isEmpty
                           ? clearColor.withOpacity(0.5)
                           : Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: tagToNameMap[Tags.values[tagValue.first]])),
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[tagValue.first])),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
                       color: tagValue.isEmpty
                           ? clearColor.withOpacity(0.5)
                           : Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: tagToNameMap[Tags.values[tagValue.first]])),
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[tagValue.first])),
                 ),
               ),
             ),
@@ -188,11 +188,11 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                     title: Text("Выберите тег:",
                         style: TextStyle(color: Colors.white)),
                     padding:
-                    EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
+                        EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
                   );
                 },
                 title: "Выберите тег:",
-                placeholder: "Выберите один или несколько тегов",
+                placeholder: "Выберите один или несколько тэгов",
                 choiceStyle: S2ChoiceStyle(
                   titleStyle: TextStyle(color: Colors.black),
                   color: backgroundColor,
@@ -209,11 +209,50 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 choiceType: S2ChoiceType.chips,
                 choiceLayout: S2ChoiceLayout.grid,
                 modalType: S2ModalType.bottomSheet,
-                value: tagValue,
+                value: tagValue.map((e) => e.index).toList(),
                 choiceItems: s2options,
                 onChange: (state) {
-                  setState(() => tagValue = state.value);
+                  setState(() {
+                    tagValue = state.value.map((e) {
+                      return Tags.values[e];
+                    }).toList();
+                  });
                   print(tagValue);
+                }),
+            SmartSelect<int>.single(
+                tileBuilder: (context, state) {
+                  return S2Tile.fromState(
+                    state,
+                    title: Text("Выберите приоритет:",
+                        style: TextStyle(color: Colors.white)),
+                    padding:
+                        EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
+                  );
+                },
+                title: "Выберите приоритет",
+                placeholder: "Выберите приоритет",
+                choiceStyle: S2ChoiceStyle(
+                  titleStyle: TextStyle(color: Colors.black),
+                  color: backgroundColor,
+                  activeColor: backgroundColor,
+                  activeAccentColor: clearColor,
+                  accentColor: clearColor,
+                ),
+                modalStyle: S2ModalStyle(
+                  backgroundColor: backgroundColor,
+                ),
+                modalHeaderStyle: S2ModalHeaderStyle(
+                    backgroundColor: backgroundColor,
+                    textStyle: TextStyle(color: clearColor)),
+                choiceType: S2ChoiceType.chips,
+                choiceLayout: S2ChoiceLayout.grid,
+                modalType: S2ModalType.bottomSheet,
+                value: priorityValue.index,
+                choiceItems: s2Priority,
+                onChange: (state) {
+                  setState(
+                      () => priorityValue = Priorities.values[state.value]);
+                  print(priorityValue);
                 }),
             InkWell(
                 onTap: () {
@@ -244,18 +283,18 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                     color: tagValue.isEmpty
                         ? clearColor.withOpacity(0.5)
                         : Utils.tagColor(
-                        isWhite: false,
-                        isDetail: false,
-                        drpv: tagToNameMap[Tags.values[tagValue.first]]),
+                            isWhite: false,
+                            isDetail: false,
+                            drpv: tagToNameMap[tagValue.first]),
                   ),
                   width: MediaQuery.of(context).size.width * 0.6,
                   height: 40,
                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   child: Center(
                       child: Text(
-                        "Задать время на выполнение",
-                        style: TextStyle(color: Colors.white),
-                      )),
+                    "Задать время на выполнение",
+                    style: TextStyle(color: Colors.white),
+                  )),
                 )),
             Container(
               margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
@@ -286,9 +325,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                       color: tagValue.isEmpty
                           ? clearColor.withOpacity(0.5)
                           : Utils.tagColor(
-                          isWhite: false,
-                          isDetail: false,
-                          drpv: tagToNameMap[Tags.values[tagValue.first]]),
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[tagValue.first]),
                       borderRadius: BorderRadius.circular(12)),
                   width: MediaQuery.of(context).size.width * 0.4,
                   height: 40,
@@ -296,9 +335,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   margin: EdgeInsets.only(bottom: 50),
                   child: Center(
                       child: Text(
-                        "Подтвердить",
-                        style: TextStyle(color: Colors.white),
-                      )),
+                    "Подтвердить",
+                    style: TextStyle(color: Colors.white),
+                  )),
                 ))
           ],
         ),
@@ -306,7 +345,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       ),
     );
   }
-
 
   @override
   void dispose() {
@@ -318,11 +356,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   @override
   void initState() {
     super.initState();
-    List<int> tags = [];
-    widget.task.tags.forEach((e){
-      tags.add(e.index);
-    });
-    tagValue = tags;
+    tagValue = [];
+    priorityValue = widget.task.priority;
+    tagValue = widget.task.tags;
     _nameController.text = widget.task.name;
     _textController.text = widget.task.text;
   }

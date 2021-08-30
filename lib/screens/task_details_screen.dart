@@ -83,17 +83,18 @@ class TaskDetailsScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Тэги: ${Utils.tagsDisplay(task.tags)}",
-                          textAlign: TextAlign.right,
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
                       Row(
                         children: [
+                          Container(
+                            margin: EdgeInsets.only(top: 20),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Тэги: ${Utils.tagsDisplay(task.tags)}",
+                              textAlign: TextAlign.right,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          Spacer(),
                           Container(
                             margin: EdgeInsets.only(top: 20),
                             alignment: Alignment.centerLeft,
@@ -103,17 +104,30 @@ class TaskDetailsScreen extends StatelessWidget {
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
-                          Spacer(),
                         ],
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "${deadlineDisplay(task.taskDeadline)}",
-                          textAlign: TextAlign.right,
-                          style: TextStyle(color: Colors.grey),
-                        ),
+                      Row(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(top: 20),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Приоритет: ${priorityToNameMap[task.priority]}",
+                              textAlign: TextAlign.right,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          Spacer(),
+                          Container(
+                            margin: EdgeInsets.only(top: 20),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "${deadlineDisplay(task.taskDeadline)}",
+                              textAlign: TextAlign.right,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   )),

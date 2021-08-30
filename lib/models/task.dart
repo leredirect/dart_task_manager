@@ -16,10 +16,11 @@ class Task {
   String taskDeadline;
   @HiveField(5)
   int id;
-
   @HiveField(6)
+  Priorities priority;
+
   Task(this.name, this.text, this.tags, this.taskCreateTime, this.taskDeadline,
-      this.id);
+      this.id, this.priority);
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
@@ -29,6 +30,7 @@ class Task {
       "taskCreateTime": this.taskCreateTime,
       "taskDeadline": this.taskDeadline,
       "id": this.id,
+      "priority": priorityToNameMap[this.priority],
     };
   }
 
@@ -39,10 +41,10 @@ class Task {
     json['tag'].forEach((e) {
       tags.add(Tags.values[e]);
     });
-
     taskCreateTime = json['taskCreateTime'];
     taskDeadline = json['taskDeadline'] as String;
     id = json['id'] as int;
+    priority = nameToPriorityMap[json['priority']];
   }
 }
 
@@ -59,6 +61,28 @@ enum Tags {
   @HiveField(4)
   EXPIRED
 }
+
+@HiveType(typeId: 2)
+enum Priorities {
+  @HiveField(0)
+  HIGH,
+  @HiveField(1)
+  MEDIUM,
+  @HiveField(2)
+  LOW,
+}
+
+final nameToPriorityMap = {
+  "Высокий": Priorities.HIGH,
+  "Средний": Priorities.MEDIUM,
+  "Низкий": Priorities.LOW,
+};
+
+final priorityToNameMap = {
+  Priorities.HIGH: "Высокий",
+  Priorities.MEDIUM: "Средний",
+  Priorities.LOW: "Низкий",
+};
 
 final nameToTagMap = {
   "Flutter": Tags.FLUTTER,

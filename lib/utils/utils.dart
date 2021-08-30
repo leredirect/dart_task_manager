@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:dart_task_manager/models/task.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:smart_select/smart_select.dart';
 
@@ -19,6 +20,17 @@ class Utils {
       s2Options.add(S2Choice<int>(value: i, title: tagToNameMap[tags[i]]));
     }
     return s2Options;
+  }
+
+  static List<S2Choice<int>> s2PriorityList (){
+    List<S2Choice<int>> s2priority = [];
+    List<Priorities> priority = new List.from(Priorities.values);
+    print(priority);
+    for (int i = 0; i< priority.length; i++){
+      s2priority.add(S2Choice<int>(value: i, title:priorityToNameMap[priority[i]]));
+    print(s2priority.last);
+    }
+    return s2priority;
   }
 
   static Color tagColor({bool isWhite, bool isDetail, String drpv, Tags tag}) {
