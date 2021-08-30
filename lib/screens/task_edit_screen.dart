@@ -231,7 +231,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   );
                 },
                 title: "Выберите приоритет",
-                placeholder: "Выберите один или несколько тегов",
+                placeholder: "Выберите приоритет",
                 choiceStyle: S2ChoiceStyle(
                   titleStyle: TextStyle(color: Colors.black),
                   color: backgroundColor,

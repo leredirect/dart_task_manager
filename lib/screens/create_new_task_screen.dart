@@ -260,7 +260,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                   );
                 },
                 title: "Выберите приоритет",
-                placeholder: "Выберите один или несколько тэгов",
+                placeholder: "Выберите приоритет",
                 choiceStyle: S2ChoiceStyle(
                   titleStyle: TextStyle(color: Colors.black),
                   color: backgroundColor,
@@ -385,5 +385,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   @override
   void initState() {
     super.initState();
+    priorityValue = Priorities.LOW;
   }
 }
