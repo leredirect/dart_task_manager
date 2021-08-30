@@ -28,7 +28,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   DateTime pickedDate;
   TimeOfDay pickedTime;
   Priorities priorityValue;
-  List<Tags> tagValue = [];
+  List<Tags> tagValue;
 
   List<S2Choice<int>> s2options = Utils.s2TagsList();
   List<S2Choice<int>> s2Priority = Utils.s2PriorityList();
@@ -212,11 +212,10 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 value: tagValue.map((e) => e.index).toList(),
                 choiceItems: s2options,
                 onChange: (state) {
-                  tagValue.clear();
                   setState(() {
                     tagValue = state.value.map((e) {
                       return Tags.values[e];
-                    });
+                    }).toList();
                   });
                   print(tagValue);
                 }),
@@ -357,6 +356,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   @override
   void initState() {
     super.initState();
+    tagValue = [];
     priorityValue = widget.task.priority;
     tagValue = widget.task.tags;
     _nameController.text = widget.task.name;

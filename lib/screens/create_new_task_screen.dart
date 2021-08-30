@@ -36,8 +36,8 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     } else {}
   }
 
-  List<Tags> tagValue = [];
-  Priorities priorityValue = Priorities.LOW;
+  List<Tags> tagValue;
+  Priorities priorityValue;
   List<S2Choice<int>> s2Options = Utils.s2TagsList();
   List<S2Choice<int>> s2Priority = Utils.s2PriorityList();
 
@@ -386,5 +386,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   void initState() {
     super.initState();
     priorityValue = Priorities.LOW;
+    tagValue = [];
   }
 }
