@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dart_task_manager/models/task.dart';
 
-class Repository {
-  static final Repository _repository = Repository._internal();
+class TaskRepository {
+  static final TaskRepository _taskRepository = TaskRepository._internal();
 
-  Repository._internal();
+  TaskRepository._internal();
 
-  factory Repository() {
-    return _repository;
+  factory TaskRepository() {
+    return _taskRepository;
   }
 
   final CollectionReference collection =

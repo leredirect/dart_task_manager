@@ -1,7 +1,7 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
-import 'package:dart_task_manager/repository/repo.dart';
+import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -132,7 +132,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     listBox.put('task', context.read<TaskListBloc>().state);
     listBox.close();
     Navigator.of(context).pop();
-    Repository repository = new Repository();
+    TaskRepository repository = new TaskRepository();
     repository.addTask(task);
   }
 

@@ -1,7 +1,7 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
-import 'package:dart_task_manager/repository/repo.dart';
+import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/screens/task_edit_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,11 +26,11 @@ class TaskDetailsScreen extends StatelessWidget {
       listBox.close();
 
       try {
-        await Repository().deleteTask(task);
+        await TaskRepository().deleteTask(task);
         Navigator.of(context).pop();
       } on Exception catch (e) {
         snackBarNotification(context, e.toString());
-        Navigator.of(context).pushNamedAndRemoveUntil("/", (_) => false);
+        Navigator.of(context).pushNamedAndRemoveUntil("homeScreen", (_) => false);
       }
     }
 

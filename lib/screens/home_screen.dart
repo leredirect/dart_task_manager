@@ -6,13 +6,13 @@ import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/task.dart';
-import 'package:dart_task_manager/repository/repo.dart';
+import 'package:dart_task_manager/models/user.dart';
+import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/task_list_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -27,6 +27,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String currentFilter = tagToNameMap[Tags.CLEAR];
+
+  Future<void> userSignOut() async {
+    var listBox = await Hive.openBox<User>('userBox');
+    listBox.clear();
+    listBox.close();
+    Navigator.pushReplacementNamed(context, "/");
+  }
 
   void createTask() {
     Navigator.push(context, MaterialPageRoute(
@@ -116,6 +123,17 @@ class _HomeScreenState extends State<HomeScreen> {
     snackBarNotification(context, "Обновлено");
   }
 
+  void handleClick(String value) {
+    switch (value) {
+      case 'Выход':
+        userSignOut();
+        break;
+      case 'Обновить':
+        myStream();
+        break;
+    }
+  }
+
   bool isOnlineVar;
 
   @override
@@ -125,106 +143,107 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       appBar: AppBar(
-        actions: [
-          Visibility(
-            visible: isOnlineVar,
-            child: IconButton(
-              onPressed: () {
-                myStream();
+          actions: [
+            PopupMenuButton<String>(
+              color: backgroundColor,
+              icon: Icon(Icons.more_vert, color: Colors.white,),
+              onSelected: handleClick,
+              itemBuilder: (BuildContext context) {
+                return {'Выход', 'Обновить'}.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice, style: TextStyle(color: Colors.white),),
+                  );
+                }).toList();
               },
-              icon: Icon(Icons.wifi_protected_setup),
-              color: Colors.white,
+            ),
+          ],
+          systemOverlayStyle: Utils.statusBarColor(),
+      backwardsCompatibility: false,
+      backgroundColor: backgroundColor,
+      title: Row(
+        children: [
+          Text(
+            "DTM",
+            style: TextStyle(color: Colors.white),
+          ),
+          Spacer(),
+          Visibility(
+            visible: !isOnlineVar,
+            child: Text(
+              "Оффлайн",
+              style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
           )
         ],
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarIconBrightness: Brightness.light,
-        ),
-        backwardsCompatibility: false,
-        backgroundColor: backgroundColor,
-        title: Row(
-          children: [
-            Text(
-              "DTM",
-              style: TextStyle(color: Colors.white),
-            ),
-            Spacer(),
-            Visibility(
-              visible: !isOnlineVar,
-              child: Text(
-                "Оффлайн",
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-            )
-          ],
-        ),
       ),
-      body: BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
-        return BlocBuilder<TaskListBloc, List<Task>>(
-          builder: (context, state) {
-            if (filtState != null) {
-              List<Task> filtredState = state
-                  .where(
-                      (element) => element.tags.contains(filtState))
-                  .toList();
-              return AnimationConfiguration.synchronized(
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                      child: TaskListWidget(taskList: filtredState)),
-                ),
-              );
-            } else {
-              return AnimationConfiguration.synchronized(
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child:
-                      FadeInAnimation(child: TaskListWidget(taskList: state)),
-                ),
-              );
-            }
-          },
-        );
-      }),
-      floatingActionButton: Container(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Visibility(
-              visible: isOnlineVar,
-              child: FloatingActionButton(
-                child: Icon(
-                  Icons.add,
-                  color: backgroundColor,
-                ),
-                onPressed: createTask,
-                backgroundColor: Utils.tagColor(
-                    isWhite: false, isDetail: false, drpv: currentFilter),
-              ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            SpeedDial(
-              child: Icon(Icons.filter_list),
-              overlayColor: Colors.black.withOpacity(0.8),
-              childMargin: EdgeInsets.only(top: 3, bottom: 3),
-              childPadding: EdgeInsets.all(3),
-              children: [
-                mySpeedDialChild(Tags.CLEAR, clearColor, true, currentFilter),
-                mySpeedDialChild(
-                    Tags.FLUTTER, flutterColor, false, currentFilter),
-                mySpeedDialChild(Tags.DART, dartColor, false, currentFilter),
-                mySpeedDialChild(
-                    Tags.ALGORITHMS, algosColor, false, currentFilter),
-              ],
-              backgroundColor: Utils.tagColor(
-                  isWhite: false, isDetail: false, drpv: currentFilter),
-            ),
-          ],
-        ),
-      ),
-      backgroundColor: backgroundColor,
+    ),
+    body: BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+    return BlocBuilder<TaskListBloc, List<Task>>(
+    builder: (context, state) {
+    if (filtState != null) {
+    List<Task> filtredState = state
+        .where((element) => element.tags.contains(filtState))
+        .toList();
+    return AnimationConfiguration.synchronized(
+    child: SlideAnimation(
+    verticalOffset: 50.0,
+    child: FadeInAnimation(
+    child: TaskListWidget(taskList: filtredState)),
+    ),
+    );
+    } else {
+    return AnimationConfiguration.synchronized(
+    child: SlideAnimation(
+    verticalOffset: 50.0,
+    child:
+    FadeInAnimation(child: TaskListWidget(taskList: state)),
+    ),
+    );
+    }
+    },
+    );
+    }),
+    floatingActionButton: Container(
+    child: Row(
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: [
+    Visibility(
+    visible: isOnlineVar,
+    child: FloatingActionButton(
+    child: Icon(
+    Icons.add,
+    color: backgroundColor,
+    ),
+    onPressed: createTask,
+    backgroundColor: Utils.tagColor(
+    isWhite: false, isDetail: false, drpv: currentFilter),
+    ),
+    ),
+    SizedBox(
+    width: 10,
+    ),
+    SpeedDial(
+    child: Icon(Icons.filter_list),
+    overlayColor: Colors.black.withOpacity(0.8),
+    childMargin: EdgeInsets.only(top: 3, bottom: 3),
+    childPadding: EdgeInsets.all(3),
+    children: [
+    mySpeedDialChild(Tags.CLEAR, clearColor, true, currentFilter),
+    mySpeedDialChild(
+    Tags.FLUTTER, flutterColor, false, currentFilter),
+    mySpeedDialChild(Tags.DART, dartColor, false, currentFilter),
+    mySpeedDialChild(
+    Tags.ALGORITHMS, algosColor, false, currentFilter),
+    ],
+    backgroundColor: Utils.tagColor(
+    isWhite: false, isDetail: false, drpv: currentFilter),
+    ),
+    ],
+    ),
+    ),
+    backgroundColor: backgroundColor
+    ,
     );
   }
 
@@ -232,8 +251,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     List<Task> tasks = [];
-    Future<QuerySnapshot> collection = Repository().getStream();
-    collection.asStream().first.then((value) {
+    Future<QuerySnapshot> collection = TaskRepository().getStream();
+    collection
+        .asStream()
+        .first
+        .then((value) {
       value.docs.forEach((element) {
         tasks.add(Task.fromJson(element.data()));
       });
