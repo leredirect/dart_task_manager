@@ -30,7 +30,8 @@ class TaskDetailsScreen extends StatelessWidget {
         Navigator.of(context).pop();
       } on Exception catch (e) {
         snackBarNotification(context, e.toString());
-        Navigator.of(context).pushNamedAndRemoveUntil("homeScreen", (_) => false);
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil("homeScreen", (_) => false);
       }
     }
 
@@ -48,10 +49,42 @@ class TaskDetailsScreen extends StatelessWidget {
       return result;
     }
 
+    void handleClick(String value) {
+      switch (value) {
+        case 'Редактировать':
+          openTaskEditor();
+          break;
+        case 'Удалить':
+          deleteCurrentTask();
+          break;
+      }
+    }
+
     return BlocBuilder<TaskListBloc, List<Task>>(builder: (context, state) {
       Utils.statusBarColor();
       return Scaffold(
         appBar: AppBar(
+          actions: [
+            PopupMenuButton<String>(
+              color: backgroundColor,
+              icon: Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ),
+              onSelected: handleClick,
+              itemBuilder: (BuildContext context) {
+                return {'Редактировать', 'Удалить'}.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(
+                      choice,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList();
+              },
+            ),
+          ],
           systemOverlayStyle: SystemUiOverlayStyle(
             statusBarIconBrightness: Brightness.light,
           ),
@@ -63,122 +96,115 @@ class TaskDetailsScreen extends StatelessWidget {
             style: TextStyle(color: Colors.white),
           ),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                  alignment: Alignment.centerLeft,
-                  margin: EdgeInsets.fromLTRB(15, 15, 15, 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Container(
-                          child: Text(
-                            task.name,
-                            style: TextStyle(fontSize: 30, color: Colors.white),
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(top: 20),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Тэги: ${Utils.tagsDisplay(task.tags)}",
-                              textAlign: TextAlign.right,
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                          Spacer(),
-                          Container(
-                            margin: EdgeInsets.only(top: 20),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Создано: ${task.taskCreateTime}",
-                              textAlign: TextAlign.right,
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(top: 20),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Приоритет: ${priorityToNameMap[task.priority]}",
-                              textAlign: TextAlign.right,
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                          Spacer(),
-                          Container(
-                            margin: EdgeInsets.only(top: 20),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "${deadlineDisplay(task.taskDeadline)}",
-                              textAlign: TextAlign.right,
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  )),
-              Container(
-                margin: EdgeInsets.only(bottom: 20),
-                height: 2,
-                color: Utils.tagColor(
-                    isWhite: false,
-                    isDetail: true,
-                    drpv: null,
-                    tag: task.tags.first),
-              ),
-              Container(
-                child: Text(task.text,
-                    style: TextStyle(fontSize: 20, color: Colors.white)),
-                alignment: Alignment.centerLeft,
-                margin: EdgeInsets.only(left: 15),
-              ),
-            ],
-          ),
-        ),
-        floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+        body: Stack(
           children: [
-            Container(
-              margin: EdgeInsets.only(left: 10),
-              child: FloatingActionButton(
-                child: Icon(
-                  Icons.delete,
-                  color: backgroundColor,
-                ),
-                onPressed: deleteCurrentTask,
-                backgroundColor: Utils.tagColor(
-                    isWhite: false,
-                    isDetail: true,
-                    drpv: null,
-                    tag: task.tags.first),
-                heroTag: null,
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                      alignment: Alignment.centerLeft,
+                      margin: EdgeInsets.fromLTRB(15, 15, 15, 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Container(
+                              child: Text(
+                                task.name,
+                                style: TextStyle(
+                                    fontSize: 30, color: Colors.white),
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.left,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )),
+                  Container(
+                    margin: EdgeInsets.only(bottom: 20),
+                    height: 2,
+                    color: Utils.tagColor(
+                        isWhite: false,
+                        isDetail: true,
+                        drpv: null,
+                        tag: task.tags.first),
+                  ),
+                  Container(
+                    child: Text(task.text,
+                        style: TextStyle(fontSize: 20, color: Colors.white)),
+                    alignment: Alignment.centerLeft,
+                    margin: EdgeInsets.only(left: 15,bottom:MediaQuery.of(context).size.height / 7 ),
+                  ),
+                ],
               ),
             ),
-            Container(
-              margin: EdgeInsets.only(left: 10),
-              child: FloatingActionButton(
-                child: Icon(Icons.edit, color: backgroundColor),
-                onPressed: openTaskEditor,
-                backgroundColor: Utils.tagColor(
-                    isWhite: false,
-                    isDetail: true,
-                    drpv: null,
-                    tag: task.tags.first),
-                heroTag: null,
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                padding: EdgeInsets.only(right: 10, left: 10),
+                color: snackBarColor,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height / 7.5,
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(top: 20),
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Тэги: ${Utils.tagsDisplay(task.tags)}",
+                            textAlign: TextAlign.right,
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                        Spacer(),
+                        Container(
+                          margin: EdgeInsets.only(top: 20),
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Создано: ${task.taskCreateTime}",
+                            textAlign: TextAlign.right,
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(top: 20),
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Приоритет: ${priorityToNameMap[task.priority]}",
+                            textAlign: TextAlign.right,
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                        Spacer(),
+                        Container(
+                          margin: EdgeInsets.only(top: 20),
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "${deadlineDisplay(task.taskDeadline)}",
+                            textAlign: TextAlign.right,
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Создатель: ${task.creator.login}",
+                        textAlign: TextAlign.right,
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

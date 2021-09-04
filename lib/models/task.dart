@@ -1,3 +1,4 @@
+import 'package:dart_task_manager/models/user.dart';
 import 'package:hive/hive.dart';
 
 part 'task.g.dart';
@@ -18,8 +19,10 @@ class Task {
   int id;
   @HiveField(6)
   Priorities priority;
+  @HiveField(7)
+  User creator;
 
-  Task(this.name, this.text, this.tags, this.taskCreateTime, this.taskDeadline,
+  Task(this.name, this.text, this.tags, this.creator, this.taskCreateTime, this.taskDeadline,
       this.id, this.priority);
 
   Map<String, dynamic> toJson() {
@@ -31,6 +34,7 @@ class Task {
       "taskDeadline": this.taskDeadline,
       "id": this.id,
       "priority": priorityToNameMap[this.priority],
+      "creator" : this.creator.login,
     };
   }
 
@@ -45,6 +49,7 @@ class Task {
     taskDeadline = json['taskDeadline'] as String;
     id = json['id'] as int;
     priority = nameToPriorityMap[json['priority']];
+    creator.login = json['creator'];
   }
 }
 

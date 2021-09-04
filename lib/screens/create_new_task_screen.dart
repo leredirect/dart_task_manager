@@ -1,6 +1,7 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
+import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -74,6 +75,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     } else {
       DateTime deadline = DateTime(pickedDate.year, pickedDate.month,
           pickedDate.day, pickedTime.hour, pickedTime.minute);
+
       String deadlineMinute;
       bool isAfter = deadline.isAfter(DateTime.now());
       Duration diff = deadline.difference(DateTime.now());
@@ -105,6 +107,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   }
 
   Future<void> addTask(String tag, String deadline, List<Tags> tagValue) async {
+    User user;
     String taskName = _nameController.text;
     String taskText = _textController.text;
     String taskCreateTime = DateFormat.d().format(DateTime.now()) +
@@ -123,8 +126,12 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
       int id = idBox.get('id');
       idBox.put('id', id + 1);
     }
+
+    var userBox = await Hive.openBox<User>('userBox');
+    user = userBox.get('user');
+
     Task task =
-        Task(taskName, taskText, tagValue, taskCreateTime, deadline, id, priorityValue);
+        Task(taskName, taskText, tagValue, user, taskCreateTime, deadline, id, priorityValue);
     print(
         "${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.taskDeadline}, ${task.priority}, ${task.tags.toString()}");
     context.read<TaskListBloc>().add(AddTaskEvent(task));
