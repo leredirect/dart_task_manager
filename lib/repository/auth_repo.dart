@@ -61,6 +61,7 @@ class AuthorisationRepository {
           if (users[i].password == user.password) {
             print("pass: true");
             res = true;
+            return res;
           } else {
             print("pass: false");
             res = false;
@@ -68,10 +69,51 @@ class AuthorisationRepository {
         } else {
           print("login: false");
           res = false;
-          //throw Exception("Ошибка: Неверный логин.");
         }
       }
     });
     return res;
+  }
+
+  Future<List<int>> getIdList() async {
+    List<User> users = [];
+    List<int> ids = [];
+    QuerySnapshot collection = await AuthorisationRepository().getStream();
+    if(collection.docs.isNotEmpty) {
+      collection.docs.forEach((element) {
+        users.add(User.fromJson(element.data()));
+      });
+      users.forEach((element) {
+        ids.add(element.id);
+      });
+      print(ids);
+      return ids;
+    }else{
+      ids.add(0);
+      return ids;
+    }
+  }
+
+  Future<bool> checkLogin(User user) async {
+    List<User> users = [];
+  QuerySnapshot collection = await AuthorisationRepository().getStream();
+
+    if (collection.docs.isNotEmpty) {
+      collection.docs.forEach((element) {
+          users.add(User.fromJson(element.data()));
+        });
+        print(users);
+        for (int i = 0; i < users.length; i++) {
+          if (users[i].login == user.login) {
+            print("login: true");
+            return true;
+          } else {
+            print("login: false");
+            return false;
+          }
+        }
+    }else{
+      return false;
+    }
   }
 }

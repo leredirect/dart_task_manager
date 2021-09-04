@@ -108,17 +108,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void myStream() {
     List<Task> tasks = [];
-    Future<QuerySnapshot> collection = Repository().getStream();
+    Future<QuerySnapshot> collection = TaskRepository().getStream();
     collection.asStream().first.then((value) {
-      value.docs.forEach((element) {
-        tasks.add(Task.fromJson(element.data()));
-        Utils.taskFromBaseDisplay(tasks);
+      if (value.docs.isNotEmpty) {
+        value.docs.forEach((element) {
+          tasks.add(Task.fromJson(element.data()));
+          Utils.taskFromBaseDisplay(tasks);
+          Hive.openBox('taskList').then((value) {
+            value.put('task', tasks);
+            value.close();
+          });
+        });
+      } else {
         Hive.openBox('taskList').then((value) {
-          value.put('task', tasks);
+          value.clear();
           value.close();
         });
         context.read<TaskListBloc>().add(HiveChecker(tasks));
-      });
+      }
     });
     snackBarNotification(context, "Обновлено");
   }
@@ -143,107 +150,112 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       appBar: AppBar(
-          actions: [
-            PopupMenuButton<String>(
-              color: backgroundColor,
-              icon: Icon(Icons.more_vert, color: Colors.white,),
-              onSelected: handleClick,
-              itemBuilder: (BuildContext context) {
-                return {'Выход', 'Обновить'}.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice, style: TextStyle(color: Colors.white),),
-                  );
-                }).toList();
-              },
+        actions: [
+          PopupMenuButton<String>(
+            color: backgroundColor,
+            icon: Icon(
+              Icons.more_vert,
+              color: Colors.white,
+            ),
+            onSelected: handleClick,
+            itemBuilder: (BuildContext context) {
+              return {'Выход', 'Обновить'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(
+                    choice,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              }).toList();
+            },
+          ),
+        ],
+        systemOverlayStyle: Utils.statusBarColor(),
+        backwardsCompatibility: false,
+        backgroundColor: backgroundColor,
+        title: Row(
+          children: [
+            Text(
+              "DTM",
+              style: TextStyle(color: Colors.white),
+            ),
+            Spacer(),
+            Visibility(
+              visible: !isOnlineVar,
+              child: Text(
+                "Оффлайн",
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+            )
+          ],
+        ),
+      ),
+      body: BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+        return BlocBuilder<TaskListBloc, List<Task>>(
+          builder: (context, state) {
+            if (filtState != null) {
+              List<Task> filtredState = state
+                  .where((element) => element.tags.contains(filtState))
+                  .toList();
+              return AnimationConfiguration.synchronized(
+                child: SlideAnimation(
+                  verticalOffset: 50.0,
+                  child: FadeInAnimation(
+                      child: TaskListWidget(taskList: filtredState)),
+                ),
+              );
+            } else {
+              return AnimationConfiguration.synchronized(
+                child: SlideAnimation(
+                  verticalOffset: 50.0,
+                  child:
+                      FadeInAnimation(child: TaskListWidget(taskList: state)),
+                ),
+              );
+            }
+          },
+        );
+      }),
+      floatingActionButton: Container(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Visibility(
+              visible: isOnlineVar,
+              child: FloatingActionButton(
+                child: Icon(
+                  Icons.add,
+                  color: backgroundColor,
+                ),
+                onPressed: createTask,
+                backgroundColor: Utils.tagColor(
+                    isWhite: false, isDetail: false, drpv: currentFilter),
+              ),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            SpeedDial(
+              child: Icon(Icons.filter_list),
+              overlayColor: Colors.black.withOpacity(0.8),
+              childMargin: EdgeInsets.only(top: 3, bottom: 3),
+              childPadding: EdgeInsets.all(3),
+              children: [
+                mySpeedDialChild(Tags.CLEAR, clearColor, true, currentFilter),
+                mySpeedDialChild(
+                    Tags.FLUTTER, flutterColor, false, currentFilter),
+                mySpeedDialChild(Tags.DART, dartColor, false, currentFilter),
+                mySpeedDialChild(
+                    Tags.ALGORITHMS, algosColor, false, currentFilter),
+              ],
+              backgroundColor: Utils.tagColor(
+                  isWhite: false, isDetail: false, drpv: currentFilter),
             ),
           ],
-          systemOverlayStyle: Utils.statusBarColor(),
-      backwardsCompatibility: false,
-      backgroundColor: backgroundColor,
-      title: Row(
-        children: [
-          Text(
-            "DTM",
-            style: TextStyle(color: Colors.white),
-          ),
-          Spacer(),
-          Visibility(
-            visible: !isOnlineVar,
-            child: Text(
-              "Оффлайн",
-              style: TextStyle(color: Colors.grey, fontSize: 14),
-            ),
-          )
-        ],
+        ),
       ),
-    ),
-    body: BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
-    return BlocBuilder<TaskListBloc, List<Task>>(
-    builder: (context, state) {
-    if (filtState != null) {
-    List<Task> filtredState = state
-        .where((element) => element.tags.contains(filtState))
-        .toList();
-    return AnimationConfiguration.synchronized(
-    child: SlideAnimation(
-    verticalOffset: 50.0,
-    child: FadeInAnimation(
-    child: TaskListWidget(taskList: filtredState)),
-    ),
-    );
-    } else {
-    return AnimationConfiguration.synchronized(
-    child: SlideAnimation(
-    verticalOffset: 50.0,
-    child:
-    FadeInAnimation(child: TaskListWidget(taskList: state)),
-    ),
-    );
-    }
-    },
-    );
-    }),
-    floatingActionButton: Container(
-    child: Row(
-    mainAxisAlignment: MainAxisAlignment.end,
-    children: [
-    Visibility(
-    visible: isOnlineVar,
-    child: FloatingActionButton(
-    child: Icon(
-    Icons.add,
-    color: backgroundColor,
-    ),
-    onPressed: createTask,
-    backgroundColor: Utils.tagColor(
-    isWhite: false, isDetail: false, drpv: currentFilter),
-    ),
-    ),
-    SizedBox(
-    width: 10,
-    ),
-    SpeedDial(
-    child: Icon(Icons.filter_list),
-    overlayColor: Colors.black.withOpacity(0.8),
-    childMargin: EdgeInsets.only(top: 3, bottom: 3),
-    childPadding: EdgeInsets.all(3),
-    children: [
-    mySpeedDialChild(Tags.CLEAR, clearColor, true, currentFilter),
-    mySpeedDialChild(
-    Tags.FLUTTER, flutterColor, false, currentFilter),
-    mySpeedDialChild(Tags.DART, dartColor, false, currentFilter),
-    mySpeedDialChild(
-    Tags.ALGORITHMS, algosColor, false, currentFilter),
-    ],
-    backgroundColor: Utils.tagColor(
-    isWhite: false, isDetail: false, drpv: currentFilter),
-    ),
-    ],
-    ),
-    ),
-    backgroundColor: backgroundColor
-    ,
+      backgroundColor: backgroundColor,
     );
   }
 
@@ -252,10 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     List<Task> tasks = [];
     Future<QuerySnapshot> collection = TaskRepository().getStream();
-    collection
-        .asStream()
-        .first
-        .then((value) {
+    collection.asStream().first.then((value) {
       value.docs.forEach((element) {
         tasks.add(Task.fromJson(element.data()));
       });

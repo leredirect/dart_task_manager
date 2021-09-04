@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/auth_repo.dart';
@@ -19,61 +20,41 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passController = TextEditingController();
   User currentUser;
 
-  Future<void> register(String login, String pass) async {
-    var idBox = await Hive.openBox<int>('id_box');
-    int id = idBox.get('id');
-    if (id == null) {
-      idBox.put('id', 0);
-      id = 0;
-      idBox.close();
-    } else {
-      int id = idBox.get('id');
-      idBox.put('id', id + 1);
-      idBox.close();
-    }
-
-    currentUser = new User(id, login, pass);
-
-    var listBox = await Hive.openBox<User>('userBox');
-    listBox.clear();
-    listBox.put('user', currentUser);
-    listBox.close();
-
-    AuthorisationRepository repository = new AuthorisationRepository();
-    repository.addUser(currentUser);
-    snackBarNotification(context, "Успешно зарегестрирован.");
-    Navigator.pushReplacementNamed(context, "homeScreen");
-  }
-
   Future<void> login(String login, String pass) async {
-    var idBox = await Hive.openBox<int>('id_box');
-    int id = idBox.get('id');
-    if (id == null) {
-      idBox.put('id', 0);
-      id = 0;
-      idBox.close();
-    } else {
-      int id = idBox.get('id');
-      idBox.put('id', id + 1);
-      idBox.close();
-    }
+    var internet = await (Connectivity().checkConnectivity());
 
-    User currentUser = new User(id, login, pass);
-    AuthorisationRepository repository = new AuthorisationRepository();
-    try {
-      bool result = await repository.checkUser(currentUser);
-      print(result);
-      if (result == true) {
-        var listBox = await Hive.openBox<User>('userBox');
-        listBox.put('user', currentUser);
-        listBox.close();
-        snackBarNotification(context, "Успешно авторизован.");
-        Navigator.pushReplacementNamed(context, "homeScreen");
+    if (internet == ConnectivityResult.none) {
+      snackBarNotification(context, "Отсутствует подключение к интернету.");
+    } else {
+      var idBox = await Hive.openBox<int>('id_box');
+      int id = idBox.get('id');
+      if (id == null) {
+        idBox.put('id', 0);
+        id = 0;
+        idBox.close();
       } else {
-        snackBarNotification(context, "Пользователь не найден");
+        int id = idBox.get('id');
+        idBox.put('id', id + 1);
+        idBox.close();
       }
-    } on Exception catch (e) {
-      snackBarNotification(context, e.toString());
+
+      User currentUser = new User(id, login, pass);
+      AuthorisationRepository repository = new AuthorisationRepository();
+      try {
+        bool result = await repository.checkUser(currentUser);
+        print(result);
+        if (result == true) {
+          var listBox = await Hive.openBox<User>('userBox');
+          listBox.put('user', currentUser);
+          listBox.close();
+          snackBarNotification(context, "Успешно авторизован.");
+          Navigator.pushReplacementNamed(context, "homeScreen");
+        } else {
+          snackBarNotification(context, "Пользователь не найден");
+        }
+      } on Exception catch (e) {
+        snackBarNotification(context, e.toString());
+      }
     }
   }
 
@@ -82,6 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return FutureBuilder<Box<User>>(
         future: Hive.openBox<User>('userBox'),
         builder: (context, snapshot) {
@@ -102,7 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: Colors.white,
                       ),
                       onPressed: () {
-                        Navigator.pushNamed(context, "registrationScreen");
+                        Navigator.pushReplacementNamed(
+                            context, "registrationScreen");
                       },
                     )
                   ],
@@ -227,5 +210,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+
   }
 }
