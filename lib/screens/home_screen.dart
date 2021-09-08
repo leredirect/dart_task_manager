@@ -18,6 +18,8 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:hive/hive.dart';
 
+
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
 
@@ -106,45 +108,32 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void myStream() {
+  Future<void> myStream() async {
+    var taskBox = await Hive.openBox('taskList');
     List<Task> tasks = [];
     Future<QuerySnapshot> collection = TaskRepository().getStream();
     collection.asStream().first.then((value) {
-      if (value.docs.isNotEmpty) {
-        value.docs.forEach((element) {
-          tasks.add(Task.fromJson(element.data()));
-          Utils.taskFromBaseDisplay(tasks);
-          Hive.openBox('taskList').then((value) {
-            value.put('task', tasks);
-            value.close();
-          });
-        });
-      } else {
-        Hive.openBox('taskList').then((value) {
-          value.clear();
-          value.close();
-        });
-        context.read<TaskListBloc>().add(HiveChecker(tasks));
-      }
+      value.docs.forEach((element) {
+        tasks.add(Task.fromJson(element.data()));
+      });
+      context.read<TaskListBloc>().add(HiveChecker(tasks));
+      Utils.taskFromBaseDisplay(tasks);
+      taskBox.clear();
+      taskBox.put('task', tasks);
+      taskBox.close();
+      snackBarNotification(context, "Обновлено");
     });
-    snackBarNotification(context, "Обновлено");
-  }
-
-  void handleClick(String value) {
-    switch (value) {
-      case 'Выход':
-        userSignOut();
-        break;
-      case 'Обновить':
-        myStream();
-        break;
-    }
   }
 
   bool isOnlineVar;
 
   @override
   Widget build(BuildContext context) {
+    Map<String, Function> options = {
+      'Выход' : userSignOut,
+      'Обновить' : myStream,
+    };
+
     isOnline();
     Utils.statusBarColor();
     return Scaffold(
@@ -157,9 +146,11 @@ class _HomeScreenState extends State<HomeScreen> {
               Icons.more_vert,
               color: Colors.white,
             ),
-            onSelected: handleClick,
+            onSelected: (String value){
+              options[value]();
+            },
             itemBuilder: (BuildContext context) {
-              return {'Выход', 'Обновить'}.map((String choice) {
+              return options.keys.map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Text(
@@ -264,21 +255,18 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     List<Task> tasks = [];
     Future<QuerySnapshot> collection = TaskRepository().getStream();
-    collection.asStream().first.then((value) {
+     collection.asStream().first.then((value) {
       value.docs.forEach((element) {
         tasks.add(Task.fromJson(element.data()));
       });
       context.read<TaskListBloc>().add(HiveChecker(tasks));
     });
-    var connectivityResult = Connectivity().checkConnectivity().then((value) {
+    Connectivity().checkConnectivity().then((value) {
       if (value == ConnectivityResult.none) {
         snackBarNotification(
             context, "Отсутствует подключение к сети. Режим чтения.");
         Hive.openBox('taskList').then((value) {
-          if (value.get('task') == null) {
-            List<Task> taskList = [];
-            value.put('task', taskList);
-          } else {
+          if (value.isNotEmpty) {
             List<Task> hiveTasks = value.get('task').cast<Task>();
             context.read<TaskListBloc>().add(HiveChecker(hiveTasks));
           }

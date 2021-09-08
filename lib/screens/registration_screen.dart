@@ -23,29 +23,31 @@ class _RegistrationScreen extends State<RegistrationScreen> {
   FocusNode loginNode = FocusNode();
   FocusNode passNode = FocusNode();
 
-
-  bool checkRegisterData(_loginController, _passController){
-      if(_loginController.text.length < 3 && _passController.text.length < 5){
-        logBorderColor = Colors.red;
-        passBorderColor = Colors.red;
-        snackBarNotification(context, "Логин и пароль должны быть длиннее 3-х и 5-ти символов соответсвенно.", duration: 2);
-        return false;
-      }
-      else if (_loginController.text.length < 3){
-        logBorderColor = Colors.red;
-        passBorderColor = clearColor;
-        snackBarNotification(context, "Логин должен быть длиннее 3-х символов.", duration: 2);
-        return false;
-      }else if(_passController.text.length < 3){
-        passBorderColor = Colors.red;
-        logBorderColor = clearColor;
-        snackBarNotification(context, "Пароль должен быть длиннее 5-ти символов.", duration: 2);
-        return false;
-      }else{
-        passBorderColor = Colors.green;
-        logBorderColor = Colors.green;
-        return true;
-      }
+  bool checkRegisterData(_loginController, _passController) {
+    if (_loginController.text.length < 3 && _passController.text.length < 5) {
+      logBorderColor = Colors.red;
+      passBorderColor = Colors.red;
+      snackBarNotification(context,
+          "Логин и пароль должны быть длиннее 3-х и 5-ти символов соответсвенно.",
+          duration: 2);
+      return false;
+    } else if (_loginController.text.length < 3) {
+      logBorderColor = Colors.red;
+      passBorderColor = clearColor;
+      snackBarNotification(context, "Логин должен быть длиннее 3-х символов.",
+          duration: 2);
+      return false;
+    } else if (_passController.text.length < 3) {
+      passBorderColor = Colors.red;
+      logBorderColor = clearColor;
+      snackBarNotification(context, "Пароль должен быть длиннее 5-ти символов.",
+          duration: 2);
+      return false;
+    } else {
+      passBorderColor = Colors.green;
+      logBorderColor = Colors.green;
+      return true;
+    }
   }
 
   Future<void> register(String login, String pass) async {
@@ -57,17 +59,22 @@ class _RegistrationScreen extends State<RegistrationScreen> {
 
       List<int> ids = await repository.getIdList();
       ids.sort();
-      print (ids);
+      print(ids);
 
-      currentUser = new User(ids.last+1, login, pass);
+      currentUser = new User(ids.last + 1, login, pass);
 
       var listBox = await Hive.openBox<User>('userBox');
       listBox.clear();
       listBox.put('user', currentUser);
       listBox.close();
 
-      bool isLoginBusy = await repository.checkLogin(currentUser);
-      if (isLoginBusy) {
+      bool isLoginTaken = await repository.checkLogin(currentUser);
+      print(isLoginTaken);
+      if (isLoginTaken) {
+        setState(() {
+          logBorderColor = Colors.red;
+          passBorderColor = Colors.red;
+        });
         snackBarNotification(context, "Имя пользователя занято.", duration: 2);
       } else {
         repository.addUser(currentUser);
@@ -77,12 +84,11 @@ class _RegistrationScreen extends State<RegistrationScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus();
+        FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
         appBar: AppBar(
@@ -123,7 +129,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
                     style: TextStyle(color: Colors.white),
                     textAlign: TextAlign.center,
                     onSubmitted: (value) {
-                        checkRegisterData(_loginController, _passController);
+                      checkRegisterData(_loginController, _passController);
                       FocusScope.of(context).requestFocus(passNode);
                     },
                     decoration: InputDecoration(
@@ -152,9 +158,11 @@ class _RegistrationScreen extends State<RegistrationScreen> {
                     controller: _passController,
                     style: TextStyle(color: Colors.white),
                     textAlign: TextAlign.center,
-                    onSubmitted: (value){
+                    onSubmitted: (value) {
                       FocusScope.of(context).dispose();
-                      checkRegisterData(_loginController, _passController);
+                      setState(() {
+                        checkRegisterData(_loginController, _passController);
+                      });
                     },
                     decoration: InputDecoration(
                       helperText: "пароль",
@@ -177,16 +185,16 @@ class _RegistrationScreen extends State<RegistrationScreen> {
                 ),
                 TextButton(
                     onPressed: () {
-                      bool isRegisterDataCorrect = checkRegisterData(_loginController, _passController);
-                      if (isRegisterDataCorrect) {
-                        setState(() {});
-                        snackBarNotification(context, "Выполняется регистрация...", duration: 1);
-                        register(_loginController.text, _passController.text);
-                      }else{
-                        setState(() {
-
-                        });
-                      }
+                      setState(() {
+                        bool isRegisterDataCorrect = checkRegisterData(
+                            _loginController, _passController);
+                        if (isRegisterDataCorrect) {
+                          snackBarNotification(
+                              context, "Выполняется регистрация...",
+                              duration: 1);
+                          register(_loginController.text, _passController.text);
+                        }
+                      });
                     },
                     child: Container(
                       decoration: BoxDecoration(
