@@ -1,5 +1,7 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/screens/home_screen.dart';
+import 'package:dart_task_manager/screens/login_screen.dart';
+import 'package:dart_task_manager/screens/registration_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'bloc/filter_bloc/filter_bloc.dart';
 import 'models/task.dart';
+import 'models/user.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +22,8 @@ Future<void> main() async {
     Hive
       ..init(appDocumentDir.path)
       ..registerAdapter(TaskAdapter())
-      ..registerAdapter(TagsAdapter());
+      ..registerAdapter(TagsAdapter())
+      ..registerAdapter(UserAdapter());
     runApp(MyApp());
   });
 }
@@ -37,7 +41,9 @@ class MyApp extends StatelessWidget {
             child: MaterialApp(
               initialRoute: '/',
               routes: {
-                '/': (context) => const HomeScreen(),
+                '/': (context) => const LoginScreen(),
+                'registrationScreen': (context) => const RegistrationScreen(),
+                'homeScreen': (context) => const HomeScreen(),
               },
               title: 'Flutter Demo',
               debugShowCheckedModeBanner: false,

@@ -90,11 +90,11 @@ class Utils {
     }
   }
 
-  static void statusBarColor() {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  static SystemUiOverlayStyle statusBarColor() {
+    return SystemUiOverlayStyle(
         statusBarColor: backgroundColor,
         statusBarBrightness: Brightness.light,
-        statusBarIconBrightness: Brightness.light));
+        statusBarIconBrightness: Brightness.light);
   }
 
   static void taskFromBaseDisplay(List<Task> tasks) {
@@ -119,10 +119,11 @@ class Utils {
   }
 }
 
-void snackBarNotification(context, String text) {
+void snackBarNotification(context, String text, {int duration}) {
+
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     backgroundColor: snackBarColor,
-    duration: Duration(seconds: 3),
+    duration: Duration(seconds: duration == null? 3: duration),
     content: Text(text),
   ));
 }

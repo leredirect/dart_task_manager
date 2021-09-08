@@ -6,17 +6,19 @@ import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/task.dart';
-import 'package:dart_task_manager/repository/repo.dart';
+import 'package:dart_task_manager/models/user.dart';
+import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/task_list_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:hive/hive.dart';
+
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -27,6 +29,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String currentFilter = tagToNameMap[Tags.CLEAR];
+
+  Future<void> userSignOut() async {
+    var listBox = await Hive.openBox<User>('userBox');
+    listBox.clear();
+    listBox.close();
+    Navigator.pushReplacementNamed(context, "/");
+  }
 
   void createTask() {
     Navigator.push(context, MaterialPageRoute(
@@ -99,47 +108,61 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void myStream() {
+  Future<void> myStream() async {
+    var taskBox = await Hive.openBox('taskList');
     List<Task> tasks = [];
-    Future<QuerySnapshot> collection = Repository().getStream();
+    Future<QuerySnapshot> collection = TaskRepository().getStream();
     collection.asStream().first.then((value) {
       value.docs.forEach((element) {
         tasks.add(Task.fromJson(element.data()));
-        Utils.taskFromBaseDisplay(tasks);
-        Hive.openBox('taskList').then((value) {
-          value.put('task', tasks);
-          value.close();
-        });
-        context.read<TaskListBloc>().add(HiveChecker(tasks));
       });
+      context.read<TaskListBloc>().add(HiveChecker(tasks));
+      Utils.taskFromBaseDisplay(tasks);
+      taskBox.clear();
+      taskBox.put('task', tasks);
+      taskBox.close();
+      snackBarNotification(context, "Обновлено");
     });
-    snackBarNotification(context, "Обновлено");
   }
 
   bool isOnlineVar;
 
   @override
   Widget build(BuildContext context) {
+    Map<String, Function> options = {
+      'Выход' : userSignOut,
+      'Обновить' : myStream,
+    };
+
     isOnline();
     Utils.statusBarColor();
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       appBar: AppBar(
         actions: [
-          Visibility(
-            visible: isOnlineVar,
-            child: IconButton(
-              onPressed: () {
-                myStream();
-              },
-              icon: Icon(Icons.wifi_protected_setup),
+          PopupMenuButton<String>(
+            color: backgroundColor,
+            icon: Icon(
+              Icons.more_vert,
               color: Colors.white,
             ),
-          )
+            onSelected: (String value){
+              options[value]();
+            },
+            itemBuilder: (BuildContext context) {
+              return options.keys.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(
+                    choice,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              }).toList();
+            },
+          ),
         ],
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarIconBrightness: Brightness.light,
-        ),
+        systemOverlayStyle: Utils.statusBarColor(),
         backwardsCompatibility: false,
         backgroundColor: backgroundColor,
         title: Row(
@@ -164,8 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context, state) {
             if (filtState != null) {
               List<Task> filtredState = state
-                  .where(
-                      (element) => element.tags.contains(filtState))
+                  .where((element) => element.tags.contains(filtState))
                   .toList();
               return AnimationConfiguration.synchronized(
                 child: SlideAnimation(
@@ -232,22 +254,19 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     List<Task> tasks = [];
-    Future<QuerySnapshot> collection = Repository().getStream();
-    collection.asStream().first.then((value) {
+    Future<QuerySnapshot> collection = TaskRepository().getStream();
+     collection.asStream().first.then((value) {
       value.docs.forEach((element) {
         tasks.add(Task.fromJson(element.data()));
       });
       context.read<TaskListBloc>().add(HiveChecker(tasks));
     });
-    var connectivityResult = Connectivity().checkConnectivity().then((value) {
+    Connectivity().checkConnectivity().then((value) {
       if (value == ConnectivityResult.none) {
         snackBarNotification(
             context, "Отсутствует подключение к сети. Режим чтения.");
         Hive.openBox('taskList').then((value) {
-          if (value.get('task') == null) {
-            List<Task> taskList = [];
-            value.put('task', taskList);
-          } else {
+          if (value.isNotEmpty) {
             List<Task> hiveTasks = value.get('task').cast<Task>();
             context.read<TaskListBloc>().add(HiveChecker(hiveTasks));
           }
