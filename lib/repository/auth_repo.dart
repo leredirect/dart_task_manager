@@ -49,8 +49,7 @@ class AuthorisationRepository {
   Future<bool> checkUser(User user) async {
     List<User> users = [];
     Future<QuerySnapshot> collection = AuthorisationRepository().getStream();
-    bool res;
-    await collection.asStream().first.then((value) {
+    return collection.asStream().first.then((value) {
       value.docs.forEach((element) {
         users.add(User.fromJson(element.data()));
       });
@@ -60,60 +59,45 @@ class AuthorisationRepository {
           print("login: true");
           if (users[i].password == user.password) {
             print("pass: true");
-            res = true;
-            return res;
-          } else {
-            print("pass: false");
-            res = false;
+            return true;
           }
-        } else {
-          print("login: false");
-          res = false;
         }
       }
+      return false;
     });
-    return res;
   }
 
   Future<List<int>> getIdList() async {
-    List<User> users = [];
     List<int> ids = [];
-    QuerySnapshot collection = await AuthorisationRepository().getStream();
-    if(collection.docs.isNotEmpty) {
-      collection.docs.forEach((element) {
-        users.add(User.fromJson(element.data()));
-      });
-      users.forEach((element) {
-        ids.add(element.id);
-      });
-      print(ids);
-      return ids;
-    }else{
-      ids.add(0);
-      return ids;
-    }
+    Future<QuerySnapshot> collection = AuthorisationRepository().getStream();
+    return collection.asStream().first.then((value) {
+      if (value.docs.isNotEmpty) {
+        value.docs.forEach((element) {
+          ids.add(User.fromJson(element.data()).id);
+        });
+        print(ids);
+        return ids;
+      } else {
+        ids.add(0);
+        return ids;
+      }
+    });
   }
 
   Future<bool> checkLogin(User user) async {
     List<User> users = [];
-  QuerySnapshot collection = await AuthorisationRepository().getStream();
-
-    if (collection.docs.isNotEmpty) {
-      collection.docs.forEach((element) {
+    Future<QuerySnapshot> collection = AuthorisationRepository().getStream();
+    return collection.asStream().first.then((value) {
+        value.docs.forEach((element) {
           users.add(User.fromJson(element.data()));
         });
-        print(users);
         for (int i = 0; i < users.length; i++) {
           if (users[i].login == user.login) {
             print("login: true");
             return true;
-          } else {
-            print("login: false");
-            return false;
           }
         }
-    }else{
-      return false;
-    }
+        return false;
+    });
   }
 }
