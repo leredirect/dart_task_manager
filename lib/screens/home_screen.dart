@@ -255,21 +255,18 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     List<Task> tasks = [];
     Future<QuerySnapshot> collection = TaskRepository().getStream();
-    collection.asStream().first.then((value) {
+     collection.asStream().first.then((value) {
       value.docs.forEach((element) {
         tasks.add(Task.fromJson(element.data()));
       });
       context.read<TaskListBloc>().add(HiveChecker(tasks));
     });
-    var connectivityResult = Connectivity().checkConnectivity().then((value) {
+    Connectivity().checkConnectivity().then((value) {
       if (value == ConnectivityResult.none) {
         snackBarNotification(
             context, "Отсутствует подключение к сети. Режим чтения.");
         Hive.openBox('taskList').then((value) {
-          if (value.isEmpty) {
-            List<Task> taskList = [];
-            value.put('task', taskList);
-          } else {
+          if (value.isNotEmpty) {
             List<Task> hiveTasks = value.get('task').cast<Task>();
             context.read<TaskListBloc>().add(HiveChecker(hiveTasks));
           }
