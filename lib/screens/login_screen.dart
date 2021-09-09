@@ -31,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
       User currentUser = new User(id, login, pass);
       try {
         bool result = await repository.checkUser(currentUser);
-        print(result);
+
         if (result == true) {
           var listBox = await Hive.openBox<User>('userBox');
           listBox.put('user', currentUser);
@@ -48,7 +48,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<bool> compareUserFromBoxWithUserFromFirebase() async {
-    print("smth");
     AuthorisationRepository repository = new AuthorisationRepository();
     var userBox = await Hive.openBox<User>('userBox');
     if (userBox.isNotEmpty) {
@@ -56,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
       bool compareWithBase = await repository.checkUser(userFromBox);
       if (compareWithBase) {
         currentUser = userFromBox;
-        print("true");
+
         return true;
       }
     }
@@ -156,6 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               controller: _passController,
                               style: TextStyle(color: Colors.white),
                               textAlign: TextAlign.center,
+                              obscureText: true,
                               decoration: InputDecoration(
                                 helperText: "пароль",
                                 helperStyle: TextStyle(

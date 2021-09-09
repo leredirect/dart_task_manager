@@ -22,33 +22,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
   Color logBorderColor = clearColor;
   FocusNode loginNode = FocusNode();
   FocusNode passNode = FocusNode();
-
-  bool checkRegisterData(_loginController, _passController) {
-    if (_loginController.text.length < 3 && _passController.text.length < 5) {
-      logBorderColor = Colors.red;
-      passBorderColor = Colors.red;
-      snackBarNotification(context,
-          "Логин и пароль должны быть длиннее 3-х и 5-ти символов соответсвенно.",
-          duration: 2);
-      return false;
-    } else if (_loginController.text.length < 3) {
-      logBorderColor = Colors.red;
-      passBorderColor = clearColor;
-      snackBarNotification(context, "Логин должен быть длиннее 3-х символов.",
-          duration: 2);
-      return false;
-    } else if (_passController.text.length < 3) {
-      passBorderColor = Colors.red;
-      logBorderColor = clearColor;
-      snackBarNotification(context, "Пароль должен быть длиннее 5-ти символов.",
-          duration: 2);
-      return false;
-    } else {
-      passBorderColor = Colors.green;
-      logBorderColor = Colors.green;
-      return true;
-    }
-  }
+  final _formKey = GlobalKey<FormState>();
 
   Future<void> register(String login, String pass) async {
     var internet = await (Connectivity().checkConnectivity());
@@ -59,8 +33,6 @@ class _RegistrationScreen extends State<RegistrationScreen> {
 
       List<int> ids = await repository.getIdList();
       ids.sort();
-      print(ids);
-
       currentUser = new User(ids.last + 1, login, pass);
 
       var listBox = await Hive.openBox<User>('userBox');
@@ -69,7 +41,6 @@ class _RegistrationScreen extends State<RegistrationScreen> {
       listBox.close();
 
       bool isLoginTaken = await repository.checkLogin(currentUser);
-      print(isLoginTaken);
       if (isLoginTaken) {
         setState(() {
           logBorderColor = Colors.red;
@@ -86,129 +57,143 @@ class _RegistrationScreen extends State<RegistrationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          leading: new IconButton(
-            icon: new Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pushReplacementNamed(context, '/'),
+    return Form(
+      key: _formKey,
+      child: GestureDetector(
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            leading: new IconButton(
+              icon: new Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.pushReplacementNamed(context, '/'),
+            ),
+            systemOverlayStyle: Utils.statusBarColor(),
+            backwardsCompatibility: false,
+            backgroundColor: backgroundColor,
+            title: Text(
+              "DTM",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
-          systemOverlayStyle: Utils.statusBarColor(),
-          backwardsCompatibility: false,
           backgroundColor: backgroundColor,
-          title: Text(
-            "DTM",
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-        backgroundColor: backgroundColor,
-        body: Center(
-          child: Container(
-            margin:
-                EdgeInsets.only(top: MediaQuery.of(context).size.height / 15),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  margin: EdgeInsets.only(bottom: 150),
-                  child: Text(
-                    "регистрация",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.white, fontSize: 15, letterSpacing: 3),
+          body: Center(
+            child: Container(
+              margin:
+                  EdgeInsets.only(top: MediaQuery.of(context).size.height / 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(bottom: 150),
+                    child: Text(
+                      "регистрация",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white, fontSize: 15, letterSpacing: 3),
+                    ),
                   ),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width / 1.5,
-                  child: TextField(
-                    focusNode: loginNode,
-                    controller: _loginController,
-                    style: TextStyle(color: Colors.white),
-                    textAlign: TextAlign.center,
-                    onSubmitted: (value) {
-                      checkRegisterData(_loginController, _passController);
-                      FocusScope.of(context).requestFocus(passNode);
-                    },
-                    decoration: InputDecoration(
-                      helperText: "логин",
-                      helperStyle:
-                          TextStyle(color: Colors.white, letterSpacing: 3),
-                      contentPadding: EdgeInsets.only(left: 5),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(0)),
-                        borderSide: BorderSide(color: logBorderColor),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(0)),
-                        borderSide: BorderSide(color: logBorderColor),
+                  Container(
+                    width: MediaQuery.of(context).size.width / 1.5,
+                    child: TextFormField(
+                      focusNode: loginNode,
+                      controller: _loginController,
+                      style: TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            value.length < 3) {
+                          return 'Логин должен быть длиннее 3-х символов.';
+                        } else {
+                          return null;
+                        }
+                      },
+                      onFieldSubmitted: (value) {
+                        FocusScope.of(context).requestFocus(passNode);
+                      },
+                      decoration: InputDecoration(
+                        helperText: "логин",
+                        helperStyle:
+                            TextStyle(color: Colors.white, letterSpacing: 3),
+                        contentPadding: EdgeInsets.only(left: 5),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(0)),
+                          borderSide: BorderSide(color: logBorderColor),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(0)),
+                          borderSide: BorderSide(color: logBorderColor),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: 30,
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width / 1.5,
-                  child: TextField(
-                    focusNode: passNode,
-                    controller: _passController,
-                    style: TextStyle(color: Colors.white),
-                    textAlign: TextAlign.center,
-                    onSubmitted: (value) {
-                      FocusScope.of(context).dispose();
-                      setState(() {
-                        checkRegisterData(_loginController, _passController);
-                      });
-                    },
-                    decoration: InputDecoration(
-                      helperText: "пароль",
-                      helperStyle:
-                          TextStyle(color: Colors.white, letterSpacing: 3),
-                      contentPadding: EdgeInsets.only(left: 5),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(0)),
-                        borderSide: BorderSide(color: passBorderColor),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(0)),
-                        borderSide: BorderSide(color: passBorderColor),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width / 1.5,
+                    child: TextFormField(
+                      focusNode: passNode,
+                      controller: _passController,
+                      style: TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            value.length < 5) {
+                          return 'Пароль должен быть длиннее 5-ти символов.';
+                        } else {
+                          return null;
+                        }
+                      },
+                      onFieldSubmitted: (value) {
+                        FocusScope.of(context).requestFocus(passNode);
+                      },
+                      decoration: InputDecoration(
+                        helperText: "пароль",
+                        helperStyle:
+                            TextStyle(color: Colors.white, letterSpacing: 3),
+                        contentPadding: EdgeInsets.only(left: 5),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(0)),
+                          borderSide: BorderSide(color: passBorderColor),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(0)),
+                          borderSide: BorderSide(color: passBorderColor),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: 100,
-                ),
-                TextButton(
-                    onPressed: () {
-                      setState(() {
-                        bool isRegisterDataCorrect = checkRegisterData(
-                            _loginController, _passController);
-                        if (isRegisterDataCorrect) {
+                  SizedBox(
+                    height: 100,
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        if (_formKey.currentState.validate()) {
                           snackBarNotification(
                               context, "Выполняется регистрация...",
                               duration: 1);
                           register(_loginController.text, _passController.text);
                         }
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white)),
-                      child: Padding(
-                          padding: EdgeInsets.only(
-                              top: 10, bottom: 10, left: 50, right: 50),
-                          child: Text(
-                            "создать",
-                            style: TextStyle(
-                                color: Colors.white, letterSpacing: 3),
-                          )),
-                    )),
-              ],
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white)),
+                        child: Padding(
+                            padding: EdgeInsets.only(
+                                top: 10, bottom: 10, left: 50, right: 50),
+                            child: Text(
+                              "создать",
+                              style: TextStyle(
+                                  color: Colors.white, letterSpacing: 3),
+                            )),
+                      )),
+                ],
+              ),
             ),
           ),
         ),
