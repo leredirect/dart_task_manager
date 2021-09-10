@@ -27,12 +27,13 @@ class _RegistrationScreen extends State<RegistrationScreen> {
   Future<void> register(String login, String pass) async {
     var internet = await (Connectivity().checkConnectivity());
     if (internet == ConnectivityResult.none) {
-      snackBarNotification(context, "Отсутствует подключение к интернету.");
+      snackBarNotification(context, "Отсутствует подключение к интернету.", duration: 2);
     } else {
       AuthorisationRepository repository = new AuthorisationRepository();
 
       List<int> ids = await repository.getIdList();
       ids.sort();
+
       currentUser = new User(ids.last + 1, login, pass);
 
       var listBox = await Hive.openBox<User>('userBox');
@@ -40,18 +41,9 @@ class _RegistrationScreen extends State<RegistrationScreen> {
       listBox.put('user', currentUser);
       listBox.close();
 
-      bool isLoginTaken = await repository.checkLogin(currentUser);
-      if (isLoginTaken) {
-        setState(() {
-          logBorderColor = Colors.red;
-          passBorderColor = Colors.red;
-        });
-        snackBarNotification(context, "Имя пользователя занято.", duration: 2);
-      } else {
-        repository.addUser(currentUser);
-        snackBarNotification(context, "Успешно зарегестрирован.", duration: 1);
-        Navigator.pushReplacementNamed(context, "homeScreen");
-      }
+      repository.addUser(currentUser);
+      snackBarNotification(context, "Успешно зарегестрирован.", duration: 1);
+      Navigator.pushReplacementNamed(context, "homeScreen");
     }
   }
 
@@ -172,12 +164,24 @@ class _RegistrationScreen extends State<RegistrationScreen> {
                     height: 100,
                   ),
                   TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState.validate()) {
-                          snackBarNotification(
-                              context, "Выполняется регистрация...",
-                              duration: 1);
-                          register(_loginController.text, _passController.text);
+                          AuthorisationRepository repository = new AuthorisationRepository();
+                          bool isLoginTaken = await repository.checkLogin(_loginController.text);
+                          if (isLoginTaken) {
+                            setState(() {
+                              logBorderColor = Colors.red;
+                            });
+                            snackBarNotification(
+                                context, "Имя пользователя занято.",
+                                duration: 1);
+                          } else {
+                            snackBarNotification(
+                                context, "Выполняется регистрация...",
+                                duration: 1);
+                            register(
+                                _loginController.text, _passController.text);
+                          }
                         }
                       },
                       child: Container(
