@@ -100,105 +100,107 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   backgroundColor: backgroundColor,
-                  body: Center(
-                    child: Container(
-                      margin: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height / 15),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(bottom: 150),
-                            child: Text(
-                              "вход в существующий аккаунт",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  letterSpacing: 3),
+                  body: SingleChildScrollView(
+                    child: Center(
+                      child: Container(
+                        margin: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height / 15),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(bottom: 150),
+                              child: Text(
+                                "вход в существующий аккаунт",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    letterSpacing: 3),
+                              ),
                             ),
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width / 1.5,
-                            child: TextField(
-                              focusNode: loginNode,
-                              controller: _loginController,
-                              style: TextStyle(color: Colors.white),
-                              textAlign: TextAlign.center,
-                              onSubmitted: (value) {
-                                FocusScope.of(context).requestFocus(passNode);
-                              },
-                              decoration: InputDecoration(
-                                helperText: "логин",
-                                helperStyle: TextStyle(
-                                    color: Colors.white, letterSpacing: 3),
-                                contentPadding: EdgeInsets.only(left: 5),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(0)),
-                                  borderSide: BorderSide(color: clearColor),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(0)),
-                                  borderSide: BorderSide(color: clearColor),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 1.5,
+                              child: TextField(
+                                focusNode: loginNode,
+                                controller: _loginController,
+                                style: TextStyle(color: Colors.white),
+                                textAlign: TextAlign.center,
+                                onSubmitted: (value) {
+                                  FocusScope.of(context).requestFocus(passNode);
+                                },
+                                decoration: InputDecoration(
+                                  helperText: "логин",
+                                  helperStyle: TextStyle(
+                                      color: Colors.white, letterSpacing: 3),
+                                  contentPadding: EdgeInsets.only(left: 5),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(0)),
+                                    borderSide: BorderSide(color: clearColor),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(0)),
+                                    borderSide: BorderSide(color: clearColor),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 30,
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width / 1.5,
-                            child: TextField(
-                              focusNode: passNode,
-                              controller: _passController,
-                              style: TextStyle(color: Colors.white),
-                              textAlign: TextAlign.center,
-                              decoration: InputDecoration(
-                                helperText: "пароль",
-                                helperStyle: TextStyle(
-                                    color: Colors.white, letterSpacing: 3),
-                                contentPadding: EdgeInsets.only(left: 5),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(0)),
-                                  borderSide: BorderSide(color: clearColor),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(0)),
-                                  borderSide: BorderSide(color: clearColor),
+                            SizedBox(
+                              height: 30,
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 1.5,
+                              child: TextField(
+                                focusNode: passNode,
+                                controller: _passController,
+                                style: TextStyle(color: Colors.white),
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  helperText: "пароль",
+                                  helperStyle: TextStyle(
+                                      color: Colors.white, letterSpacing: 3),
+                                  contentPadding: EdgeInsets.only(left: 5),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(0)),
+                                    borderSide: BorderSide(color: clearColor),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(0)),
+                                    borderSide: BorderSide(color: clearColor),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 100,
-                          ),
-                          TextButton(
-                              onPressed: () {
-                                login(_loginController.text,
-                                    _passController.text);
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.white)),
-                                child: Padding(
-                                    padding: EdgeInsets.only(
-                                        top: 10,
-                                        bottom: 10,
-                                        left: 50,
-                                        right: 50),
-                                    child: Text(
-                                      "вход",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          letterSpacing: 3),
-                                    )),
-                              )),
-                        ],
+                            SizedBox(
+                              height: 100,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  login(_loginController.text,
+                                      _passController.text);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.white)),
+                                  child: Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 10,
+                                          bottom: 10,
+                                          left: 50,
+                                          right: 50),
+                                      child: Text(
+                                        "вход",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            letterSpacing: 3),
+                                      )),
+                                )),
+                          ],
+                        ),
                       ),
                     ),
                   ),
