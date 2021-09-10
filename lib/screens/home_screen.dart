@@ -4,6 +4,8 @@ import 'package:dart_task_manager/bloc/filter_bloc/filter_bloc.dart';
 import 'package:dart_task_manager/bloc/filter_bloc/filter_event.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
+import 'package:dart_task_manager/bloc/user_bloc/user_bloc.dart';
+import 'package:dart_task_manager/bloc/user_bloc/user_event.dart';
 import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/models/user.dart';
@@ -31,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String currentFilter = tagToNameMap[Tags.CLEAR];
 
   Future<void> userSignOut() async {
+    context.read<UserBloc>().add(ClearUserEvent());
     var listBox = await Hive.openBox<User>('userBox');
     listBox.clear();
     listBox.close();

@@ -118,6 +118,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       fields[0] as String,
       fields[1] as String,
       (fields[2] as List)?.cast<Tags>(),
+      fields[7] as User,
       fields[3] as String,
       fields[4] as String,
       fields[5] as int,
@@ -128,7 +129,7 @@ class TaskAdapter extends TypeAdapter<Task> {
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -142,7 +143,9 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(5)
       ..write(obj.id)
       ..writeByte(6)
-      ..write(obj.priority);
+      ..write(obj.priority)
+      ..writeByte(7)
+      ..write(obj.creator);
   }
 
   @override

@@ -67,7 +67,7 @@ class AuthorisationRepository {
     });
   }
 
-  Future<bool> checkUser(String login, String password) async {
+  Future<bool> isUserExists(String login, String password) async {
     List<User> users = [];
     Future<QuerySnapshot> collection = AuthorisationRepository().getStream();
     return collection.asStream().first.then((value) {
