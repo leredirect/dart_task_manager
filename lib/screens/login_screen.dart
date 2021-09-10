@@ -19,7 +19,10 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _loginController = TextEditingController();
   final _passController = TextEditingController();
+  Color passBorderColor = clearColor;
+  Color logBorderColor = clearColor;
   User currentUser;
+  final _formKey = GlobalKey<FormState>();
 
   Future<void> login(String login, String pass) async {
     var internet = await (Connectivity().checkConnectivity());
@@ -27,21 +30,14 @@ class _LoginScreenState extends State<LoginScreen> {
     if (internet == ConnectivityResult.none) {
       snackBarNotification(context, "Отсутствует подключение к интернету.");
     } else {
-      List<int> ids = await IdsRepository().getIdList();
-      int id = ids.last + 1;
-      User currentUser = new User(id, login, pass);
       try {
-        bool result = await repository.checkUser(currentUser);
-        print(result);
-        if (result == true) {
-          var listBox = await Hive.openBox<User>('userBox');
-          listBox.put('user', currentUser);
-          listBox.close();
-          snackBarNotification(context, "Успешно авторизован.");
-          Navigator.pushReplacementNamed(context, "homeScreen");
-        } else {
-          snackBarNotification(context, "Пользователь не найден");
-        }
+        User currentUser = await repository.getUser(login, pass);
+
+        var listBox = await Hive.openBox<User>('userBox');
+        listBox.put('user', currentUser);
+        listBox.close();
+        snackBarNotification(context, "Успешно авторизован.");
+        Navigator.pushReplacementNamed(context, "homeScreen");
       } on Exception catch (e) {
         snackBarNotification(context, e.toString());
       }
@@ -49,15 +45,15 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<bool> compareUserFromBoxWithUserFromFirebase() async {
-    print("smth");
     AuthorisationRepository repository = new AuthorisationRepository();
     var userBox = await Hive.openBox<User>('userBox');
     if (userBox.isNotEmpty) {
       User userFromBox = userBox.get("user");
-      bool compareWithBase = await repository.checkUser(userFromBox);
+      bool compareWithBase =
+          await repository.checkUser(userFromBox.login, userFromBox.password);
       if (compareWithBase) {
         currentUser = userFromBox;
-        print("true");
+
         return true;
       }
     }
@@ -101,105 +97,167 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   backgroundColor: backgroundColor,
-                  body: Center(
-                    child: Container(
-                      margin: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height / 15),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(bottom: 150),
-                            child: Text(
-                              "вход в существующий аккаунт",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  letterSpacing: 3),
-                            ),
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width / 1.5,
-                            child: TextField(
-                              focusNode: loginNode,
-                              controller: _loginController,
-                              style: TextStyle(color: Colors.white),
-                              textAlign: TextAlign.center,
-                              onSubmitted: (value) {
-                                FocusScope.of(context).requestFocus(passNode);
-                              },
-                              decoration: InputDecoration(
-                                helperText: "логин",
-                                helperStyle: TextStyle(
-                                    color: Colors.white, letterSpacing: 3),
-                                contentPadding: EdgeInsets.only(left: 5),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(0)),
-                                  borderSide: BorderSide(color: clearColor),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(0)),
-                                  borderSide: BorderSide(color: clearColor),
+                  body: SingleChildScrollView(
+                    child: Form(
+                      key: _formKey,
+                      child: Center(
+                        child: Container(
+                          margin: EdgeInsets.only(
+                              top: MediaQuery.of(context).size.height / 15),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(bottom: 150),
+                                child: Text(
+                                  "вход в существующий аккаунт",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      letterSpacing: 3),
                                 ),
                               ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 30,
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width / 1.5,
-                            child: TextField(
-                              focusNode: passNode,
-                              controller: _passController,
-                              style: TextStyle(color: Colors.white),
-                              textAlign: TextAlign.center,
-                              decoration: InputDecoration(
-                                helperText: "пароль",
-                                helperStyle: TextStyle(
-                                    color: Colors.white, letterSpacing: 3),
-                                contentPadding: EdgeInsets.only(left: 5),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(0)),
-                                  borderSide: BorderSide(color: clearColor),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(0)),
-                                  borderSide: BorderSide(color: clearColor),
+                              Container(
+                                width: MediaQuery.of(context).size.width / 1.5,
+                                child: TextFormField(
+                                  focusNode: loginNode,
+                                  controller: _loginController,
+                                  style: TextStyle(color: Colors.white),
+                                  textAlign: TextAlign.center,
+                                  onTap: () {
+                                    setState(() {
+                                      logBorderColor = clearColor;
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null ||
+                                        value.isEmpty ||
+                                        value.length < 3) {
+                                      return 'Логин должен быть длиннее 3-х символов.';
+                                    } else {
+                                      return null;
+                                    }
+                                  },
+                                  onFieldSubmitted: (value) {
+                                    FocusScope.of(context).requestFocus(passNode);
+                                  },
+                                  decoration: InputDecoration(
+                                    helperText: "логин",
+                                    helperStyle: TextStyle(
+                                        color: Colors.white, letterSpacing: 3),
+                                    contentPadding: EdgeInsets.only(left: 5),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(0)),
+                                      borderSide:
+                                          BorderSide(color: logBorderColor),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(0)),
+                                      borderSide:
+                                          BorderSide(color: logBorderColor),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                              SizedBox(
+                                height: 30,
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width / 1.5,
+                                child: TextFormField(
+                                  focusNode: passNode,
+                                  controller: _passController,
+                                  style: TextStyle(color: Colors.white),
+                                  textAlign: TextAlign.center,
+                                  obscureText: true,
+                                  onTap: () {
+                                    setState(() {
+                                      passBorderColor = clearColor;
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null ||
+                                        value.isEmpty ||
+                                        value.length < 5) {
+                                      return 'Пароль должен быть длиннее 5-ти символов.';
+                                    } else {
+                                      return null;
+                                    }
+                                  },
+                                  onFieldSubmitted: (value) {
+                                    FocusScope.of(context).requestFocus(passNode);
+                                  },
+                                  decoration: InputDecoration(
+                                    helperText: "пароль",
+                                    helperStyle: TextStyle(
+                                        color: Colors.white, letterSpacing: 3),
+                                    contentPadding: EdgeInsets.only(left: 5),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(0)),
+                                      borderSide:
+                                          BorderSide(color: passBorderColor),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(0)),
+                                      borderSide:
+                                          BorderSide(color: passBorderColor),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 100,
+                              ),
+                              TextButton(
+                                  onPressed: () async {
+                                    if (_formKey.currentState.validate()) {
+                                      AuthorisationRepository repository =
+                                          new AuthorisationRepository();
+                                      bool isUserExist =
+                                          await repository.checkUser(
+                                              _loginController.text,
+                                              _passController.text);
+                                      if (isUserExist) {
+                                        snackBarNotification(
+                                            context, "Выполняется авторизация...",
+                                            duration: 1);
+                                        login(_loginController.text,
+                                            _passController.text);
+                                      } else {
+                                        setState(() {
+                                          logBorderColor = Colors.red;
+                                          passBorderColor = Colors.red;
+                                        });
+                                        snackBarNotification(context,
+                                            "Авторизация не удалась. Проверьте введенные данные.",
+                                            duration: 2);
+                                      }
+                                    }
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.white)),
+                                    child: Padding(
+                                        padding: EdgeInsets.only(
+                                            top: 10,
+                                            bottom: 10,
+                                            left: 50,
+                                            right: 50),
+                                        child: Text(
+                                          "создать",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              letterSpacing: 3),
+                                        )),
+                                  )),
+                            ],
                           ),
-                          SizedBox(
-                            height: 100,
-                          ),
-                          TextButton(
-                              onPressed: () {
-                                login(_loginController.text,
-                                    _passController.text);
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.white)),
-                                child: Padding(
-                                    padding: EdgeInsets.only(
-                                        top: 10,
-                                        bottom: 10,
-                                        left: 50,
-                                        right: 50),
-                                    child: Text(
-                                      "вход",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          letterSpacing: 3),
-                                    )),
-                              )),
-                        ],
+                        ),
                       ),
                     ),
                   ),

@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class IdsRepository {
-  static final IdsRepository _idsRepository =
-  IdsRepository._internal();
+  static final IdsRepository _idsRepository = IdsRepository._internal();
 
   IdsRepository._internal();
 
@@ -12,41 +11,38 @@ class IdsRepository {
 
   int id;
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> idToJson() {
     return <String, dynamic>{
       "last-id": this.id,
     };
   }
 
-  fromJson(Map<String, dynamic> json) {
-    id = json['last-id'] as int;
+  idFromJson(Map<String, dynamic> json) {
+    id = json['last-id'];
   }
 
   CollectionReference idCollection =
-  FirebaseFirestore.instance.collection("ids");
+      FirebaseFirestore.instance.collection("ids");
 
   Future<QuerySnapshot> getStream() {
     return idCollection.get();
   }
 
-  Future<List<int>> getIdList() async {
-    List<int> ids = [];
+  Future<int> getIdList() async {
     Future<QuerySnapshot> collection = IdsRepository().getStream();
     return collection.asStream().first.then((value) {
       if (value.docs.isNotEmpty) {
         value.docs.forEach((element) {
-          ids.add(fromJson(element.data()));
+          idFromJson(element.data());
+          this.id = this.id + 1;
+          idCollection.doc(element.id).update(idToJson());
         });
-        print(ids);
-        return ids;
+        return this.id;
       } else {
         this.id = 0;
-        idCollection.add(this.toJson());
-        ids.add(0);
-        return ids;
+        idCollection.add(this.idToJson());
+        return this.id;
       }
     });
   }
-  
-  
 }
