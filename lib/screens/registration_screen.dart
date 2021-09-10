@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/auth_repo.dart';
+import 'package:dart_task_manager/repository/ids_repo.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,14 +28,14 @@ class _RegistrationScreen extends State<RegistrationScreen> {
   Future<void> register(String login, String pass) async {
     var internet = await (Connectivity().checkConnectivity());
     if (internet == ConnectivityResult.none) {
-      snackBarNotification(context, "Отсутствует подключение к интернету.", duration: 2);
+      snackBarNotification(context, "Отсутствует подключение к интернету.",
+          duration: 2);
     } else {
       AuthorisationRepository repository = new AuthorisationRepository();
 
-      List<int> ids = await repository.getIdList();
-      ids.sort();
+      int newId = await IdRepository().getLastCreatedId();
 
-      currentUser = new User(ids.last + 1, login, pass);
+      currentUser = new User(newId, login, pass);
 
       var listBox = await Hive.openBox<User>('userBox');
       listBox.clear();
@@ -73,8 +74,8 @@ class _RegistrationScreen extends State<RegistrationScreen> {
           body: SingleChildScrollView(
             child: Center(
               child: Container(
-                margin:
-                    EdgeInsets.only(top: MediaQuery.of(context).size.height / 15),
+                margin: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height / 15),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -84,7 +85,9 @@ class _RegistrationScreen extends State<RegistrationScreen> {
                         "регистрация",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            color: Colors.white, fontSize: 15, letterSpacing: 3),
+                            color: Colors.white,
+                            fontSize: 15,
+                            letterSpacing: 3),
                       ),
                     ),
                     Container(
@@ -167,8 +170,10 @@ class _RegistrationScreen extends State<RegistrationScreen> {
                     TextButton(
                         onPressed: () async {
                           if (_formKey.currentState.validate()) {
-                            AuthorisationRepository repository = new AuthorisationRepository();
-                            bool isLoginTaken = await repository.checkLogin(_loginController.text);
+                            AuthorisationRepository repository =
+                                new AuthorisationRepository();
+                            bool isLoginTaken = await repository
+                                .checkLogin(_loginController.text);
                             if (isLoginTaken) {
                               setState(() {
                                 logBorderColor = Colors.red;

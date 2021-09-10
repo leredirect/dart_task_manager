@@ -88,22 +88,7 @@ class AuthorisationRepository {
     });
   }
 
-  Future<List<int>> getIdList() async {
-    List<int> ids = [];
-    Future<QuerySnapshot> collection = AuthorisationRepository().getStream();
-    return collection.asStream().first.then((value) {
-      if (value.docs.isNotEmpty) {
-        value.docs.forEach((element) {
-          ids.add(User.fromJson(element.data()).id);
-        });
-        print(ids);
-        return ids;
-      } else {
-        ids.add(0);
-        return ids;
-      }
-    });
-  }
+
 
   Future<bool> checkLogin(String login) async {
     List<String> logins = [];
