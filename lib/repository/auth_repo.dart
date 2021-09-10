@@ -46,7 +46,7 @@ class AuthorisationRepository {
     });
   }
 
-  Future<bool> checkUser(User user) async {
+  Future<User> getUser(String login, String password) async {
     List<User> users = [];
     Future<QuerySnapshot> collection = AuthorisationRepository().getStream();
     return collection.asStream().first.then((value) {
@@ -55,9 +55,30 @@ class AuthorisationRepository {
       });
       print(users);
       for (int i = 0; i < users.length; i++) {
-        if (users[i].login == user.login) {
+        if (users[i].login == login) {
           print("login: true");
-          if (users[i].password == user.password) {
+          if (users[i].password == password) {
+            print("pass: true");
+            return users[i];
+          }
+        }
+      }
+      throw Exception("Ошибка.");
+    });
+  }
+
+  Future<bool> checkUser(String login, String password) async {
+    List<User> users = [];
+    Future<QuerySnapshot> collection = AuthorisationRepository().getStream();
+    return collection.asStream().first.then((value) {
+      value.docs.forEach((element) {
+        users.add(User.fromJson(element.data()));
+      });
+      print(users);
+      for (int i = 0; i < users.length; i++) {
+        if (users[i].login == login) {
+          print("login: true");
+          if (users[i].password == password) {
             print("pass: true");
             return true;
           }
@@ -84,15 +105,15 @@ class AuthorisationRepository {
     });
   }
 
-  Future<bool> checkLogin(User user) async {
-    List<User> users = [];
+  Future<bool> checkLogin(String login) async {
+    List<String> logins = [];
     Future<QuerySnapshot> collection = AuthorisationRepository().getStream();
     return collection.asStream().first.then((value) {
         value.docs.forEach((element) {
-          users.add(User.fromJson(element.data()));
+          logins.add(User.fromJson(element.data()).login);
         });
-        for (int i = 0; i < users.length; i++) {
-          if (users[i].login == user.login) {
+        for (int i = 0; i < logins.length; i++) {
+          if (logins[i] == login) {
             print("login: true");
             return true;
           }
