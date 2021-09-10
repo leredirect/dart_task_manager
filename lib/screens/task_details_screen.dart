@@ -198,7 +198,7 @@ class TaskDetailsScreen extends StatelessWidget {
                       margin: EdgeInsets.only(top: 20),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Создатель: ${task.creator.login}",
+                        "Создатель: ${task.creator}",
                         textAlign: TextAlign.right,
                         style: TextStyle(color: Colors.grey),
                       ),

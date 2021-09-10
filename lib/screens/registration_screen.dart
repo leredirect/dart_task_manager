@@ -1,4 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dart_task_manager/bloc/user_bloc/user_bloc.dart';
+import 'package:dart_task_manager/bloc/user_bloc/user_event.dart';
 import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/auth_repo.dart';
@@ -7,6 +9,8 @@ import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key key}) : super(key: key);
@@ -36,6 +40,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
       int newId = await IdRepository().getLastCreatedId();
 
       currentUser = new User(newId, login, pass);
+      context.read<UserBloc>().add(SetUserEvent(currentUser));
 
       var listBox = await Hive.openBox<User>('userBox');
       listBox.clear();

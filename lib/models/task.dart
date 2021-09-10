@@ -20,7 +20,7 @@ class Task {
   @HiveField(6)
   Priorities priority;
   @HiveField(7)
-  User creator;
+  String creator;
 
   Task(this.name, this.text, this.tags, this.creator, this.taskCreateTime, this.taskDeadline,
       this.id, this.priority);
@@ -34,7 +34,7 @@ class Task {
       "taskDeadline": this.taskDeadline,
       "id": this.id,
       "priority": priorityToNameMap[this.priority],
-      "creator" : this.creator.login,
+      "creator" : this.creator,
     };
   }
 
@@ -49,7 +49,7 @@ class Task {
     taskDeadline = json['taskDeadline'] as String;
     id = json['id'] as int;
     priority = nameToPriorityMap[json['priority']];
-    creator.login = json['creator'];
+    creator = (json['creator']);
   }
 }
 

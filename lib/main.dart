@@ -10,6 +10,7 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'bloc/filter_bloc/filter_bloc.dart';
+import 'bloc/user_bloc/user_bloc.dart';
 import 'models/task.dart';
 import 'models/user.dart';
 
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
         providers: [
           BlocProvider<TaskListBloc>(create: (context) => TaskListBloc()),
+          BlocProvider<UserBloc>(create: (context) => UserBloc()),
           BlocProvider<FilterBloc>(create: (context) => FilterBloc())
         ],
         child: AnnotatedRegion<SystemUiOverlayStyle>(

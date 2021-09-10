@@ -1,13 +1,15 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dart_task_manager/bloc/user_bloc/user_bloc.dart';
+import 'package:dart_task_manager/bloc/user_bloc/user_event.dart';
 import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/auth_repo.dart';
-import 'package:dart_task_manager/repository/ids_repo.dart';
 import 'package:dart_task_manager/screens/home_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key key}) : super(key: key);
@@ -32,6 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       try {
         User currentUser = await repository.getUser(login, pass);
+        context.read<UserBloc>().add(SetUserEvent(currentUser));
 
         var listBox = await Hive.openBox<User>('userBox');
         listBox.put('user', currentUser);
@@ -53,6 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
           await repository.checkUser(userFromBox.login, userFromBox.password);
       if (compareWithBase) {
         currentUser = userFromBox;
+        context.read<UserBloc>().add(SetUserEvent(currentUser));
 
         return true;
       }

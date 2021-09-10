@@ -1,5 +1,6 @@
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
+import 'package:dart_task_manager/bloc/user_bloc/user_bloc.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/task_repo.dart';
@@ -127,11 +128,10 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
       idBox.put('id', id + 1);
     }
 
-    var userBox = await Hive.openBox<User>('userBox');
-    user = userBox.get('user');
+    user = context.read<UserBloc>().state;
 
     Task task =
-        Task(taskName, taskText, tagValue, user, taskCreateTime, deadline, id, priorityValue);
+        Task(taskName, taskText, tagValue, user.login, taskCreateTime, deadline, id, priorityValue);
     print(
         "${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.taskDeadline}, ${task.priority}, ${task.tags.toString()}");
     context.read<TaskListBloc>().add(AddTaskEvent(task));

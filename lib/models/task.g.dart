@@ -118,7 +118,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       fields[0] as String,
       fields[1] as String,
       (fields[2] as List)?.cast<Tags>(),
-      fields[7] as User,
+      fields[7] as String,
       fields[3] as String,
       fields[4] as String,
       fields[5] as int,
