@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/auth_repo.dart';
+import 'package:dart_task_manager/repository/ids_repo.dart';
 import 'package:dart_task_manager/screens/home_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (internet == ConnectivityResult.none) {
       snackBarNotification(context, "Отсутствует подключение к интернету.");
     } else {
-      List<int> ids = await repository.getIdList();
+      List<int> ids = await IdsRepository().getIdList();
       int id = ids.last + 1;
       User currentUser = new User(id, login, pass);
       try {

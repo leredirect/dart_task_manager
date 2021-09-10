@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/auth_repo.dart';
+import 'package:dart_task_manager/repository/ids_repo.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
     } else {
       AuthorisationRepository repository = new AuthorisationRepository();
 
-      List<int> ids = await repository.getIdList();
+      List<int> ids = await IdsRepository().getIdList();
       ids.sort();
       print(ids);
 
