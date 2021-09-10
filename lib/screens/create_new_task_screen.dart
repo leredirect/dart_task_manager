@@ -109,6 +109,8 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   Future<void> addTask(String tag, String deadline, List<Tags> tagValue) async {
     String taskName = _nameController.text;
     String taskText = _textController.text;
+    User user = context.read<UserBloc>().state;
+
     String taskCreateTime = DateFormat.d().format(DateTime.now()) +
         "." +
         DateFormat.M().format(DateTime.now()) +
@@ -125,8 +127,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
       int id = idBox.get('id');
       idBox.put('id', id + 1);
     }
-    User user;
-    user = context.read<UserBloc>().state;
+
 
     Task task = Task(taskName, taskText, tagValue, user, taskCreateTime,
         deadline, id, priorityValue);

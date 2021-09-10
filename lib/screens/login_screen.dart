@@ -233,10 +233,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                         login(_loginController.text,
                                             _passController.text);
                                       } else {
-                                        setState(() {
-                                          logBorderColor = Colors.red;
-                                          passBorderColor = Colors.red;
-                                        });
                                         snackBarNotification(context,
                                             "Авторизация не удалась. Проверьте введенные данные.",
                                             duration: 2);
