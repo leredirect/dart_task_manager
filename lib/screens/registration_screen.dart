@@ -33,9 +33,9 @@ class _RegistrationScreen extends State<RegistrationScreen> {
     } else {
       AuthorisationRepository repository = new AuthorisationRepository();
 
-      int id = await IdsRepository().getIdList();
+      int newId = await IdRepository().getLastCreatedId();
 
-      currentUser = new User(id, login, pass);
+      currentUser = new User(newId, login, pass);
 
       var listBox = await Hive.openBox<User>('userBox');
       listBox.clear();

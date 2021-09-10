@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class IdsRepository {
-  static final IdsRepository _idsRepository = IdsRepository._internal();
+class IdRepository {
+  static final IdRepository _idRepository = IdRepository._internal();
 
-  IdsRepository._internal();
+  IdRepository._internal();
 
-  factory IdsRepository() {
-    return _idsRepository;
+  factory IdRepository() {
+    return _idRepository;
   }
 
   int id;
@@ -28,8 +28,8 @@ class IdsRepository {
     return idCollection.get();
   }
 
-  Future<int> getIdList() async {
-    Future<QuerySnapshot> collection = IdsRepository().getStream();
+  Future<int> getLastCreatedId() async {
+    Future<QuerySnapshot> collection = this.getStream();
     return collection.asStream().first.then((value) {
       if (value.docs.isNotEmpty) {
         value.docs.forEach((element) {
