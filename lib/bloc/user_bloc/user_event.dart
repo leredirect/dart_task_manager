@@ -10,7 +10,5 @@ class SetUserEvent extends UserEvent {
 }
 
 class ClearUserEvent extends UserEvent {
-  User user;
-
-  ClearUserEvent(this.user);
+  ClearUserEvent();
 }

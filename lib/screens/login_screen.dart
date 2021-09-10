@@ -36,9 +36,9 @@ class _LoginScreenState extends State<LoginScreen> {
         User currentUser = await repository.getUser(login, pass);
         context.read<UserBloc>().add(SetUserEvent(currentUser));
 
-        var listBox = await Hive.openBox<User>('userBox');
-        listBox.put('user', currentUser);
-        listBox.close();
+        var userBox = await Hive.openBox<User>('userBox');
+        userBox.put('user', currentUser);
+        userBox.close();
         snackBarNotification(context, "Успешно авторизован.");
         Navigator.pushReplacementNamed(context, "homeScreen");
       } on Exception catch (e) {
@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (userBox.isNotEmpty) {
       User userFromBox = userBox.get("user");
       bool compareWithBase =
-          await repository.checkUser(userFromBox.login, userFromBox.password);
+          await repository.isUserExists(userFromBox.login, userFromBox.password);
       if (compareWithBase) {
         currentUser = userFromBox;
         context.read<UserBloc>().add(SetUserEvent(currentUser));
@@ -223,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       AuthorisationRepository repository =
                                           new AuthorisationRepository();
                                       bool isUserExist =
-                                          await repository.checkUser(
+                                          await repository.isUserExists(
                                               _loginController.text,
                                               _passController.text);
                                       if (isUserExist) {

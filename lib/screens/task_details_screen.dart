@@ -49,18 +49,11 @@ class TaskDetailsScreen extends StatelessWidget {
       return result;
     }
 
-    void handleClick(String value) {
-      switch (value) {
-        case 'Редактировать':
-          openTaskEditor();
-          break;
-        case 'Удалить':
-          deleteCurrentTask();
-          break;
-      }
-    }
-
     return BlocBuilder<TaskListBloc, List<Task>>(builder: (context, state) {
+      Map<String, Function> options = {
+        'Редактировать': openTaskEditor,
+        'Удалить': deleteCurrentTask,
+      };
       Utils.statusBarColor();
       return Scaffold(
         appBar: AppBar(
@@ -71,9 +64,11 @@ class TaskDetailsScreen extends StatelessWidget {
                 Icons.more_vert,
                 color: Colors.white,
               ),
-              onSelected: handleClick,
+              onSelected: (String value) {
+                options[value]();
+              },
               itemBuilder: (BuildContext context) {
-                return {'Редактировать', 'Удалить'}.map((String choice) {
+                return options.keys.map((String choice) {
                   return PopupMenuItem<String>(
                     value: choice,
                     child: Text(
@@ -134,7 +129,9 @@ class TaskDetailsScreen extends StatelessWidget {
                     child: Text(task.text,
                         style: TextStyle(fontSize: 20, color: Colors.white)),
                     alignment: Alignment.centerLeft,
-                    margin: EdgeInsets.only(left: 15,bottom:MediaQuery.of(context).size.height / 7 ),
+                    margin: EdgeInsets.only(
+                        left: 15,
+                        bottom: MediaQuery.of(context).size.height / 7),
                   ),
                 ],
               ),
@@ -198,7 +195,7 @@ class TaskDetailsScreen extends StatelessWidget {
                       margin: EdgeInsets.only(top: 20),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Создатель: ${task.creator}",
+                        "Создатель: ${task.creator.login}",
                         textAlign: TextAlign.right,
                         style: TextStyle(color: Colors.grey),
                       ),

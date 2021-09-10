@@ -138,7 +138,7 @@ class TaskDetailsScreenNoActions extends StatelessWidget {
                       margin: EdgeInsets.only(top: 20),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Создатель: ${task.creator}",
+                        "Создатель: ${task.creator.login}",
                         textAlign: TextAlign.right,
                         style: TextStyle(color: Colors.grey),
                       ),
