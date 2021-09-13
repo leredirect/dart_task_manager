@@ -1,8 +1,10 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/bloc/user_bloc/user_bloc.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/models/user.dart';
+import 'package:dart_task_manager/repository/ids_repo.dart';
 import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -110,6 +112,8 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     String taskName = _nameController.text;
     String taskText = _textController.text;
     User user = context.read<UserBloc>().state;
+    Task task;
+    bool connection;
 
     String taskCreateTime = DateFormat.d().format(DateTime.now()) +
         "." +
@@ -119,18 +123,33 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
         " в " +
         DateFormat.Hm().format(DateTime.now());
 
-    var idBox = await Hive.openBox<int>('id_box');
-    int id = idBox.get('id');
-    if (id == null) {
-      idBox.put('id', 0);
-    } else {
-      int id = idBox.get('id');
-      idBox.put('id', id + 1);
+    // var idBox = await Hive.openBox<int>('id_box');
+    // int id = idBox.get('id');
+    // if (id == null) {
+    //   idBox.put('id', 0);
+    // } else {
+    //   int id = idBox.get('id');
+    //   idBox.put('id', id + 1);
+    // }
+
+    int id = await IdRepository().getLastCreatedTaskId();
+
+    ConnectivityResult connectivity = await Connectivity().checkConnectivity();
+
+      if (connectivity  == ConnectivityResult.none) {
+        connection = false;
+      } else {
+        connection = true;
+      }
+
+    if (connection){
+      task = Task(taskName, taskText, tagValue, user, taskCreateTime,
+          deadline, id, priorityValue, true);
+    }else{
+      task = Task(taskName, taskText, tagValue, user, taskCreateTime,
+          deadline, id, priorityValue, false);
     }
 
-
-    Task task = Task(taskName, taskText, tagValue, user, taskCreateTime,
-        deadline, id, priorityValue);
     print(
         "${task.id}, ${task.name}, ${task.text}, ${task.taskCreateTime}, ${task.taskDeadline}, ${task.priority}, ${task.tags.toString()}");
     context.read<TaskListBloc>().add(AddTaskEvent(task));

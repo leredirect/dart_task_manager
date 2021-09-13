@@ -21,9 +21,11 @@ class Task {
   Priorities priority;
   @HiveField(7)
   User creator;
+  @HiveField(8)
+  bool isPushed;
 
   Task(this.name, this.text, this.tags, this.creator, this.taskCreateTime, this.taskDeadline,
-      this.id, this.priority);
+      this.id, this.priority, [this.isPushed]);
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
@@ -50,6 +52,7 @@ class Task {
     id = json['id'] as int;
     priority = nameToPriorityMap[json['priority']];
     creator = User.fromJson(json['creator']);
+    isPushed = true;
   }
 }
 

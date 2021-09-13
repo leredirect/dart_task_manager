@@ -132,9 +132,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, Function> offlineOptions = {
+      'Выход': userSignOut,
+    };
+
     Map<String, Function> options = {
-      'Выход' : userSignOut,
-      'Обновить' : myStream,
+      'Выход': userSignOut,
+      'Обновить': myStream,
     };
 
     isOnline();
@@ -149,19 +153,35 @@ class _HomeScreenState extends State<HomeScreen> {
               Icons.more_vert,
               color: Colors.white,
             ),
-            onSelected: (String value){
-              options[value]();
+            onSelected: (String value) async {
+              if (isOnlineVar) {
+                options[value]();
+              } else {
+                offlineOptions[value]();
+              }
             },
             itemBuilder: (BuildContext context) {
-              return options.keys.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(
-                    choice,
-                    style: TextStyle(color: Colors.white),
-                  ),
-                );
-              }).toList();
+              if (isOnlineVar) {
+                return options.keys.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(
+                      choice,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList();
+              } else {
+                return offlineOptions.keys.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(
+                      choice,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList();
+              }
             },
           ),
         ],
@@ -216,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Visibility(
-              visible: isOnlineVar,
+              visible: true,
               child: FloatingActionButton(
                 child: Icon(
                   Icons.add,
@@ -258,7 +278,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     List<Task> tasks = [];
     Future<QuerySnapshot> collection = TaskRepository().getStream();
-     collection.asStream().first.then((value) {
+    collection.asStream().first.then((value) {
       value.docs.forEach((element) {
         tasks.add(Task.fromJson(element.data()));
       });

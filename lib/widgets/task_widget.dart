@@ -14,6 +14,7 @@ class TaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     var circlesIterable = task.tags.map((e) {
       return Container(
           width: 15,
@@ -21,9 +22,7 @@ class TaskWidget extends StatelessWidget {
           margin: EdgeInsets.only(top: 10, left: 5, right: 5),
           decoration: BoxDecoration(
             color: Utils.tagColor(
-                isWhite: false,
-                isDetail: false,
-                drpv: tagToNameMap[e]),
+                isWhite: false, isDetail: false, drpv: tagToNameMap[e]),
             shape: BoxShape.circle,
           ));
     });
@@ -131,6 +130,10 @@ class TaskWidget extends StatelessWidget {
                             fontWeight: FontWeight.w300),
                       ),
                     ),
+                    Visibility(
+                        visible: task.isPushed? false:true,
+                        child:
+                            Icon(Icons.access_time)),
                   ],
                 ),
               ),

@@ -37,7 +37,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
     } else {
       AuthorisationRepository repository = new AuthorisationRepository();
 
-      int newId = await IdRepository().getLastCreatedId();
+      int newId = await IdRepository().getLastCreatedUserId();
 
       currentUser = new User(newId, login, pass);
       context.read<UserBloc>().add(SetUserEvent(currentUser));
