@@ -11,6 +11,8 @@ import 'package:path_provider/path_provider.dart';
 
 import 'bloc/filter_bloc/filter_bloc.dart';
 import 'bloc/user_bloc/user_bloc.dart';
+import 'bloc/validation_bloc/login_bloc.dart';
+import 'bloc/validation_bloc/registration_bloc.dart';
 import 'models/task.dart';
 import 'models/user.dart';
 
@@ -34,6 +36,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
         providers: [
+          BlocProvider<RegistrationFormBloc>(create: (context) => RegistrationFormBloc()),
+          BlocProvider<LoginFormBloc>(create: (context) => LoginFormBloc()),
           BlocProvider<TaskListBloc>(create: (context) => TaskListBloc()),
           BlocProvider<UserBloc>(create: (context) => UserBloc()),
           BlocProvider<FilterBloc>(create: (context) => FilterBloc())
