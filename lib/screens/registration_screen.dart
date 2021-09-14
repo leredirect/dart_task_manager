@@ -45,6 +45,8 @@ class _RegistrationScreen extends State<RegistrationScreen> {
       listBox.put('user', currentUser);
       listBox.close();
 
+      context.read<RegistrationFormBloc>().clear();
+
       repository.addUser(currentUser);
       snackBarNotification(context, "Успешно зарегестрирован.", duration: 1);
       Navigator.pushReplacementNamed(context, "homeScreen");

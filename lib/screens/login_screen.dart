@@ -39,6 +39,9 @@ class _LoginScreenState extends State<LoginScreen> {
         var userBox = await Hive.openBox<User>('userBox');
         userBox.put('user', currentUser);
         userBox.close();
+
+        context.read<LoginFormBloc>().clear();
+
         snackBarNotification(context, "Успешно авторизован.");
         Navigator.pushReplacementNamed(context, "homeScreen");
       } on Exception catch (e) {
