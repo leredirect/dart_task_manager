@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/bloc/user_bloc/user_bloc.dart';
@@ -5,7 +6,6 @@ import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/ids_repo.dart';
 import 'package:dart_task_manager/repository/task_repo.dart';
-import 'package:dart_task_manager/utils/connectivity_utils.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -123,9 +123,10 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
         DateFormat.Hm().format(DateTime.now());
 
     int id = await IdRepository().getLastCreatedTaskId();
-    bool isOnline = await ConnectivityUtils.isOnline();
+//101
+    ConnectivityResult connectivity = await Connectivity().checkConnectivity();
 
-    if (isOnline) {
+    if (connectivity != ConnectivityResult.none) {
       task = Task(taskName, taskText, tagValue, user, taskCreateTime, deadline,
           id, priorityValue, true);
     } else {
