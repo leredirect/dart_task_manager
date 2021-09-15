@@ -83,7 +83,8 @@ class _RegistrationScreen extends State<RegistrationScreen> {
               UIBlock.block(context);
             },
             onSuccess: (context, state) async {
-              await Future.delayed(Duration(milliseconds: 1000));
+
+
               UIBlock.unblock(context);
               snackBarNotification(context, "Выполняется регистрация...",
                   duration: 1);
@@ -178,7 +179,9 @@ class _RegistrationScreen extends State<RegistrationScreen> {
                         height: 100,
                       ),
                       TextButton(
-                          onPressed: registrationBloc.submit,
+                          onPressed: (){
+                            registrationBloc.submit();
+                            },
                           child: Container(
                             decoration: BoxDecoration(
                                 border: Border.all(color: Colors.white)),

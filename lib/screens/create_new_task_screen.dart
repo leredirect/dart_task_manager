@@ -113,7 +113,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     String taskText = _textController.text;
     User user = context.read<UserBloc>().state;
     Task task;
-    bool connection;
 
     String taskCreateTime = DateFormat.d().format(DateTime.now()) +
         "." +
@@ -123,31 +122,16 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
         " в " +
         DateFormat.Hm().format(DateTime.now());
 
-    // var idBox = await Hive.openBox<int>('id_box');
-    // int id = idBox.get('id');
-    // if (id == null) {
-    //   idBox.put('id', 0);
-    // } else {
-    //   int id = idBox.get('id');
-    //   idBox.put('id', id + 1);
-    // }
-
     int id = await IdRepository().getLastCreatedTaskId();
-
+//101
     ConnectivityResult connectivity = await Connectivity().checkConnectivity();
 
-      if (connectivity  == ConnectivityResult.none) {
-        connection = false;
-      } else {
-        connection = true;
-      }
-
-    if (connection){
-      task = Task(taskName, taskText, tagValue, user, taskCreateTime,
-          deadline, id, priorityValue, true);
-    }else{
-      task = Task(taskName, taskText, tagValue, user, taskCreateTime,
-          deadline, id, priorityValue, false);
+    if (connectivity != ConnectivityResult.none) {
+      task = Task(taskName, taskText, tagValue, user, taskCreateTime, deadline,
+          id, priorityValue, true);
+    } else {
+      task = Task(taskName, taskText, tagValue, user, taskCreateTime, deadline,
+          id, priorityValue, false);
     }
 
     print(

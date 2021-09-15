@@ -132,11 +132,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, Function> offlineOptions = {
+    Map<String, Function> offlineMenuOptions = {
       'Выход': userSignOut,
     };
 
-    Map<String, Function> options = {
+    Map<String, Function> menuOptions  = {
       'Выход': userSignOut,
       'Обновить': myStream,
     };
@@ -155,14 +155,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             onSelected: (String value) async {
               if (isOnlineVar) {
-                options[value]();
+                menuOptions [value]();
               } else {
-                offlineOptions[value]();
+                offlineMenuOptions[value]();
               }
             },
             itemBuilder: (BuildContext context) {
               if (isOnlineVar) {
-                return options.keys.map((String choice) {
+                return menuOptions.keys.map((String choice) {
                   return PopupMenuItem<String>(
                     value: choice,
                     child: Text(
@@ -172,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }).toList();
               } else {
-                return offlineOptions.keys.map((String choice) {
+                return offlineMenuOptions.keys.map((String choice) {
                   return PopupMenuItem<String>(
                     value: choice,
                     child: Text(
@@ -235,17 +235,14 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Visibility(
-              visible: true,
-              child: FloatingActionButton(
-                child: Icon(
-                  Icons.add,
-                  color: backgroundColor,
-                ),
-                onPressed: createTask,
-                backgroundColor: Utils.tagColor(
-                    isWhite: false, isDetail: false, drpv: currentFilter),
+            FloatingActionButton(
+              child: Icon(
+                Icons.add,
+                color: backgroundColor,
               ),
+              onPressed: createTask,
+              backgroundColor: Utils.tagColor(
+                  isWhite: false, isDetail: false, drpv: currentFilter),
             ),
             SizedBox(
               width: 10,

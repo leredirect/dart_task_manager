@@ -131,7 +131,7 @@ class TaskWidget extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                        visible: task.isPushed? false:true,
+                        visible: !task.isPushed? false:true,
                         child:
                             Icon(Icons.access_time)),
                   ],

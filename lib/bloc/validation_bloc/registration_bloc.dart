@@ -1,18 +1,19 @@
 import 'package:dart_task_manager/repository/auth_repo.dart';
+import 'package:dart_task_manager/utils/validation_utils.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 
 class RegistrationFormBloc extends FormBloc<String, String> {
   final login = TextFieldBloc(validators: [
-    required,
-    loginValidator,
+    ValidationUtils.required,
+    loginValidation,
   ], asyncValidators: [
-    baseValidator,
+    loginTakenValidation,
   ]);
 
   final password = TextFieldBloc(
     validators: [
-      required,
-      passwordValidator,
+      ValidationUtils.required,
+      passwordValidation,
     ],
   );
 
@@ -27,17 +28,10 @@ class RegistrationFormBloc extends FormBloc<String, String> {
 
   @override
   void onSubmitting() async {
-    print(login.value);
-    AuthorisationRepository repository = new AuthorisationRepository();
-    bool isLoginTaken = await repository.checkLogin(login.value);
-    if (isLoginTaken) {
-      emitFailure(failureResponse: "Проверьте правильность введенных данных.");
-    } else {
-      emitSuccess();
-    }
+    emitSuccess(canSubmitAgain: true);
   }
 
-  static Future<String> baseValidator(String string) async {
+  static Future<String> loginTakenValidation(String string) async {
     AuthorisationRepository repository = new AuthorisationRepository();
     bool isLoginTaken = await repository.checkLogin(string);
     if (isLoginTaken) {
@@ -47,27 +41,17 @@ class RegistrationFormBloc extends FormBloc<String, String> {
     }
   }
 
-  static String passwordValidator(String string) {
+  static String passwordValidation(String string) {
     if (string == null || string.isEmpty || string.length >= 5) {
       return null;
     }
-    return "Пароль должен быть длинее 5-ти символов.";
+    return "Пароль должен быть длиннее 5-ти символов.";
   }
 
-  static String loginValidator(String string) {
+  static String loginValidation(String string) {
     if (string == null || string.isEmpty || string.length >= 5) {
       return null;
     }
-    return "Логин должен быть длинее 5-ти символов.";
-  }
-
-  static String required(dynamic value) {
-    if (value == null ||
-        value == false ||
-        ((value is Iterable || value is String || value is Map) &&
-            value.length == 0)) {
-      return "Поле не может быть пустым";
-    }
-    return null;
+    return "Логин должен быть длиннее 5-ти символов.";
   }
 }
