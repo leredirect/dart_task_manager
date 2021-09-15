@@ -1,7 +1,5 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/task_details_screen.dart';
-import 'package:dart_task_manager/screens/task_details_screen_noActions.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +12,6 @@ class TaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     var circlesIterable = task.tags.map((e) {
       return Container(
           width: 15,
@@ -30,21 +27,11 @@ class TaskWidget extends StatelessWidget {
 
     Utils.statusBarColor();
     void openTaskDetails() {
-      var connectivityResult = Connectivity().checkConnectivity().then((value) {
-        if (value == ConnectivityResult.none) {
-          Navigator.push(context, MaterialPageRoute(builder: (_) {
-            return TaskDetailsScreenNoActions(
-              task: task,
-            );
-          }));
-        } else {
-          Navigator.push(context, MaterialPageRoute(builder: (_) {
-            return TaskDetailsScreen(
-              task: task,
-            );
-          }));
-        }
-      });
+      Navigator.push(context, MaterialPageRoute(builder: (_) {
+        return TaskDetailsScreen(
+          task: task,
+        );
+      }));
     }
 
     return Column(
@@ -131,9 +118,8 @@ class TaskWidget extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                        visible: !task.isPushed? false:true,
-                        child:
-                            Icon(Icons.access_time)),
+                        visible: !task.isPushed ? false : true,
+                        child: Icon(Icons.access_time)),
                   ],
                 ),
               ),
