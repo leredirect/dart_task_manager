@@ -9,16 +9,19 @@ class IdRepository {
     return _idRepository;
   }
 
-  int id;
+  int userId;
+  int taskId;
 
   Map<String, dynamic> idToJson() {
     return <String, dynamic>{
-      "last-id": this.id,
+      "last-user-id": this.userId,
+      "last-task-id": this.taskId,
     };
   }
 
   idFromJson(Map<String, dynamic> json) {
-    id = json['last-id'];
+    userId = json['last-user-id'];
+    taskId = json['last-task-id'];
   }
 
   CollectionReference idCollection =
@@ -28,21 +31,41 @@ class IdRepository {
     return idCollection.get();
   }
 
-  Future<int> getLastCreatedId() async {
+  Future<int> getLastCreatedUserId() async {
     Future<QuerySnapshot> collection = this.getStream();
     return collection.asStream().first.then((value) {
       if (value.docs.isNotEmpty) {
         value.docs.forEach((element) {
           idFromJson(element.data());
-          this.id = this.id + 1;
+          this.userId = this.userId + 1;
           idCollection.doc(element.id).update(idToJson());
         });
-        return this.id;
+        print(this.userId);
+        return this.userId;
       } else {
-        this.id = 0;
+        this.userId = 0;
         idCollection.add(this.idToJson());
-        return this.id;
+        return this.userId;
       }
     });
   }
+
+  Future<int> getLastCreatedTaskId() async {
+    Future<QuerySnapshot> collection = this.getStream();
+    var value = await collection.asStream().first;
+      if (value.docs.isNotEmpty) {
+        value.docs.forEach((element) {
+          idFromJson(element.data());
+          this.taskId = this.taskId + 1;
+          idCollection.doc(element.id).update(idToJson());
+        });
+        print(this.taskId);
+        return this.taskId;
+      } else {
+        this.taskId = 0;
+        idCollection.add(this.idToJson());
+        return this.taskId;
+      }
+  }
+
 }

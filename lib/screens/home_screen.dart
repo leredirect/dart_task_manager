@@ -132,9 +132,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, Function> options = {
-      'Выход' : userSignOut,
-      'Обновить' : myStream,
+    Map<String, Function> offlineMenuOptions = {
+      'Выход': userSignOut,
+    };
+
+    Map<String, Function> menuOptions  = {
+      'Выход': userSignOut,
+      'Обновить': myStream,
     };
 
     isOnline();
@@ -149,19 +153,35 @@ class _HomeScreenState extends State<HomeScreen> {
               Icons.more_vert,
               color: Colors.white,
             ),
-            onSelected: (String value){
-              options[value]();
+            onSelected: (String value) async {
+              if (isOnlineVar) {
+                menuOptions [value]();
+              } else {
+                offlineMenuOptions[value]();
+              }
             },
             itemBuilder: (BuildContext context) {
-              return options.keys.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(
-                    choice,
-                    style: TextStyle(color: Colors.white),
-                  ),
-                );
-              }).toList();
+              if (isOnlineVar) {
+                return menuOptions.keys.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(
+                      choice,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList();
+              } else {
+                return offlineMenuOptions.keys.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(
+                      choice,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList();
+              }
             },
           ),
         ],
@@ -215,17 +235,14 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Visibility(
-              visible: isOnlineVar,
-              child: FloatingActionButton(
-                child: Icon(
-                  Icons.add,
-                  color: backgroundColor,
-                ),
-                onPressed: createTask,
-                backgroundColor: Utils.tagColor(
-                    isWhite: false, isDetail: false, drpv: currentFilter),
+            FloatingActionButton(
+              child: Icon(
+                Icons.add,
+                color: backgroundColor,
               ),
+              onPressed: createTask,
+              backgroundColor: Utils.tagColor(
+                  isWhite: false, isDetail: false, drpv: currentFilter),
             ),
             SizedBox(
               width: 10,
@@ -258,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     List<Task> tasks = [];
     Future<QuerySnapshot> collection = TaskRepository().getStream();
-     collection.asStream().first.then((value) {
+    collection.asStream().first.then((value) {
       value.docs.forEach((element) {
         tasks.add(Task.fromJson(element.data()));
       });

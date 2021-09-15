@@ -21,7 +21,7 @@ class AuthorisationRepository {
   Future<DocumentReference> addUser(User user) {
     return collection.add(user.toJson());
   }
-
+//101
   Future<DocumentReference> deleteUser(User user) {
     return collection.where("id", isEqualTo: user.id).get().then((value) {
       if (value.docs.length == 0) {
