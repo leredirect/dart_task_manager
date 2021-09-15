@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dart_task_manager/bloc/filter_bloc/filter_bloc.dart';
 import 'package:dart_task_manager/bloc/filter_bloc/filter_event.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
@@ -10,7 +11,6 @@ import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
-import 'package:dart_task_manager/utils/connectivity_utils.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/task_list_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,6 +19,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:hive/hive.dart';
+
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -29,7 +31,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String currentFilter = tagToNameMap[Tags.CLEAR];
-  bool isOnline;
 
   Future<void> userSignOut() async {
     context.read<UserBloc>().add(ClearUserEvent());
@@ -64,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
         label: tagToNameMap[tag],
         onTap: () {
           currentFilter = tagToNameMap[tag];
-          context.read<FilterBloc>().add(ClearFilter());
+          context.read<FilterBloc>().add(ClearFilter(tag));
         },
         labelBackgroundColor: color,
       );
@@ -89,11 +90,25 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void checkIfOnline() async {
-    bool onlineStatus = await ConnectivityUtils.isOnline();
-    setState(() {
-      isOnline = onlineStatus;
-    });
+  void isOnline() async {
+    var internet = await (Connectivity().checkConnectivity());
+    switch (internet) {
+      case ConnectivityResult.wifi:
+        setState(() {
+          isOnlineVar = true;
+        });
+        break;
+      case ConnectivityResult.mobile:
+        setState(() {
+          isOnlineVar = true;
+        });
+        break;
+      case ConnectivityResult.none:
+        setState(() {
+          isOnlineVar = false;
+        });
+        break;
+    }
   }
 
   Future<void> myStream() async {
@@ -113,17 +128,20 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  bool isOnlineVar;
+
   @override
   Widget build(BuildContext context) {
     Map<String, Function> offlineMenuOptions = {
       'Выход': userSignOut,
     };
 
-    Map<String, Function> menuOptions = {
+    Map<String, Function> menuOptions  = {
       'Выход': userSignOut,
       'Обновить': myStream,
     };
 
+    isOnline();
     Utils.statusBarColor();
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -136,14 +154,14 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.white,
             ),
             onSelected: (String value) async {
-              if (isOnline) {
-                menuOptions[value]();
+              if (isOnlineVar) {
+                menuOptions [value]();
               } else {
                 offlineMenuOptions[value]();
               }
             },
             itemBuilder: (BuildContext context) {
-              if (isOnline) {
+              if (isOnlineVar) {
                 return menuOptions.keys.map((String choice) {
                   return PopupMenuItem<String>(
                     value: choice,
@@ -178,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Spacer(),
             Visibility(
-              visible: !isOnline,
+              visible: !isOnlineVar,
               child: Text(
                 "Оффлайн",
                 style: TextStyle(color: Colors.grey, fontSize: 14),
@@ -263,8 +281,8 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       context.read<TaskListBloc>().add(HiveChecker(tasks));
     });
-    ConnectivityUtils.isOnline().then((isOnline) {
-      if (!isOnline) {
+    Connectivity().checkConnectivity().then((value) {
+      if (value == ConnectivityResult.none) {
         snackBarNotification(
             context, "Отсутствует подключение к сети. Режим чтения.");
         Hive.openBox('taskList').then((value) {
