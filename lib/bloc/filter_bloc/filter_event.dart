@@ -9,7 +9,4 @@ class FilterChecker extends FilterEvent {
 }
 
 class ClearFilter extends FilterEvent {
-  Tags tag;
-//101
-  ClearFilter(this.tag);
 }
