@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dart_task_manager/bloc/user_bloc/user_bloc.dart';
 import 'package:dart_task_manager/bloc/user_bloc/user_event.dart';
 import 'package:dart_task_manager/bloc/validation_bloc/login_bloc.dart';
@@ -5,9 +6,7 @@ import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/auth_repo.dart';
 import 'package:dart_task_manager/screens/home_screen.dart';
-import 'package:dart_task_manager/utils/connectivity_utils.dart';
 import 'package:dart_task_manager/utils/utils.dart';
-import 'package:dart_task_manager/widgets/text_input_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,12 +22,14 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _loginController = TextEditingController();
+  final _passController = TextEditingController();
   User currentUser;
 
   Future<void> login(String login, String pass) async {
-    bool isOnline = await ConnectivityUtils.isOnline();
+    var internet = await (Connectivity().checkConnectivity());
     AuthorisationRepository repository = new AuthorisationRepository();
-    if (!isOnline) {
+    if (internet == ConnectivityResult.none) {
       snackBarNotification(context, "Отсутствует подключение к интернету.");
     } else {
       try {
@@ -142,26 +143,74 @@ class _LoginScreenState extends State<LoginScreen> {
                                         letterSpacing: 3),
                                   ),
                                 ),
-                                TextInputWidget(
-                                  textFieldBloc: loginBloc.login,
-                                  focusNode: loginNode,
-                                  helperText: 'логин',
-                                  onEditingComplete: () {
-                                    FocusScope.of(context)
-                                        .requestFocus(passNode);
-                                  },
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.5,
+                                  child: TextFieldBlocBuilder(
+                                    onEditingComplete: () {
+                                      FocusScope.of(context)
+                                          .requestFocus(passNode);
+                                    },
+                                    focusNode: loginNode,
+                                    style: TextStyle(color: Colors.white),
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                      helperText: "логин",
+                                      helperStyle: TextStyle(
+                                          color: Colors.white,
+                                          letterSpacing: 3),
+                                      contentPadding: EdgeInsets.only(left: 5),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(0)),
+                                        borderSide:
+                                            BorderSide(color: clearColor),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(0)),
+                                        borderSide:
+                                            BorderSide(color: clearColor),
+                                      ),
+                                    ),
+                                    textFieldBloc: loginBloc.login,
+                                  ),
                                 ),
                                 SizedBox(
                                   height: 30,
                                 ),
-                                TextInputWidget(
-                                  textFieldBloc: loginBloc.password,
-                                  focusNode: passNode,
-                                  helperText: 'пароль',
-                                  onEditingComplete: () {
-                                    FocusManager.instance.primaryFocus
-                                        ?.unfocus();
-                                  },
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.5,
+                                  child: TextFieldBlocBuilder(
+                                    focusNode: passNode,
+                                    onEditingComplete: () {
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
+                                    },
+                                    style: TextStyle(color: Colors.white),
+                                    textAlign: TextAlign.center,
+                                    decoration: InputDecoration(
+                                      helperText: "логин",
+                                      helperStyle: TextStyle(
+                                          color: Colors.white,
+                                          letterSpacing: 3),
+                                      contentPadding: EdgeInsets.only(left: 5),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(0)),
+                                        borderSide:
+                                            BorderSide(color: clearColor),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(0)),
+                                        borderSide:
+                                            BorderSide(color: clearColor),
+                                      ),
+                                    ),
+                                    textFieldBloc: loginBloc.password,
+                                  ),
                                 ),
                                 SizedBox(
                                   height: 100,
@@ -204,6 +253,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void dispose() {
     super.dispose();
+    _loginController.dispose();
+    _passController.dispose();
   }
 
   @override
