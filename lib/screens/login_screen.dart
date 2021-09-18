@@ -7,9 +7,7 @@ import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/auth_repo.dart';
 import 'package:dart_task_manager/screens/home_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
-import 'package:dart_task_manager/widgets/text_button.dart';
 import 'package:dart_task_manager/widgets/text_input_widget.dart';
-import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,9 +27,8 @@ class _LoginScreenState extends State<LoginScreen> {
   User currentUser;
 
   Future<void> login(String login, String pass) async {
-    bool isOnline = context
-        .read<ConnectivityBloc>()
-        .state;
+    bool isOnline = context.read<ConnectivityBloc>().state;
+
     AuthorisationRepository repository = new AuthorisationRepository();
     if (!isOnline) {
       snackBarNotification(context, "Отсутствует подключение к интернету.");
@@ -39,6 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
       try {
         User currentUser = await repository.getUser(login, pass);
         context.read<UserBloc>().add(SetUserEvent(currentUser));
+
         var userBox = await Hive.openBox<User>('userBox');
         userBox.put('user', currentUser);
         userBox.close();
@@ -46,8 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
         context.read<LoginFormBloc>().clear();
 
         snackBarNotification(context, "Успешно авторизован.");
-        Navigator.pushNamedAndRemoveUntil(
-            context, "homeScreen", (route) => false);
+        Navigator.pushReplacementNamed(context, "homeScreen");
       } on Exception catch (e) {
         snackBarNotification(context, e.toString());
       }
@@ -106,72 +103,103 @@ class _LoginScreenState extends State<LoginScreen> {
                     onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                     child: Scaffold(
                       backgroundColor: backgroundColor,
-                      body: AnimationConfiguration.synchronized(
-                        duration: const Duration(milliseconds: 1000),
-                        child: FadeInAnimation(
-                          child: Center(
-                            child: Container(
-                              margin: EdgeInsets.only(
-                                  top: MediaQuery
-                                      .of(context)
-                                      .size
-                                      .height /
-                                      15),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.only(top: 10),
-                                    child: TextWidget(
-                                      text: "DTM",
-                                          fontSize: 25,
+                      body: SingleChildScrollView(
+                        child: AnimationConfiguration.synchronized(
+                          duration: const Duration(milliseconds: 1000),
+                          child: FadeInAnimation(
+                            child: Center(
+                              child: Container(
+                                margin: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height /
+                                        15),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      margin: EdgeInsets.only(top: 10),
+                                      child: Text(
+                                        "DTM",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 25,
+                                            letterSpacing: 10),
+                                      ),
                                     ),
-                                  ),
-                                  Spacer(
-                                  ),
-                                  Container(
-                                    // margin: EdgeInsets.only(
-                                    //     top: 100, bottom: 100),
-                                    child: TextWidget(
-                                      text: "вход в существующий аккаунт",
-                                      fontSize: headerText,
-                                      color: Colors.white,
+                                    Container(
+                                      margin: EdgeInsets.only(
+                                          top: 100, bottom: 100),
+                                      child: Text(
+                                        "вход в существующий аккаунт",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                            letterSpacing: 3),
+                                      ),
                                     ),
-                                  ),
-                                  Spacer(
-                                  ),
-                                  TextInputWidget(
-                                    isObscured: false,
-                                    textFieldBloc: loginBloc.login,
-                                    focusNode: loginNode,
-                                    helperText: 'логин',
-                                    onEditingComplete: () {
-                                      FocusScope.of(context)
-                                          .requestFocus(passNode);
-                                    },
-                                  ),
-                                  TextInputWidget(
-                                    suffixButton: SuffixButton.obscureText,
-                                    isObscured: true,
-                                    textFieldBloc: loginBloc.password,
-                                    focusNode: passNode,
-                                    helperText: 'пароль',
-                                    onEditingComplete: () {
-                                      FocusManager.instance.primaryFocus
-                                          ?.unfocus();
-                                    },
-                                  ),
-                                 Spacer(),
-                                  TextButtonWidget(
-                                    onPressed: loginBloc.submit,
-                                    borderColor: Colors.white,
-                                    text: "войти", textColor: Colors.white,),
-                                  TextButtonWidget(onPressed: () {
-                                    Navigator.pushNamed(context, "registrationScreen");},
-                                    borderColor: backgroundColor,
-                                    text: "регистрация", textColor: Colors.grey,),
-                                  Spacer(),
-                                ],
+                                    TextInputWidget(
+                                      isObscured: false,
+                                      textFieldBloc: loginBloc.login,
+                                      focusNode: loginNode,
+                                      helperText: 'логин',
+                                      onEditingComplete: () {
+                                        FocusScope.of(context)
+                                            .requestFocus(passNode);
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: 30,
+                                    ),
+                                    TextInputWidget(
+                                      isObscured: true,
+                                      textFieldBloc: loginBloc.password,
+                                      focusNode: passNode,
+                                      helperText: 'пароль',
+                                      onEditingComplete: () {
+                                        FocusManager.instance.primaryFocus
+                                            ?.unfocus();
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: 100,
+                                    ),
+                                    TextButton(
+                                        onPressed: loginBloc.submit,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.white)),
+                                          child: Padding(
+                                              padding: EdgeInsets.only(
+                                                  top: 10,
+                                                  bottom: 10,
+                                                  left: 50,
+                                                  right: 50),
+                                              child: Text(
+                                                "войти",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    letterSpacing: 3),
+                                              )),
+                                        )),
+                                    Container(
+                                      margin: EdgeInsets.only(top: 70),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          Navigator.pushReplacementNamed(
+                                              context, "registrationScreen");
+                                        },
+                                        child: Text(
+                                          "регистрация",
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 13,
+                                              letterSpacing: 3),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -184,16 +212,10 @@ class _LoginScreenState extends State<LoginScreen> {
             }
           } else {
             return Container(
-              color: backgroundColor,
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
-              height: MediaQuery
-                  .of(context)
-                  .size
-                  .height,
-            );
+                color: backgroundColor,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                );
           }
         });
   }

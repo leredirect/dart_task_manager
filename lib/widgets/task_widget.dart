@@ -1,7 +1,6 @@
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/task_details_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
-import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../constants.dart';
@@ -13,18 +12,18 @@ class TaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // var circlesIterable = task.tags.map((e) {
-    //   return Container(
-    //       width: 15,
-    //       height: 15,
-    //       margin: EdgeInsets.only(top: 10, left: 5, right: 5),
-    //       decoration: BoxDecoration(
-    //         color: Utils.tagColor(
-    //             isWhite: false, isDetail: false, drpv: tagToNameMap[e]),
-    //         shape: BoxShape.circle,
-    //       ));
-    // });
-    //List<Widget> circles = circlesIterable.toList();
+    var circlesIterable = task.tags.map((e) {
+      return Container(
+          width: 15,
+          height: 15,
+          margin: EdgeInsets.only(top: 10, left: 5, right: 5),
+          decoration: BoxDecoration(
+            color: Utils.tagColor(
+                isWhite: false, isDetail: false, drpv: tagToNameMap[e]),
+            shape: BoxShape.circle,
+          ));
+    });
+    List<Widget> circles = circlesIterable.toList();
 
     Utils.statusBarColor();
     void openTaskDetails() {
@@ -59,14 +58,24 @@ class TaskWidget extends StatelessWidget {
               onTap: openTaskDetails,
               child: Container(
                 padding: EdgeInsets.all(3),
-                color: taskColorDark,
+                color: Utils.tagColor(
+                    isWhite: false,
+                    isDetail: true,
+                    drpv: null,
+                    tag: task.tags.first),
                 child: Column(
                   children: [
                     Container(
                       alignment: Alignment.centerLeft,
-                      child: TextWidget(
-                        text: task.name,
-                        fontSize: headerText,
+                      child: Text(
+                        task.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: clearColor,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w300),
                       ),
                     ),
                     SizedBox(
@@ -82,15 +91,30 @@ class TaskWidget extends StatelessWidget {
                     ),
                     Container(
                       alignment: Alignment.centerLeft,
-                      child: TextWidget(
-                        text: task.text,
+                      child: Text(
+                        task.text,
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: clearColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w200),
                       ),
                     ),
                     Spacer(),
                     Container(
                       alignment: Alignment.centerLeft,
-                      child: TextWidget(
-                        text: task.taskCreateTime,
+                      child: Text(
+                        task.taskCreateTime,
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: clearColor.withOpacity(0.7),
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w300),
                       ),
                     ),
                     Visibility(
@@ -102,6 +126,9 @@ class TaskWidget extends StatelessWidget {
             ),
           ),
         ),
+        Row(
+          children: circles,
+        )
       ],
     );
   }

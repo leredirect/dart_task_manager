@@ -3,7 +3,6 @@ import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/utils/utils.dart';
-import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -112,8 +111,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
         appBar: AppBar(
           systemOverlayStyle: Utils.statusBarColor(),
           iconTheme: IconThemeData(color: Colors.white),
-          title: TextWidget(
-            text: "Новая задача",
+          title: Text(
+            "Новая задача",
+            style: TextStyle(color: Colors.white),
           ),
           backgroundColor: backgroundColor,
         ),
@@ -129,12 +129,21 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 hintStyle: TextStyle(color: Colors.white),
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                      color: taskColorDark
-                  ),
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[tagValue.first])),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: taskColorDark
+                    color: tagValue.isEmpty
+                        ? clearColor.withOpacity(0.5)
+                        : Utils.tagColor(
+                            isWhite: false,
+                            isDetail: false,
+                            drpv: tagToNameMap[tagValue.first]),
                   ),
                 ),
               ),
@@ -149,13 +158,21 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 contentPadding: EdgeInsets.only(left: 5),
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                      color: taskColorDark
-                  ),
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[tagValue.first])),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                      color: taskColorDark
-                  ),
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[tagValue.first])),
                 ),
               ),
             ),
@@ -163,8 +180,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 tileBuilder: (context, state) {
                   return S2Tile.fromState(
                     state,
-                    title: TextWidget(text: "Выберите тег:",
-                    ),
+                    title: Text("Выберите тег:",
+                        style: TextStyle(color: Colors.white)),
                     padding:
                         EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
                   );
@@ -200,8 +217,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 tileBuilder: (context, state) {
                   return S2Tile.fromState(
                     state,
-                    title: TextWidget(text: "Выберите приоритет:",
-                       ),
+                    title: Text("Выберите приоритет:",
+                        style: TextStyle(color: Colors.white)),
                     padding:
                         EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
                   );
@@ -256,21 +273,32 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                       )
                     ],
                     borderRadius: BorderRadius.circular(12),
-                    color: taskColorDark,
+                    color: tagValue.isEmpty
+                        ? clearColor.withOpacity(0.5)
+                        : Utils.tagColor(
+                            isWhite: false,
+                            isDetail: false,
+                            drpv: tagToNameMap[tagValue.first]),
                   ),
                   width: MediaQuery.of(context).size.width * 0.6,
                   height: 40,
                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   child: Center(
-                      child: TextWidget(
-                    text: "Задать время на выполнение",
+                      child: Text(
+                    "Задать время на выполнение",
+                    style: TextStyle(color: Colors.white),
                   )),
                 )),
             Container(
               margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
               alignment: Alignment.center,
-              child: TextWidget(
-                text: Utils.timeHint(pickedDate, pickedTime, isEdit: false),
+              child: Text(
+                Utils.timeHint(pickedDate, pickedTime, isEdit: false),
+                style: TextStyle(
+                  color: Colors.white24,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
               ),
             ),
             Spacer(),
@@ -287,15 +315,21 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                           offset: Offset(0, 3),
                         )
                       ],
-                      color: taskColorDark,
+                      color: tagValue.isEmpty
+                          ? clearColor.withOpacity(0.5)
+                          : Utils.tagColor(
+                              isWhite: false,
+                              isDetail: false,
+                              drpv: tagToNameMap[tagValue.first]),
                       borderRadius: BorderRadius.circular(12)),
                   width: MediaQuery.of(context).size.width * 0.4,
                   height: 40,
                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   margin: EdgeInsets.only(bottom: 50),
                   child: Center(
-                      child: TextWidget(
-                    text: "Подтвердить",
+                      child: Text(
+                    "Подтвердить",
+                    style: TextStyle(color: Colors.white),
                   )),
                 ))
           ],

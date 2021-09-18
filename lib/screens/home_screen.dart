@@ -13,7 +13,6 @@ import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/task_list_widget.dart';
-import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -55,10 +54,10 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.only(bottom: 3, top: 3, left: 5, right: 5),
           margin: EdgeInsets.only(bottom: 20),
           color: color,
-          child: TextWidget(
-            text: tagToNameMap[tag],
-            fontSize: headerText,
-            color: Colors.white
+          child: Text(
+            tagToNameMap[tag],
+            style: TextStyle(
+                fontWeight: FontWeight.w300, letterSpacing: 2, fontSize: 18),
           ),
         ),
         label: tagToNameMap[tag],
@@ -73,9 +72,11 @@ class _HomeScreenState extends State<HomeScreen> {
         labelWidget: Container(
           padding: EdgeInsets.only(bottom: 3, top: 3, left: 5, right: 5),
           color: color,
-          child: TextWidget(
-            text: tagToNameMap[tag],
-            fontSize: headerText),
+          child: Text(
+            tagToNameMap[tag],
+            style: TextStyle(
+                fontWeight: FontWeight.w300, letterSpacing: 2, fontSize: 18),
+          ),
         ),
         label: tagToNameMap[tag],
         onTap: () {
@@ -143,8 +144,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   return menuOptions.keys.map((String choice) {
                     return PopupMenuItem<String>(
                       value: choice,
-                      child: TextWidget(
-                        text: choice,
+                      child: Text(
+                        choice,
+                        style: TextStyle(color: Colors.white),
                       ),
                     );
                   }).toList();
@@ -152,8 +154,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   return offlineMenuOptions.keys.map((String choice) {
                     return PopupMenuItem<String>(
                       value: choice,
-                      child: TextWidget(
-                        text: choice,
+                      child: Text(
+                        choice,
+                        style: TextStyle(color: Colors.white),
                       ),
                     );
                   }).toList();
@@ -165,14 +168,16 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: backgroundColor,
           title: Row(
             children: [
-              TextWidget(
-                text: "DTM",
+              Text(
+                "DTM",
+                style: TextStyle(color: Colors.white),
               ),
               Spacer(),
               Visibility(
                 visible: !connectivityState,
-                child: TextWidget(
-                  text: "Оффлайн",
+                child: Text(
+                  "Оффлайн",
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
                 ),
               )
             ],
@@ -211,28 +216,30 @@ class _HomeScreenState extends State<HomeScreen> {
               FloatingActionButton(
                 child: Icon(
                   Icons.add,
-                  color: Colors.white,
+                  color: backgroundColor,
                 ),
                 onPressed: createTask,
-                backgroundColor: taskColorDark,
+                backgroundColor: Utils.tagColor(
+                    isWhite: false, isDetail: false, drpv: currentFilter),
               ),
               SizedBox(
                 width: 10,
               ),
               SpeedDial(
-                child: Icon(Icons.filter_list, color:Colors.white,),
+                child: Icon(Icons.filter_list),
                 overlayColor: Colors.black.withOpacity(0.8),
                 childMargin: EdgeInsets.only(top: 3, bottom: 3),
                 childPadding: EdgeInsets.all(3),
                 children: [
                   mySpeedDialChild(Tags.CLEAR, clearColor, true, currentFilter),
                   mySpeedDialChild(
-                      Tags.FLUTTER, taskColorDark, false, currentFilter),
-                  mySpeedDialChild(Tags.DART, taskColorDark, false, currentFilter),
+                      Tags.FLUTTER, flutterColor, false, currentFilter),
+                  mySpeedDialChild(Tags.DART, dartColor, false, currentFilter),
                   mySpeedDialChild(
-                      Tags.ALGORITHMS, taskColorDark, false, currentFilter),
+                      Tags.ALGORITHMS, algosColor, false, currentFilter),
                 ],
-                backgroundColor: taskColorDark,
+                backgroundColor: Utils.tagColor(
+                    isWhite: false, isDetail: false, drpv: currentFilter),
               ),
             ],
           ),
