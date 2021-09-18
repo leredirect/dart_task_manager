@@ -9,6 +9,7 @@ class TextInputWidget extends StatelessWidget {
   final TextFieldBloc textFieldBloc;
   final String helperText;
   final bool isObscured;
+  final SuffixButton suffixButton;
 
   const TextInputWidget(
       {Key key,
@@ -16,7 +17,7 @@ class TextInputWidget extends StatelessWidget {
       @required this.textFieldBloc,
       @required this.helperText,
       @required this.focusNode,
-        this.isObscured})
+        this.isObscured, this.suffixButton})
       : super(key: key);
 
   @override
@@ -26,13 +27,23 @@ class TextInputWidget extends StatelessWidget {
       child: TextFieldBlocBuilder(
         onEditingComplete: this.onEditingComplete,
         focusNode: focusNode,
-        obscureText: this.isObscured,
-        style: TextStyle(color: Colors.white),
-        textAlign: TextAlign.center,
+        suffixButton: this.suffixButton,
+        obscureTextTrueIcon: Icon(Icons.visibility_outlined, color: clearColor),
+        obscureTextFalseIcon: Icon(Icons.visibility_off_outlined, color: clearColor),
+        style: TextStyle(color: Colors.white, letterSpacing: 2),
+        textAlign: TextAlign.left,
         decoration: InputDecoration(
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(0)),
+            borderSide: BorderSide(color: Colors.red),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(0)),
+            borderSide: BorderSide(color: Colors.red),
+          ),
           helperText: this.helperText,
           helperStyle: TextStyle(color: Colors.white, letterSpacing: 3),
-          contentPadding: EdgeInsets.only(left: 5),
+          contentPadding: EdgeInsets.only(left: 10),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(0)),
             borderSide: BorderSide(color: clearColor),

@@ -10,6 +10,7 @@ import 'package:dart_task_manager/repository/ids_repo.dart';
 import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/text_input_widget.dart';
+import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -146,9 +147,8 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
             appBar: AppBar(
               systemOverlayStyle: Utils.statusBarColor(),
               iconTheme: IconThemeData(color: Colors.white),
-              title: Text(
-                "Новая задача",
-                style: TextStyle(color: Colors.white),
+              title: TextWidget(
+                text: "Новая задача",
               ),
               backgroundColor: backgroundColor,
             ),
@@ -180,8 +180,8 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                     tileBuilder: (context, state) {
                       return S2Tile.fromState(
                         state,
-                        title: Text("Выберите тег:",
-                            style: TextStyle(color: Colors.white)),
+                        title: TextWidget( text: "Выберите тег:",
+                            ),
                         padding: EdgeInsets.only(
                             left: 5, right: 5, bottom: 0, top: 3),
                       );
@@ -215,8 +215,8 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                     tileBuilder: (context, state) {
                       return S2Tile.fromState(
                         state,
-                        title: Text("Выберите приоритет:",
-                            style: TextStyle(color: Colors.white)),
+                        title: TextWidget(text: "Выберите приоритет:",
+                        ),
                         padding: EdgeInsets.only(
                             left: 5, right: 5, bottom: 0, top: 3),
                       );
@@ -271,32 +271,21 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                           )
                         ],
                         borderRadius: BorderRadius.circular(12),
-                        color: tagValue.isEmpty
-                            ? clearColor.withOpacity(0.5)
-                            : Utils.tagColor(
-                                isWhite: false,
-                                isDetail: false,
-                                drpv: tagToNameMap[tagValue.first]),
+                        color: taskColorDark,
                       ),
                       width: MediaQuery.of(context).size.width * 0.6,
                       height: 40,
                       padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                       child: Center(
-                          child: Text(
-                        "Задать время на выполнение",
-                        style: TextStyle(color: Colors.white),
+                          child: TextWidget(
+                        text: "Задать время на выполнение",
                       )),
                     )),
                 Container(
                   margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
                   alignment: Alignment.center,
-                  child: Text(
-                    Utils.timeHint(pickedDate, pickedTime, isEdit: false),
-                    style: TextStyle(
-                      color: Colors.white24,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
+                  child: TextWidget(
+                    text: Utils.timeHint(pickedDate, pickedTime, isEdit: false),
                   ),
                 ),
                 Spacer(),
@@ -314,12 +303,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                               offset: Offset(0, 3),
                             )
                           ],
-                          color: tagValue.isEmpty
-                              ? clearColor.withOpacity(0.5)
-                              : Utils.tagColor(
-                                  isWhite: false,
-                                  isDetail: false,
-                                  drpv: tagToNameMap[tagValue.first]),
+                          color: taskColorDark,
                           borderRadius: BorderRadius.circular(12)),
                       width: MediaQuery.of(context).size.width * 0.4,
                       height: 40,

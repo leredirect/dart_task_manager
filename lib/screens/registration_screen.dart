@@ -7,11 +7,14 @@ import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/auth_repo.dart';
 import 'package:dart_task_manager/repository/ids_repo.dart';
 import 'package:dart_task_manager/utils/utils.dart';
+import 'package:dart_task_manager/widgets/text_button.dart';
 import 'package:dart_task_manager/widgets/text_input_widget.dart';
+import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:hive/hive.dart';
 import 'package:uiblock/uiblock.dart';
 
@@ -61,18 +64,6 @@ class _RegistrationScreen extends State<RegistrationScreen> {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
-        appBar: AppBar(
-          leading: new IconButton(
-            icon: new Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pushReplacementNamed(context, '/'),
-          ),
-          systemOverlayStyle: Utils.statusBarColor(),
-          backgroundColor: backgroundColor,
-          title: Text(
-            "DTM",
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
         backgroundColor: backgroundColor,
         body: Builder(builder: (context) {
           var registrationBloc = BlocProvider.of<RegistrationFormBloc>(context);
@@ -93,64 +84,65 @@ class _RegistrationScreen extends State<RegistrationScreen> {
 
               snackBarNotification(context, state.failureResponse, duration: 1);
             },
-            child: SingleChildScrollView(
-              child: Center(
-                child: Container(
-                  margin: EdgeInsets.only(
-                      top: MediaQuery.of(context).size.height / 15),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(bottom: 150),
-                        child: Text(
-                          "регистрация",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              letterSpacing: 3),
+            child: AnimationConfiguration.synchronized(
+              duration: const Duration(milliseconds: 1000),
+              child: FadeInAnimation(
+                child: Center(
+                  child: Container(
+                    margin: EdgeInsets.only(
                         ),
-                      ),
-                      TextInputWidget(
-                        textFieldBloc: registrationBloc.login,
-                        focusNode: loginNode,
-                        helperText: 'логин',
-                        onEditingComplete: () {
-                          FocusScope.of(context).requestFocus(passNode);
-                        },
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      TextInputWidget(
-                        textFieldBloc: registrationBloc.password,
-                        focusNode: passNode,
-                        helperText: 'пароль',
-                        onEditingComplete: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                        },
-                      ),
-                      SizedBox(
-                        height: 100,
-                      ),
-                      TextButton(
-                          onPressed: () {
-                            registrationBloc.submit();
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Spacer(),
+                        Container(
+                          child: TextWidget(
+                            text: "регистрация",
+                            color: Colors.white,
+                            fontSize: headerText,
+                          ),
+                        ),
+                        Spacer(),
+                        TextInputWidget(
+                          textFieldBloc: registrationBloc.login,
+                          isObscured: false,
+                          focusNode: loginNode,
+                          helperText: 'логин',
+                          onEditingComplete: () {
+                            FocusScope.of(context).requestFocus(passNode);
                           },
-                          child: Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.white)),
-                            child: Padding(
-                                padding: EdgeInsets.only(
-                                    top: 10, bottom: 10, left: 50, right: 50),
-                                child: Text(
-                                  "регистрация",
-                                  style: TextStyle(
-                                      color: Colors.white, letterSpacing: 3),
-                                )),
-                          )),
-                    ],
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        TextInputWidget(
+                          textFieldBloc: registrationBloc.password,
+                          suffixButton: SuffixButton.obscureText,
+                          isObscured: true,
+                          focusNode: passNode,
+                          helperText: 'пароль',
+                          onEditingComplete: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                          },
+                        ),
+                        Spacer(),
+                        TextButtonWidget(
+                          onPressed: registrationBloc.submit,
+                          borderColor: Colors.white,
+                          text: "регистрация",
+                          textColor: Colors.white,
+                        ),
+                        TextButtonWidget(
+                          onPressed: () {
+                            Navigator.pushNamed(context, "/");
+                          },
+                          borderColor: backgroundColor,
+                          text: "войти",
+                          textColor: Colors.grey,
+                        ),
+                        Spacer(),
+                      ],
+                    ),
                   ),
                 ),
               ),
