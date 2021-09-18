@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:dart_task_manager/models/task.dart';
+import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:smart_select/smart_select.dart';
@@ -30,52 +31,52 @@ class Utils {
     return s2priority;
   }
 
-  static Color tagColor({bool isWhite, bool isDetail, String drpv, Tags tag}) {
-    Tags drpEnum = nameToTagMap[drpv];
-    if (isWhite) {
-      switch (drpEnum) {
-        case Tags.DART:
-          return dartColor;
-          break;
-        case Tags.FLUTTER:
-          return flutterColor;
-          break;
-        case Tags.ALGORITHMS:
-          return algosColor;
-          break;
-        case Tags.CLEAR:
-          return backgroundColor;
-      }
-    } else if (isDetail) {
-      switch (tag) {
-        case Tags.DART:
-          return dartColor;
-          break;
-        case Tags.FLUTTER:
-          return flutterColor;
-          break;
-        case Tags.ALGORITHMS:
-          return algosColor;
-          break;
-        case Tags.CLEAR:
-          return backgroundColor;
-      }
-    } else {
-      switch (drpEnum) {
-        case Tags.DART:
-          return dartColor;
-          break;
-        case Tags.FLUTTER:
-          return flutterColor;
-          break;
-        case Tags.ALGORITHMS:
-          return algosColor;
-          break;
-        case Tags.CLEAR:
-          return clearColor;
-      }
-    }
-  }
+  // static Color tagColor({bool isWhite, bool isDetail, String drpv, Tags tag}) {
+  //   Tags drpEnum = nameToTagMap[drpv];
+  //   if (isWhite) {
+  //     switch (drpEnum) {
+  //       case Tags.DART:
+  //         return dartColor;
+  //         break;
+  //       case Tags.FLUTTER:
+  //         return flutterColor;
+  //         break;
+  //       case Tags.ALGORITHMS:
+  //         return algosColor;
+  //         break;
+  //       case Tags.CLEAR:
+  //         return backgroundColor;
+  //     }
+  //   } else if (isDetail) {
+  //     switch (tag) {
+  //       case Tags.DART:
+  //         return dartColor;
+  //         break;
+  //       case Tags.FLUTTER:
+  //         return flutterColor;
+  //         break;
+  //       case Tags.ALGORITHMS:
+  //         return algosColor;
+  //         break;
+  //       case Tags.CLEAR:
+  //         return backgroundColor;
+  //     }
+  //   } else {
+  //     switch (drpEnum) {
+  //       case Tags.DART:
+  //         return dartColor;
+  //         break;
+  //       case Tags.FLUTTER:
+  //         return flutterColor;
+  //         break;
+  //       case Tags.ALGORITHMS:
+  //         return algosColor;
+  //         break;
+  //       case Tags.CLEAR:
+  //         return clearColor;
+  //     }
+  //   }
+  // }
 
   static String timeHint(pickedDate, pickedTime, {bool isEdit, Task task}) {
     if (pickedDate != null && pickedTime != null) {
@@ -112,6 +113,6 @@ void snackBarNotification(context, String text,
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     backgroundColor: backgroundColor == null ? snackBarColor : backgroundColor,
     duration: Duration(seconds: duration == null ? 3 : duration),
-    content: Text(text),
+    content: TextWidget(text: text),
   ));
 }
