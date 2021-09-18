@@ -24,8 +24,9 @@ class Task {
   @HiveField(8)
   bool isPushed;
 
-  Task(this.name, this.text, this.tags, this.creator, this.taskCreateTime, this.taskDeadline,
-      this.id, this.priority, [this.isPushed]);
+  Task(this.name, this.text, this.tags, this.creator, this.taskCreateTime,
+      this.taskDeadline, this.id, this.priority,
+      [this.isPushed]);
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
@@ -36,7 +37,7 @@ class Task {
       "taskDeadline": this.taskDeadline,
       "id": this.id,
       "priority": priorityToNameMap[this.priority],
-      "creator" : this.creator.toJson(),
+      "creator": this.creator.toJson(),
     };
   }
 

@@ -8,13 +8,15 @@ class TextInputWidget extends StatelessWidget {
   final Function onEditingComplete;
   final TextFieldBloc textFieldBloc;
   final String helperText;
+  final bool isObscured;
 
   const TextInputWidget(
       {Key key,
       @required this.onEditingComplete,
       @required this.textFieldBloc,
       @required this.helperText,
-      @required this.focusNode})
+      @required this.focusNode,
+        this.isObscured})
       : super(key: key);
 
   @override
@@ -24,6 +26,7 @@ class TextInputWidget extends StatelessWidget {
       child: TextFieldBlocBuilder(
         onEditingComplete: this.onEditingComplete,
         focusNode: focusNode,
+        obscureText: this.isObscured,
         style: TextStyle(color: Colors.white),
         textAlign: TextAlign.center,
         decoration: InputDecoration(

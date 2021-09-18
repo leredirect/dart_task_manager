@@ -46,8 +46,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
     var listBox = await Hive.openBox<List<Task>>('taskList');
     listBox.put('task', context.read<TaskListBloc>().state);
     listBox.close();
-    print(
-        "${widget.task.id}, ${widget.task.name}, ${widget.task.text}, ${widget.task.taskCreateTime}, ${widget.task.taskDeadline}, ${widget.task.tags.toString()}");
     try {
       await TaskRepository().editTask(widget.task);
       Navigator.of(context).pop();
@@ -111,10 +109,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         appBar: AppBar(
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarIconBrightness: Brightness.light,
-          ),
-          backwardsCompatibility: false,
+          systemOverlayStyle: Utils.statusBarColor(),
           iconTheme: IconThemeData(color: Colors.white),
           title: Text(
             "Новая задача",
@@ -217,7 +212,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                       return Tags.values[e];
                     }).toList();
                   });
-                  print(tagValue);
                 }),
             SmartSelect<int>.single(
                 tileBuilder: (context, state) {
@@ -252,7 +246,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 onChange: (state) {
                   setState(
                       () => priorityValue = Priorities.values[state.value]);
-                  print(priorityValue);
                 }),
             InkWell(
                 onTap: () {

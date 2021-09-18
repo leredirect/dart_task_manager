@@ -1,4 +1,3 @@
-
 import 'package:dart_task_manager/models/user.dart';
 
 class UserEvent {}

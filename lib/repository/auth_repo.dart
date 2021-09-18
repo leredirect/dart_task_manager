@@ -21,7 +21,6 @@ class AuthorisationRepository {
   Future<DocumentReference> addUser(User user) {
     return collection.add(user.toJson());
   }
-//101
   Future<DocumentReference> deleteUser(User user) {
     return collection.where("id", isEqualTo: user.id).get().then((value) {
       if (value.docs.length == 0) {
@@ -53,12 +52,9 @@ class AuthorisationRepository {
       value.docs.forEach((element) {
         users.add(User.fromJson(element.data()));
       });
-      print(users);
       for (int i = 0; i < users.length; i++) {
         if (users[i].login == login) {
-          print("login: true");
           if (users[i].password == password) {
-            print("pass: true");
             return users[i];
           }
         }
@@ -74,12 +70,9 @@ class AuthorisationRepository {
       value.docs.forEach((element) {
         users.add(User.fromJson(element.data()));
       });
-      print(users);
       for (int i = 0; i < users.length; i++) {
         if (users[i].login == login) {
-          print("login: true");
           if (users[i].password == password) {
-            print("pass: true");
             return true;
           }
         }
@@ -99,7 +92,7 @@ class AuthorisationRepository {
         });
         for (int i = 0; i < logins.length; i++) {
           if (logins[i] == login) {
-            print("login: true");
+
             return true;
           }
         }

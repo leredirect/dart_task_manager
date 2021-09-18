@@ -44,7 +44,6 @@ class TaskDetailsScreen extends StatelessWidget {
     }
 
     String deadlineDisplay(String deadline) {
-      print(task.taskDeadline);
       String result = "Дедлайн: $deadline";
       return result;
     }
@@ -80,10 +79,7 @@ class TaskDetailsScreen extends StatelessWidget {
               },
             ),
           ],
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarIconBrightness: Brightness.light,
-          ),
-          backwardsCompatibility: false,
+          systemOverlayStyle: Utils.statusBarColor(),
           iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: backgroundColor,
           title: Text(

@@ -40,7 +40,6 @@ class IdRepository {
           this.userId = this.userId + 1;
           idCollection.doc(element.id).update(idToJson());
         });
-        print(this.userId);
         return this.userId;
       } else {
         this.userId = 0;
@@ -59,7 +58,6 @@ class IdRepository {
           this.taskId = this.taskId + 1;
           idCollection.doc(element.id).update(idToJson());
         });
-        print(this.taskId);
         return this.taskId;
       } else {
         this.taskId = 0;

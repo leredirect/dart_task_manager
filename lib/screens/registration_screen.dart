@@ -1,4 +1,4 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dart_task_manager/bloc/connectivity_bloc/connectivity_bloc.dart';
 import 'package:dart_task_manager/bloc/user_bloc/user_bloc.dart';
 import 'package:dart_task_manager/bloc/user_bloc/user_event.dart';
 import 'package:dart_task_manager/bloc/validation_bloc/registration_bloc.dart';
@@ -6,7 +6,6 @@ import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/auth_repo.dart';
 import 'package:dart_task_manager/repository/ids_repo.dart';
-import 'package:dart_task_manager/utils/connectivity_utils.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/text_input_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,7 +29,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
   FocusNode passNode = FocusNode();
 
   Future<void> register(String login, String pass) async {
-    bool isOnline = await ConnectivityUtils.isOnline();
+    bool isOnline = context.read<ConnectivityBloc>().state;
     if (!isOnline) {
       snackBarNotification(context, "Отсутствует подключение к интернету.",
           duration: 2);
@@ -68,7 +67,6 @@ class _RegistrationScreen extends State<RegistrationScreen> {
             onPressed: () => Navigator.pushReplacementNamed(context, '/'),
           ),
           systemOverlayStyle: Utils.statusBarColor(),
-          backwardsCompatibility: false,
           backgroundColor: backgroundColor,
           title: Text(
             "DTM",
@@ -84,7 +82,6 @@ class _RegistrationScreen extends State<RegistrationScreen> {
               UIBlock.block(context);
             },
             onSuccess: (context, state) async {
-
               UIBlock.unblock(context);
               snackBarNotification(context, "Выполняется регистрация...",
                   duration: 1);
@@ -94,8 +91,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
             onFailure: (context, state) {
               UIBlock.unblock(context);
 
-              snackBarNotification(context, state.failureResponse,
-                  duration: 1);
+              snackBarNotification(context, state.failureResponse, duration: 1);
             },
             child: SingleChildScrollView(
               child: Center(
@@ -116,24 +112,32 @@ class _RegistrationScreen extends State<RegistrationScreen> {
                               letterSpacing: 3),
                         ),
                       ),
-                      TextInputWidget(textFieldBloc: registrationBloc.login, focusNode: loginNode, helperText: 'логин', onEditingComplete: (){
-                           FocusScope.of(context).requestFocus(passNode);
-                         },
+                      TextInputWidget(
+                        textFieldBloc: registrationBloc.login,
+                        focusNode: loginNode,
+                        helperText: 'логин',
+                        onEditingComplete: () {
+                          FocusScope.of(context).requestFocus(passNode);
+                        },
                       ),
                       SizedBox(
                         height: 30,
                       ),
-                      TextInputWidget(textFieldBloc: registrationBloc.password, focusNode: passNode, helperText: 'пароль', onEditingComplete: (){
-                        FocusManager.instance.primaryFocus?.unfocus();
-                      },
+                      TextInputWidget(
+                        textFieldBloc: registrationBloc.password,
+                        focusNode: passNode,
+                        helperText: 'пароль',
+                        onEditingComplete: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                        },
                       ),
                       SizedBox(
                         height: 100,
                       ),
                       TextButton(
-                          onPressed: (){
+                          onPressed: () {
                             registrationBloc.submit();
-                            },
+                          },
                           child: Container(
                             decoration: BoxDecoration(
                                 border: Border.all(color: Colors.white)),

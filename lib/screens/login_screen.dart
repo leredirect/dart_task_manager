@@ -1,3 +1,4 @@
+import 'package:dart_task_manager/bloc/connectivity_bloc/connectivity_bloc.dart';
 import 'package:dart_task_manager/bloc/user_bloc/user_bloc.dart';
 import 'package:dart_task_manager/bloc/user_bloc/user_event.dart';
 import 'package:dart_task_manager/bloc/validation_bloc/login_bloc.dart';
@@ -5,13 +6,13 @@ import 'package:dart_task_manager/constants.dart';
 import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/auth_repo.dart';
 import 'package:dart_task_manager/screens/home_screen.dart';
-import 'package:dart_task_manager/utils/connectivity_utils.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/text_input_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:hive/hive.dart';
 import 'package:uiblock/uiblock.dart';
 
@@ -26,7 +27,8 @@ class _LoginScreenState extends State<LoginScreen> {
   User currentUser;
 
   Future<void> login(String login, String pass) async {
-    bool isOnline = await ConnectivityUtils.isOnline();
+    bool isOnline = context.read<ConnectivityBloc>().state;
+
     AuthorisationRepository repository = new AuthorisationRepository();
     if (!isOnline) {
       snackBarNotification(context, "Отсутствует подключение к интернету.");
@@ -80,7 +82,6 @@ class _LoginScreenState extends State<LoginScreen> {
             } else {
               return Builder(builder: (context) {
                 var loginBloc = BlocProvider.of<LoginFormBloc>(context);
-
                 return FormBlocListener<LoginFormBloc, String, String>(
                   onSubmitting: (context, state) {
                     UIBlock.block(context);
@@ -101,91 +102,105 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: GestureDetector(
                     onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                     child: Scaffold(
-                      appBar: AppBar(
-                        systemOverlayStyle: Utils.statusBarColor(),
-                        backwardsCompatibility: false,
-                        actions: [
-                          IconButton(
-                            icon: Icon(
-                              Icons.person_add,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, "registrationScreen");
-                            },
-                          )
-                        ],
-                        backgroundColor: backgroundColor,
-                        title: Text(
-                          "DTM",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
                       backgroundColor: backgroundColor,
                       body: SingleChildScrollView(
-                        child: Center(
-                          child: Container(
-                            margin: EdgeInsets.only(
-                                top: MediaQuery.of(context).size.height / 15),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.only(bottom: 150),
-                                  child: Text(
-                                    "вход в существующий аккаунт",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 15,
-                                        letterSpacing: 3),
-                                  ),
+                        child: AnimationConfiguration.synchronized(
+                          duration: const Duration(milliseconds: 1000),
+                          child: FadeInAnimation(
+                            child: Center(
+                              child: Container(
+                                margin: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height /
+                                        15),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      margin: EdgeInsets.only(top: 10),
+                                      child: Text(
+                                        "DTM",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 25,
+                                            letterSpacing: 10),
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(
+                                          top: 100, bottom: 100),
+                                      child: Text(
+                                        "вход в существующий аккаунт",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                            letterSpacing: 3),
+                                      ),
+                                    ),
+                                    TextInputWidget(
+                                      isObscured: false,
+                                      textFieldBloc: loginBloc.login,
+                                      focusNode: loginNode,
+                                      helperText: 'логин',
+                                      onEditingComplete: () {
+                                        FocusScope.of(context)
+                                            .requestFocus(passNode);
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: 30,
+                                    ),
+                                    TextInputWidget(
+                                      isObscured: true,
+                                      textFieldBloc: loginBloc.password,
+                                      focusNode: passNode,
+                                      helperText: 'пароль',
+                                      onEditingComplete: () {
+                                        FocusManager.instance.primaryFocus
+                                            ?.unfocus();
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: 100,
+                                    ),
+                                    TextButton(
+                                        onPressed: loginBloc.submit,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.white)),
+                                          child: Padding(
+                                              padding: EdgeInsets.only(
+                                                  top: 10,
+                                                  bottom: 10,
+                                                  left: 50,
+                                                  right: 50),
+                                              child: Text(
+                                                "войти",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    letterSpacing: 3),
+                                              )),
+                                        )),
+                                    Container(
+                                      margin: EdgeInsets.only(top: 70),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          Navigator.pushReplacementNamed(
+                                              context, "registrationScreen");
+                                        },
+                                        child: Text(
+                                          "регистрация",
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 13,
+                                              letterSpacing: 3),
+                                        ),
+                                      ),
+                                    )
+                                  ],
                                 ),
-                                TextInputWidget(
-                                  textFieldBloc: loginBloc.login,
-                                  focusNode: loginNode,
-                                  helperText: 'логин',
-                                  onEditingComplete: () {
-                                    FocusScope.of(context)
-                                        .requestFocus(passNode);
-                                  },
-                                ),
-                                SizedBox(
-                                  height: 30,
-                                ),
-                                TextInputWidget(
-                                  textFieldBloc: loginBloc.password,
-                                  focusNode: passNode,
-                                  helperText: 'пароль',
-                                  onEditingComplete: () {
-                                    FocusManager.instance.primaryFocus
-                                        ?.unfocus();
-                                  },
-                                ),
-                                SizedBox(
-                                  height: 100,
-                                ),
-                                TextButton(
-                                    onPressed: loginBloc.submit,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          border:
-                                              Border.all(color: Colors.white)),
-                                      child: Padding(
-                                          padding: EdgeInsets.only(
-                                              top: 10,
-                                              bottom: 10,
-                                              left: 50,
-                                              right: 50),
-                                          child: Text(
-                                            "войти",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                letterSpacing: 3),
-                                          )),
-                                    )),
-                              ],
+                              ),
                             ),
                           ),
                         ),
@@ -196,7 +211,11 @@ class _LoginScreenState extends State<LoginScreen> {
               });
             }
           } else {
-            return Container();
+            return Container(
+                color: backgroundColor,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                );
           }
         });
   }

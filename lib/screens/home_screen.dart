@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dart_task_manager/bloc/connectivity_bloc/connectivity_bloc.dart';
 import 'package:dart_task_manager/bloc/filter_bloc/filter_bloc.dart';
 import 'package:dart_task_manager/bloc/filter_bloc/filter_event.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
@@ -10,7 +11,6 @@ import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
-import 'package:dart_task_manager/utils/connectivity_utils.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/task_list_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,7 +29,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String currentFilter = tagToNameMap[Tags.CLEAR];
-  bool isOnline;
 
   Future<void> userSignOut() async {
     context.read<UserBloc>().add(ClearUserEvent());
@@ -89,13 +88,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void checkIfOnline() async {
-    bool onlineStatus = await ConnectivityUtils.isOnline();
-    setState(() {
-      isOnline = onlineStatus;
-    });
-  }
-
   Future<void> myStream() async {
     var taskBox = await Hive.openBox('taskList');
     List<Task> tasks = [];
@@ -105,7 +97,6 @@ class _HomeScreenState extends State<HomeScreen> {
         tasks.add(Task.fromJson(element.data()));
       });
       context.read<TaskListBloc>().add(HiveChecker(tasks));
-      Utils.taskFromBaseDisplay(tasks);
       taskBox.clear();
       taskBox.put('task', tasks);
       taskBox.close();
@@ -125,131 +116,137 @@ class _HomeScreenState extends State<HomeScreen> {
     };
 
     Utils.statusBarColor();
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      appBar: AppBar(
-        actions: [
-          PopupMenuButton<String>(
-            color: backgroundColor,
-            icon: Icon(
-              Icons.more_vert,
-              color: Colors.white,
+    return BlocBuilder<ConnectivityBloc, bool>(
+        builder: (context, connectivityState) {
+      if (connectivityState == true) {
+        myStream();
+      }
+
+      return Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        appBar: AppBar(
+          actions: [
+            PopupMenuButton<String>(
+              color: backgroundColor,
+              icon: Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ),
+              onSelected: (String value) async {
+                if (connectivityState) {
+                  menuOptions[value]();
+                } else {
+                  offlineMenuOptions[value]();
+                }
+              },
+              itemBuilder: (BuildContext context) {
+                if (connectivityState) {
+                  return menuOptions.keys.map((String choice) {
+                    return PopupMenuItem<String>(
+                      value: choice,
+                      child: Text(
+                        choice,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }).toList();
+                } else {
+                  return offlineMenuOptions.keys.map((String choice) {
+                    return PopupMenuItem<String>(
+                      value: choice,
+                      child: Text(
+                        choice,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }).toList();
+                }
+              },
             ),
-            onSelected: (String value) async {
-              if (isOnline) {
-                menuOptions[value]();
-              } else {
-                offlineMenuOptions[value]();
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              if (isOnline) {
-                return menuOptions.keys.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(
-                      choice,
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  );
-                }).toList();
-              } else {
-                return offlineMenuOptions.keys.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(
-                      choice,
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  );
-                }).toList();
-              }
-            },
+          ],
+          systemOverlayStyle: Utils.statusBarColor(),
+          backgroundColor: backgroundColor,
+          title: Row(
+            children: [
+              Text(
+                "DTM",
+                style: TextStyle(color: Colors.white),
+              ),
+              Spacer(),
+              Visibility(
+                visible: !connectivityState,
+                child: Text(
+                  "Оффлайн",
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+              )
+            ],
           ),
-        ],
-        systemOverlayStyle: Utils.statusBarColor(),
-        backwardsCompatibility: false,
+        ),
+        body: BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+          return BlocBuilder<TaskListBloc, List<Task>>(
+            builder: (context, state) {
+              if (filtState != null) {
+                List<Task> filtredState = state
+                    .where((element) => element.tags.contains(filtState))
+                    .toList();
+                return AnimationConfiguration.synchronized(
+                  child: SlideAnimation(
+                    verticalOffset: 50.0,
+                    child: FadeInAnimation(
+                        child: TaskListWidget(taskList: filtredState)),
+                  ),
+                );
+              } else {
+                return AnimationConfiguration.synchronized(
+                  child: SlideAnimation(
+                    verticalOffset: 50.0,
+                    child:
+                        FadeInAnimation(child: TaskListWidget(taskList: state)),
+                  ),
+                );
+              }
+            },
+          );
+        }),
+        floatingActionButton: Container(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FloatingActionButton(
+                child: Icon(
+                  Icons.add,
+                  color: backgroundColor,
+                ),
+                onPressed: createTask,
+                backgroundColor: Utils.tagColor(
+                    isWhite: false, isDetail: false, drpv: currentFilter),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              SpeedDial(
+                child: Icon(Icons.filter_list),
+                overlayColor: Colors.black.withOpacity(0.8),
+                childMargin: EdgeInsets.only(top: 3, bottom: 3),
+                childPadding: EdgeInsets.all(3),
+                children: [
+                  mySpeedDialChild(Tags.CLEAR, clearColor, true, currentFilter),
+                  mySpeedDialChild(
+                      Tags.FLUTTER, flutterColor, false, currentFilter),
+                  mySpeedDialChild(Tags.DART, dartColor, false, currentFilter),
+                  mySpeedDialChild(
+                      Tags.ALGORITHMS, algosColor, false, currentFilter),
+                ],
+                backgroundColor: Utils.tagColor(
+                    isWhite: false, isDetail: false, drpv: currentFilter),
+              ),
+            ],
+          ),
+        ),
         backgroundColor: backgroundColor,
-        title: Row(
-          children: [
-            Text(
-              "DTM",
-              style: TextStyle(color: Colors.white),
-            ),
-            Spacer(),
-            Visibility(
-              visible: !isOnline,
-              child: Text(
-                "Оффлайн",
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-            )
-          ],
-        ),
-      ),
-      body: BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
-        return BlocBuilder<TaskListBloc, List<Task>>(
-          builder: (context, state) {
-            if (filtState != null) {
-              List<Task> filtredState = state
-                  .where((element) => element.tags.contains(filtState))
-                  .toList();
-              return AnimationConfiguration.synchronized(
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                      child: TaskListWidget(taskList: filtredState)),
-                ),
-              );
-            } else {
-              return AnimationConfiguration.synchronized(
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child:
-                      FadeInAnimation(child: TaskListWidget(taskList: state)),
-                ),
-              );
-            }
-          },
-        );
-      }),
-      floatingActionButton: Container(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            FloatingActionButton(
-              child: Icon(
-                Icons.add,
-                color: backgroundColor,
-              ),
-              onPressed: createTask,
-              backgroundColor: Utils.tagColor(
-                  isWhite: false, isDetail: false, drpv: currentFilter),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            SpeedDial(
-              child: Icon(Icons.filter_list),
-              overlayColor: Colors.black.withOpacity(0.8),
-              childMargin: EdgeInsets.only(top: 3, bottom: 3),
-              childPadding: EdgeInsets.all(3),
-              children: [
-                mySpeedDialChild(Tags.CLEAR, clearColor, true, currentFilter),
-                mySpeedDialChild(
-                    Tags.FLUTTER, flutterColor, false, currentFilter),
-                mySpeedDialChild(Tags.DART, dartColor, false, currentFilter),
-                mySpeedDialChild(
-                    Tags.ALGORITHMS, algosColor, false, currentFilter),
-              ],
-              backgroundColor: Utils.tagColor(
-                  isWhite: false, isDetail: false, drpv: currentFilter),
-            ),
-          ],
-        ),
-      ),
-      backgroundColor: backgroundColor,
-    );
+      );
+    });
   }
 
   @override
@@ -263,7 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       context.read<TaskListBloc>().add(HiveChecker(tasks));
     });
-    ConnectivityUtils.isOnline().then((isOnline) {
+    bool isOnline = context.read<ConnectivityBloc>().state;
       if (!isOnline) {
         snackBarNotification(
             context, "Отсутствует подключение к сети. Режим чтения.");
@@ -277,6 +274,5 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         myStream();
       }
-    });
   }
 }
