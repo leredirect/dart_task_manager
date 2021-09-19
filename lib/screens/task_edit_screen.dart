@@ -3,7 +3,6 @@ import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/utils/utils.dart';
-import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -112,8 +111,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
         appBar: AppBar(
           systemOverlayStyle: Utils.statusBarColor(),
           iconTheme: IconThemeData(color: Colors.white),
-          title: TextWidget(
-            text: "Новая задача",
+          title: Text(
+            "Новая задача",
+            style: headerText,
           ),
           backgroundColor: backgroundColor,
         ),
@@ -163,7 +163,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 tileBuilder: (context, state) {
                   return S2Tile.fromState(
                     state,
-                    title: TextWidget(text: "Выберите тег:",
+                    title: Text("Выберите тег:",
+                        style: standartText
                     ),
                     padding:
                         EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
@@ -200,7 +201,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 tileBuilder: (context, state) {
                   return S2Tile.fromState(
                     state,
-                    title: TextWidget(text: "Выберите приоритет:",
+                    title: Text("Выберите приоритет:",
+                        style: standartText
                        ),
                     padding:
                         EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 3),
@@ -262,15 +264,17 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   height: 40,
                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   child: Center(
-                      child: TextWidget(
-                    text: "Задать время на выполнение",
+                      child: Text(
+                     "Задать время на выполнение",
+                          style: standartText
                   )),
                 )),
             Container(
               margin: EdgeInsets.fromLTRB(5, 10, 0, 0),
               alignment: Alignment.center,
-              child: TextWidget(
-                text: Utils.timeHint(pickedDate, pickedTime, isEdit: false),
+              child: Text(
+                Utils.timeHint(pickedDate, pickedTime, isEdit: false),
+                  style: standartGreyText
               ),
             ),
             Spacer(),
@@ -294,8 +298,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   margin: EdgeInsets.only(bottom: 50),
                   child: Center(
-                      child: TextWidget(
-                    text: "Подтвердить",
+                      child: Text(
+                    "Подтвердить",
+                          style: standartText
                   )),
                 ))
           ],

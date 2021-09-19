@@ -13,7 +13,7 @@ import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/task_list_widget.dart';
-import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -55,10 +55,9 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.only(bottom: 3, top: 3, left: 5, right: 5),
           margin: EdgeInsets.only(bottom: 20),
           color: color,
-          child: TextWidget(
-            text: tagToNameMap[tag],
-            fontSize: headerText,
-            color: Colors.white
+          child: Text(
+           tagToNameMap[tag],
+            style: headerText,
           ),
         ),
         label: tagToNameMap[tag],
@@ -73,9 +72,9 @@ class _HomeScreenState extends State<HomeScreen> {
         labelWidget: Container(
           padding: EdgeInsets.only(bottom: 3, top: 3, left: 5, right: 5),
           color: color,
-          child: TextWidget(
-            text: tagToNameMap[tag],
-            fontSize: headerText),
+          child: Text(
+            tagToNameMap[tag],
+            style: headerText),
         ),
         label: tagToNameMap[tag],
         onTap: () {
@@ -99,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
       taskBox.clear();
       taskBox.put('task', tasks);
       taskBox.close();
-      snackBarNotification(context, "Обновлено");
+      //snackBarNotification(context, "Обновлено");
     });
   }
 
@@ -143,8 +142,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   return menuOptions.keys.map((String choice) {
                     return PopupMenuItem<String>(
                       value: choice,
-                      child: TextWidget(
-                        text: choice,
+                      child: Text(
+                        choice,
+                          style: standartText
                       ),
                     );
                   }).toList();
@@ -152,8 +152,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   return offlineMenuOptions.keys.map((String choice) {
                     return PopupMenuItem<String>(
                       value: choice,
-                      child: TextWidget(
-                        text: choice,
+                      child: Text(
+                        choice,
+                          style: standartText
                       ),
                     );
                   }).toList();
@@ -165,14 +166,16 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: backgroundColor,
           title: Row(
             children: [
-              TextWidget(
-                text: "DTM",
+              Text(
+                "DTM",
+                  style: headerText
               ),
               Spacer(),
               Visibility(
                 visible: !connectivityState,
-                child: TextWidget(
-                  text: "Оффлайн",
+                child: Text(
+                  "Оффлайн",
+                    style: standartText
                 ),
               )
             ],

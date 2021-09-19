@@ -1,4 +1,4 @@
-import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
+import 'package:dart_task_manager/constants.dart';
 import 'package:flutter/material.dart';
 
 class TextButtonWidget extends StatelessWidget {
@@ -7,12 +7,13 @@ class TextButtonWidget extends StatelessWidget {
   final String text;
   final Color textColor;
   final double fontSize;
+  final textStyle;
 
   const TextButtonWidget(
       {Key key,
       this.onPressed,
       this.borderColor,
-      this.text, this.textColor, this.fontSize = 13})
+      this.text, this.textColor, this.fontSize = 13, this.textStyle = standartText})
       : super(key: key);
 
   @override
@@ -27,7 +28,7 @@ class TextButtonWidget extends StatelessWidget {
             child: Padding(
               padding:
                   EdgeInsets.only(top: 10, bottom: 10, left: 50, right: 50),
-              child: TextWidget(text: this.text, color: this.textColor, fontSize: 14,),
+              child: Text(this.text, style: this.textStyle,),
             ),
           ),
         ));

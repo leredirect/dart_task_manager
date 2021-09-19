@@ -13,12 +13,17 @@ class TaskDataBloc extends FormBloc<String, String> {
       ValidationUtils.required,
     ],
   );
+  
+  final deadline = InputFieldBloc<DateTime, Object>(
+    validators: [ValidationUtils.required]
+  );
 
   TaskDataBloc() {
     addFieldBlocs(
       fieldBlocs: [
         name,
         text,
+        deadline,
       ],
     );
   }

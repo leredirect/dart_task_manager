@@ -8,8 +8,7 @@ import 'package:dart_task_manager/repository/auth_repo.dart';
 import 'package:dart_task_manager/repository/ids_repo.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/text_button.dart';
-import 'package:dart_task_manager/widgets/text_input_widget.dart';
-import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
+import 'package:dart_task_manager/widgets/text_forms/logon_text_input_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -53,7 +52,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
 
       repository.addUser(currentUser);
       snackBarNotification(context, "Успешно зарегестрирован.", duration: 1);
-      Navigator.pushReplacementNamed(context, "homeScreen");
+      Navigator.pushNamedAndRemoveUntil(context, "homeScreen", (route) => false);
     }
   }
 
@@ -96,14 +95,12 @@ class _RegistrationScreen extends State<RegistrationScreen> {
                       children: [
                         Spacer(),
                         Container(
-                          child: TextWidget(
-                            text: "регистрация",
-                            color: Colors.white,
-                            fontSize: headerText,
+                          child: Text("регистрация",
+                              style: headerText
                           ),
                         ),
                         Spacer(),
-                        TextInputWidget(
+                        LogonTextInputWidget(
                           textFieldBloc: registrationBloc.login,
                           isObscured: false,
                           focusNode: loginNode,
@@ -115,7 +112,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
                         SizedBox(
                           height: 30,
                         ),
-                        TextInputWidget(
+                        LogonTextInputWidget(
                           textFieldBloc: registrationBloc.password,
                           suffixButton: SuffixButton.obscureText,
                           isObscured: true,

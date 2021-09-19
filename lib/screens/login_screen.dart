@@ -8,8 +8,7 @@ import 'package:dart_task_manager/repository/auth_repo.dart';
 import 'package:dart_task_manager/screens/home_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/text_button.dart';
-import 'package:dart_task_manager/widgets/text_input_widget.dart';
-import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
+import 'package:dart_task_manager/widgets/text_forms/logon_text_input_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -122,9 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 children: [
                                   Container(
                                     margin: EdgeInsets.only(top: 10),
-                                    child: TextWidget(
-                                      text: "DTM",
-                                          fontSize: 25,
+                                    child: Text("DTM",
+                                          style: bigText,
                                     ),
                                   ),
                                   Spacer(
@@ -132,15 +130,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Container(
                                     // margin: EdgeInsets.only(
                                     //     top: 100, bottom: 100),
-                                    child: TextWidget(
-                                      text: "вход в существующий аккаунт",
-                                      fontSize: headerText,
-                                      color: Colors.white,
+                                    child: Text(
+                                      "вход в существующий аккаунт",
+                                      style: headerText,
                                     ),
                                   ),
                                   Spacer(
                                   ),
-                                  TextInputWidget(
+                                  LogonTextInputWidget(
                                     isObscured: false,
                                     textFieldBloc: loginBloc.login,
                                     focusNode: loginNode,
@@ -150,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           .requestFocus(passNode);
                                     },
                                   ),
-                                  TextInputWidget(
+                                  LogonTextInputWidget(
                                     suffixButton: SuffixButton.obscureText,
                                     isObscured: true,
                                     textFieldBloc: loginBloc.password,

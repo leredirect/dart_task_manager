@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 
-import '../constants.dart';
+import '../../constants.dart';
 
-class TextInputWidget extends StatelessWidget {
+class LogonTextInputWidget extends StatelessWidget {
   final FocusNode focusNode;
   final Function onEditingComplete;
   final TextFieldBloc textFieldBloc;
@@ -11,7 +11,7 @@ class TextInputWidget extends StatelessWidget {
   final bool isObscured;
   final SuffixButton suffixButton;
 
-  const TextInputWidget(
+  const LogonTextInputWidget(
       {Key key,
       @required this.onEditingComplete,
       @required this.textFieldBloc,

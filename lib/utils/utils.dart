@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:dart_task_manager/models/task.dart';
-import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:smart_select/smart_select.dart';
@@ -113,6 +112,6 @@ void snackBarNotification(context, String text,
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     backgroundColor: backgroundColor == null ? snackBarColor : backgroundColor,
     duration: Duration(seconds: duration == null ? 3 : duration),
-    content: TextWidget(text: text),
+    content: Text(text),
   ));
 }

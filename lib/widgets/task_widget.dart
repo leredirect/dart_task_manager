@@ -1,7 +1,6 @@
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/task_details_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
-import 'package:dart_task_manager/widgets/text_widgets/default_text_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../constants.dart';
@@ -64,9 +63,10 @@ class TaskWidget extends StatelessWidget {
                   children: [
                     Container(
                       alignment: Alignment.centerLeft,
-                      child: TextWidget(
-                        text: task.name,
-                        fontSize: headerText,
+                      child: Text(
+                        task.name,
+                        maxLines: 1,
+                        style: headerTextWithOverflow,
                       ),
                     ),
                     SizedBox(
@@ -82,15 +82,19 @@ class TaskWidget extends StatelessWidget {
                     ),
                     Container(
                       alignment: Alignment.centerLeft,
-                      child: TextWidget(
-                        text: task.text,
+                      child: Text(
+                        task.text,
+                          maxLines: 5,
+                          style: standartTextWithOverflow,
                       ),
                     ),
                     Spacer(),
                     Container(
                       alignment: Alignment.centerLeft,
-                      child: TextWidget(
-                        text: task.taskCreateTime,
+                      child: Text(
+                        task.taskCreateTime,
+
+                          style: smallItalicText
                       ),
                     ),
                     Visibility(
