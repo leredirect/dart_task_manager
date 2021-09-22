@@ -6,8 +6,8 @@ import 'package:dart_task_manager/screens/task_edit_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:hive/hive.dart';
 
 import '../constants.dart';
@@ -43,15 +43,10 @@ class TaskDetailsScreen extends StatelessWidget {
       }));
     }
 
-    String deadlineDisplay(String deadline) {
-      String result = "Дедлайн: $deadline";
-      return result;
-    }
-
     return BlocBuilder<TaskListBloc, List<Task>>(builder: (context, state) {
       Map<String, Function> options = {
-        'Редактировать': openTaskEditor,
-        'Удалить': deleteCurrentTask,
+        'редактировать': openTaskEditor,
+        'удалить': deleteCurrentTask,
       };
       Utils.statusBarColor();
       return Scaffold(
@@ -70,10 +65,7 @@ class TaskDetailsScreen extends StatelessWidget {
                 return options.keys.map((String choice) {
                   return PopupMenuItem<String>(
                     value: choice,
-                    child: Text(
-                     choice,
-                        style: standartText
-                    ),
+                    child: Text(choice, style: standartText),
                   );
                 }).toList();
               },
@@ -82,10 +74,7 @@ class TaskDetailsScreen extends StatelessWidget {
           systemOverlayStyle: Utils.statusBarColor(),
           iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: backgroundColor,
-          title: Text(
-           "Детали задачи",
-              style: headerText
-          ),
+          title: Text("детали задачи", style: headerText),
         ),
         body: Stack(
           children: [
@@ -103,7 +92,7 @@ class TaskDetailsScreen extends StatelessWidget {
                             child: Container(
                               child: Text(
                                 task.name,
-                                style:bigText,
+                                style: bigText,
                               ),
                             ),
                           ),
@@ -115,8 +104,7 @@ class TaskDetailsScreen extends StatelessWidget {
                     color: taskColorDark,
                   ),
                   Container(
-                    child: Text(task.text,
-                        style: headerText),
+                    child: Text(task.text, style: headerText),
                     alignment: Alignment.centerLeft,
                     margin: EdgeInsets.only(
                         left: 15,
@@ -139,17 +127,16 @@ class TaskDetailsScreen extends StatelessWidget {
                         Container(
                           margin: EdgeInsets.only(top: 20),
                           alignment: Alignment.centerLeft,
-                          child: Text("Тэги: ${Utils.tagsDisplay(task.tags)}",
+                          child: Text("теги: ${Utils.tagsDisplay(task.tags)}",
                               style: smallLetterSpacingStandartGreyText),
-                          ),
+                        ),
                         Spacer(),
                         Container(
                           margin: EdgeInsets.only(top: 20),
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Создано: ${task.taskCreateTime}",
-                              style: smallLetterSpacingStandartGreyText
-                        ),
+                              "создано: ${DateFormat('dd-MM-yyyy в kk:mm').format(task.taskCreateTime).toString()}",
+                              style: smallLetterSpacingStandartGreyText),
                         ),
                       ],
                     ),
@@ -159,18 +146,16 @@ class TaskDetailsScreen extends StatelessWidget {
                           margin: EdgeInsets.only(top: 20),
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Приоритет: ${priorityToNameMap[task.priority]}",
-                              style: smallLetterSpacingStandartGreyText
-                          ),
-      ),
+                              "приоритет: ${priorityToNameMap[task.priority]}",
+                              style: smallLetterSpacingStandartGreyText),
+                        ),
                         Spacer(),
                         Container(
                           margin: EdgeInsets.only(top: 20),
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "${deadlineDisplay(task.taskDeadline)}",
-                          style: smallLetterSpacingStandartGreyText
-                          ),
+                              "дедлайн: ${DateFormat('dd-MM-yyyy в kk:mm').format(task.taskDeadline).toString()}",
+                              style: smallLetterSpacingStandartGreyText),
                         ),
                       ],
                     ),
@@ -178,9 +163,9 @@ class TaskDetailsScreen extends StatelessWidget {
                       margin: EdgeInsets.only(top: 20),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Создатель: ${task.creator.login}",
+                        "создатель: ${task.creator.login}",
                         style: smallLetterSpacingStandartGreyText,
-                    ),
+                      ),
                     ),
                   ],
                 ),

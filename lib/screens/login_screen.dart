@@ -28,9 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
   User currentUser;
 
   Future<void> login(String login, String pass) async {
-    bool isOnline = context
-        .read<ConnectivityBloc>()
-        .state;
+    bool isOnline = context.read<ConnectivityBloc>().state;
     AuthorisationRepository repository = new AuthorisationRepository();
     if (!isOnline) {
       snackBarNotification(context, "Отсутствует подключение к интернету.");
@@ -111,22 +109,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Center(
                             child: Container(
                               margin: EdgeInsets.only(
-                                  top: MediaQuery
-                                      .of(context)
-                                      .size
-                                      .height /
-                                      15),
+                                  top: MediaQuery.of(context).size.height / 15),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Container(
                                     margin: EdgeInsets.only(top: 10),
-                                    child: Text("DTM",
-                                          style: bigText,
+                                    child: Text(
+                                      "DTM",
+                                      style: bigText,
                                     ),
                                   ),
-                                  Spacer(
-                                  ),
+                                  Spacer(),
                                   Container(
                                     // margin: EdgeInsets.only(
                                     //     top: 100, bottom: 100),
@@ -135,8 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       style: headerText,
                                     ),
                                   ),
-                                  Spacer(
-                                  ),
+                                  Spacer(),
                                   LogonTextInputWidget(
                                     isObscured: false,
                                     textFieldBloc: loginBloc.login,
@@ -158,15 +151,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ?.unfocus();
                                     },
                                   ),
-                                 Spacer(),
+                                  Spacer(),
                                   TextButtonWidget(
                                     onPressed: loginBloc.submit,
                                     borderColor: Colors.white,
-                                    text: "войти", textColor: Colors.white,),
-                                  TextButtonWidget(onPressed: () {
-                                    Navigator.pushNamed(context, "registrationScreen");},
+                                    text: "войти",
+                                    textColor: Colors.white,
+                                  ),
+                                  TextButtonWidget(
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                          context, "registrationScreen");
+                                    },
                                     borderColor: backgroundColor,
-                                    text: "регистрация", textColor: Colors.grey,),
+                                    text: "регистрация",
+                                    textColor: Colors.grey,
+                                  ),
                                   Spacer(),
                                 ],
                               ),
@@ -182,14 +182,8 @@ class _LoginScreenState extends State<LoginScreen> {
           } else {
             return Container(
               color: backgroundColor,
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
-              height: MediaQuery
-                  .of(context)
-                  .size
-                  .height,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
             );
           }
         });

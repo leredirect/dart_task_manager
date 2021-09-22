@@ -9,69 +9,56 @@ const taskColorDark = Color(0xffFF65A3);
 
 const TextStyle standartText = TextStyle(
     overflow: TextOverflow.ellipsis,
-  fontSize: 13,
-  letterSpacing: 2,
-  color: Colors.white
-);
-
+    fontSize: 13,
+    letterSpacing: 2,
+    color: Colors.white);
 
 const TextStyle smallText = TextStyle(
     overflow: TextOverflow.ellipsis,
     fontSize: 9,
     letterSpacing: 2,
-    color: Colors.white
-);
+    color: Colors.white);
 
-const TextStyle headerText = TextStyle(
-    fontSize: 17,
-    letterSpacing: 2,
-    color: Colors.white
-);
+const TextStyle headerText =
+    TextStyle(fontSize: 17, letterSpacing: 2, color: Colors.white);
 
 const TextStyle standartTextWithOverflow = TextStyle(
     overflow: TextOverflow.ellipsis,
     fontSize: 13,
     letterSpacing: 2,
-    color: Colors.white
-);
+    color: Colors.white);
 const TextStyle headerTextWithOverflow = TextStyle(
     overflow: TextOverflow.ellipsis,
     fontSize: 17,
     letterSpacing: 2,
-    color: Colors.white
-);
+    color: Colors.white);
 
 const TextStyle bigText = TextStyle(
     overflow: TextOverflow.ellipsis,
     fontSize: 21,
     letterSpacing: 2,
-    color: Colors.white
-);
+    color: Colors.white);
 
 const TextStyle standartGreyText = TextStyle(
     overflow: TextOverflow.ellipsis,
     fontSize: 13,
     letterSpacing: 2,
-    color: Colors.grey
-);
+    color: Colors.grey);
 const TextStyle smallLetterSpacingStandartText = TextStyle(
     overflow: TextOverflow.ellipsis,
     fontSize: 13,
     letterSpacing: 1,
-    color: Colors.white
-);
+    color: Colors.white);
 
 const TextStyle smallItalicText = TextStyle(
     overflow: TextOverflow.ellipsis,
-  fontStyle: FontStyle.italic,
+    fontStyle: FontStyle.italic,
     fontSize: 9,
     letterSpacing: 1,
-    color: Colors.white
-);
+    color: Colors.white);
 
 const TextStyle smallLetterSpacingStandartGreyText = TextStyle(
     overflow: TextOverflow.ellipsis,
     fontSize: 13,
-    letterSpacing: 1,
-    color: Colors.grey
-);
+    letterSpacing: 0,
+    color: Colors.grey);

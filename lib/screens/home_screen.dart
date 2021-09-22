@@ -13,7 +13,6 @@ import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/task_list_widget.dart';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,42 +47,29 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   SpeedDialChild mySpeedDialChild(
-      Tags tag, Color color, bool isFirst, currentFilter) {
-    if (isFirst) {
-      return SpeedDialChild(
-        labelWidget: Container(
-          padding: EdgeInsets.only(bottom: 3, top: 3, left: 5, right: 5),
-          margin: EdgeInsets.only(bottom: 20),
-          color: color,
-          child: Text(
-           tagToNameMap[tag],
-            style: headerText,
-          ),
+      Tags tag, Color color, bool isClear, currentFilter) {
+    return SpeedDialChild(
+      labelWidget: Container(
+        padding: EdgeInsets.only(bottom: 5, top: 5, left: 10, right: 10),
+        margin: EdgeInsets.only(bottom: 20),
+        color: backgroundColor,
+        child: Text(
+          tagToNameMap[tag],
+          style: headerText,
         ),
-        label: tagToNameMap[tag],
-        onTap: () {
+      ),
+      label: tagToNameMap[tag],
+      onTap: () {
+        if (isClear) {
           currentFilter = tagToNameMap[tag];
-          context.read<FilterBloc>().add(ClearFilter());
-        },
-        labelBackgroundColor: color,
-      );
-    } else {
-      return SpeedDialChild(
-        labelWidget: Container(
-          padding: EdgeInsets.only(bottom: 3, top: 3, left: 5, right: 5),
-          color: color,
-          child: Text(
-            tagToNameMap[tag],
-            style: headerText),
-        ),
-        label: tagToNameMap[tag],
-        onTap: () {
+          context.read<FilterBloc>().add(ClearFilter(Tags.CLEAR));
+        } else {
           currentFilter = tagToNameMap[tag];
           context.read<FilterBloc>().add(FilterChecker(tag));
-        },
-        labelBackgroundColor: color,
-      );
-    }
+        }
+      },
+      labelBackgroundColor: color,
+    );
   }
 
   Future<void> myStream() async {
@@ -142,20 +128,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   return menuOptions.keys.map((String choice) {
                     return PopupMenuItem<String>(
                       value: choice,
-                      child: Text(
-                        choice,
-                          style: standartText
-                      ),
+                      child: Text(choice, style: standartText),
                     );
                   }).toList();
                 } else {
                   return offlineMenuOptions.keys.map((String choice) {
                     return PopupMenuItem<String>(
                       value: choice,
-                      child: Text(
-                        choice,
-                          style: standartText
-                      ),
+                      child: Text(choice, style: standartText),
                     );
                   }).toList();
                 }
@@ -166,17 +146,11 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: backgroundColor,
           title: Row(
             children: [
-              Text(
-                "DTM",
-                  style: headerText
-              ),
+              Text("DTM", style: headerText),
               Spacer(),
               Visibility(
                 visible: !connectivityState,
-                child: Text(
-                  "Оффлайн",
-                    style: standartText
-                ),
+                child: Text("Оффлайн", style: standartText),
               )
             ],
           ),
@@ -223,7 +197,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 10,
               ),
               SpeedDial(
-                child: Icon(Icons.filter_list, color:Colors.white,),
+                child: Icon(
+                  Icons.filter_list,
+                  color: Colors.white,
+                ),
                 overlayColor: Colors.black.withOpacity(0.8),
                 childMargin: EdgeInsets.only(top: 3, bottom: 3),
                 childPadding: EdgeInsets.all(3),
@@ -231,9 +208,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   mySpeedDialChild(Tags.CLEAR, clearColor, true, currentFilter),
                   mySpeedDialChild(
                       Tags.FLUTTER, taskColorDark, false, currentFilter),
-                  mySpeedDialChild(Tags.DART, taskColorDark, false, currentFilter),
                   mySpeedDialChild(
-                      Tags.ALGORITHMS, taskColorDark, false, currentFilter),
+                      Tags.DART, taskColorDark, false, currentFilter),
+                  mySpeedDialChild(
+                      Tags.ALGORITHMS, clearColor, false, currentFilter),
                 ],
                 backgroundColor: taskColorDark,
               ),
@@ -257,18 +235,18 @@ class _HomeScreenState extends State<HomeScreen> {
       context.read<TaskListBloc>().add(HiveChecker(tasks));
     });
     bool isOnline = context.read<ConnectivityBloc>().state;
-      if (!isOnline) {
-        snackBarNotification(
-            context, "Отсутствует подключение к сети. Режим чтения.");
-        Hive.openBox('taskList').then((value) {
-          if (value.isNotEmpty) {
-            List<Task> hiveTasks = value.get('task').cast<Task>();
-            context.read<TaskListBloc>().add(HiveChecker(hiveTasks));
-          }
-          value.close();
-        });
-      } else {
-        myStream();
-      }
+    if (!isOnline) {
+      snackBarNotification(
+          context, "Отсутствует подключение к сети. Режим чтения.");
+      Hive.openBox('taskList').then((value) {
+        if (value.isNotEmpty) {
+          List<Task> hiveTasks = value.get('task').cast<Task>();
+          context.read<TaskListBloc>().add(HiveChecker(hiveTasks));
+        }
+        value.close();
+      });
+    } else {
+      myStream();
+    }
   }
 }

@@ -2,6 +2,7 @@ import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/task_details_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 
 import '../constants.dart';
 
@@ -84,22 +85,38 @@ class TaskWidget extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         task.text,
-                          maxLines: 5,
-                          style: standartTextWithOverflow,
+                        maxLines: 5,
+                        style: standartTextWithOverflow,
                       ),
                     ),
                     Spacer(),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        task.taskCreateTime,
-
-                          style: smallItalicText
-                      ),
+                    Row(
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                  "дедлайн: ${DateFormat('dd-MM-yyyy в kk:mm').format(task.taskCreateTime).toString()}",
+                                  style: smallItalicText),
+                            ),
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                  "создана: ${DateFormat('dd-MM-yyyy в kk:mm').format(task.taskCreateTime).toString()}",
+                                  style: smallItalicText),
+                            ),
+                          ],
+                        ),
+                        Spacer(),
+                        Visibility(
+                            visible: task.isPushed ? false : true,
+                            child: Icon(
+                              Icons.access_time,
+                              color: Colors.white,
+                            )),
+                      ],
                     ),
-                    Visibility(
-                        visible: task.isPushed ? false : true,
-                        child: Icon(Icons.access_time)),
                   ],
                 ),
               ),

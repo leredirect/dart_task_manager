@@ -52,7 +52,8 @@ class _RegistrationScreen extends State<RegistrationScreen> {
 
       repository.addUser(currentUser);
       snackBarNotification(context, "Успешно зарегестрирован.", duration: 1);
-      Navigator.pushNamedAndRemoveUntil(context, "homeScreen", (route) => false);
+      Navigator.pushNamedAndRemoveUntil(
+          context, "homeScreen", (route) => false);
     }
   }
 
@@ -88,16 +89,13 @@ class _RegistrationScreen extends State<RegistrationScreen> {
               child: FadeInAnimation(
                 child: Center(
                   child: Container(
-                    margin: EdgeInsets.only(
-                        ),
+                    margin: EdgeInsets.only(),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Spacer(),
                         Container(
-                          child: Text("регистрация",
-                              style: headerText
-                          ),
+                          child: Text("регистрация", style: headerText),
                         ),
                         Spacer(),
                         LogonTextInputWidget(

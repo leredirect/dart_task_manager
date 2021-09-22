@@ -8,4 +8,8 @@ class FilterChecker extends FilterEvent {
   FilterChecker(this.tag);
 }
 
-class ClearFilter extends FilterEvent {}
+class ClearFilter extends FilterEvent {
+  Tags tag;
+
+  ClearFilter(this.tag);
+}

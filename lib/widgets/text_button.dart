@@ -13,13 +13,16 @@ class TextButtonWidget extends StatelessWidget {
       {Key key,
       this.onPressed,
       this.borderColor,
-      this.text, this.textColor, this.fontSize = 13, this.textStyle = standartText})
+      this.text,
+      this.textColor,
+      this.fontSize = 13,
+      this.textStyle = standartText})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(20),
+        margin: EdgeInsets.all(20),
         child: TextButton(
           onPressed: this.onPressed,
           child: Container(
@@ -28,7 +31,10 @@ class TextButtonWidget extends StatelessWidget {
             child: Padding(
               padding:
                   EdgeInsets.only(top: 10, bottom: 10, left: 50, right: 50),
-              child: Text(this.text, style: this.textStyle,),
+              child: Text(
+                this.text,
+                style: this.textStyle,
+              ),
             ),
           ),
         ));

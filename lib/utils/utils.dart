@@ -30,63 +30,6 @@ class Utils {
     return s2priority;
   }
 
-  // static Color tagColor({bool isWhite, bool isDetail, String drpv, Tags tag}) {
-  //   Tags drpEnum = nameToTagMap[drpv];
-  //   if (isWhite) {
-  //     switch (drpEnum) {
-  //       case Tags.DART:
-  //         return dartColor;
-  //         break;
-  //       case Tags.FLUTTER:
-  //         return flutterColor;
-  //         break;
-  //       case Tags.ALGORITHMS:
-  //         return algosColor;
-  //         break;
-  //       case Tags.CLEAR:
-  //         return backgroundColor;
-  //     }
-  //   } else if (isDetail) {
-  //     switch (tag) {
-  //       case Tags.DART:
-  //         return dartColor;
-  //         break;
-  //       case Tags.FLUTTER:
-  //         return flutterColor;
-  //         break;
-  //       case Tags.ALGORITHMS:
-  //         return algosColor;
-  //         break;
-  //       case Tags.CLEAR:
-  //         return backgroundColor;
-  //     }
-  //   } else {
-  //     switch (drpEnum) {
-  //       case Tags.DART:
-  //         return dartColor;
-  //         break;
-  //       case Tags.FLUTTER:
-  //         return flutterColor;
-  //         break;
-  //       case Tags.ALGORITHMS:
-  //         return algosColor;
-  //         break;
-  //       case Tags.CLEAR:
-  //         return clearColor;
-  //     }
-  //   }
-  // }
-
-  static String timeHint(pickedDate, pickedTime, {bool isEdit, Task task}) {
-    if (pickedDate != null && pickedTime != null) {
-      return "Выбранная дата: ${pickedDate.day}-${pickedDate.month}-${pickedDate.year}\nВыбранное время: ${pickedTime.hour}:${pickedTime.minute}";
-    } else if (isEdit) {
-      return "Выбрано ранее:\n${task.taskDeadline}";
-    } else {
-      return "Выберите время";
-    }
-  }
-
   static SystemUiOverlayStyle statusBarColor() {
     return SystemUiOverlayStyle(
         statusBarColor: backgroundColor,
@@ -115,3 +58,33 @@ void snackBarNotification(context, String text,
     content: Text(text),
   ));
 }
+
+
+
+final nameToPriorityMap = {
+  "высокий": Priorities.HIGH,
+  "средний": Priorities.MEDIUM,
+  "низкий": Priorities.LOW,
+};
+
+final priorityToNameMap = {
+  Priorities.HIGH: "высокий",
+  Priorities.MEDIUM: "средний",
+  Priorities.LOW: "низкий",
+};
+
+final nameToTagMap = {
+  "flutter": Tags.FLUTTER,
+  "dart": Tags.DART,
+  "алгоритмы": Tags.ALGORITHMS,
+  "нет фильтра": Tags.CLEAR,
+  "истекшие": Tags.EXPIRED,
+};
+
+final tagToNameMap = {
+  Tags.FLUTTER: "flutter",
+  Tags.DART: "dart",
+  Tags.ALGORITHMS: "алгоритмы",
+  Tags.CLEAR: "нет фильтра",
+  Tags.EXPIRED: "истекшие",
+};

@@ -17,7 +17,8 @@ class LogonTextInputWidget extends StatelessWidget {
       @required this.textFieldBloc,
       @required this.helperText,
       @required this.focusNode,
-        this.isObscured, this.suffixButton})
+      this.isObscured,
+      this.suffixButton})
       : super(key: key);
 
   @override
@@ -29,7 +30,8 @@ class LogonTextInputWidget extends StatelessWidget {
         focusNode: focusNode,
         suffixButton: this.suffixButton,
         obscureTextTrueIcon: Icon(Icons.visibility_outlined, color: clearColor),
-        obscureTextFalseIcon: Icon(Icons.visibility_off_outlined, color: clearColor),
+        obscureTextFalseIcon:
+            Icon(Icons.visibility_off_outlined, color: clearColor),
         style: TextStyle(color: Colors.white, letterSpacing: 2),
         textAlign: TextAlign.left,
         decoration: InputDecoration(

@@ -17,7 +17,7 @@ import 'bloc/navigator_bloc/navigator_bloc.dart';
 import 'bloc/user_bloc/user_bloc.dart';
 import 'bloc/validation_bloc/login_bloc.dart';
 import 'bloc/validation_bloc/registration_bloc.dart';
-import 'bloc/validation_bloc/task_data_bloc.dart';
+import 'bloc/validation_bloc/task_data_bloc/task_data_bloc.dart';
 import 'models/task.dart';
 import 'models/user.dart';
 
@@ -52,9 +52,11 @@ class _MyAppState extends State<MyApp> {
       create: (BuildContext context) => NavigatorBloc(navigatorKey: _navKey),
       child: MultiBlocProvider(
           providers: [
-            BlocProvider<ConnectivityBloc>(create: (context) => ConnectivityBloc()),
+            BlocProvider<ConnectivityBloc>(
+                create: (context) => ConnectivityBloc()),
             BlocProvider<LoginFormBloc>(create: (context) => LoginFormBloc()),
-            BlocProvider<RegistrationFormBloc>(create: (context) => RegistrationFormBloc()),
+            BlocProvider<RegistrationFormBloc>(
+                create: (context) => RegistrationFormBloc()),
             BlocProvider<TaskDataBloc>(create: (context) => TaskDataBloc()),
             BlocProvider<TaskListBloc>(create: (context) => TaskListBloc()),
             BlocProvider<UserBloc>(create: (context) => UserBloc()),

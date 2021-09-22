@@ -21,6 +21,7 @@ class AuthorisationRepository {
   Future<DocumentReference> addUser(User user) {
     return collection.add(user.toJson());
   }
+
   Future<DocumentReference> deleteUser(User user) {
     return collection.where("id", isEqualTo: user.id).get().then((value) {
       if (value.docs.length == 0) {
@@ -81,22 +82,19 @@ class AuthorisationRepository {
     });
   }
 
-
-
   Future<bool> checkLogin(String login) async {
     List<String> logins = [];
     Future<QuerySnapshot> collection = AuthorisationRepository().getStream();
     return collection.asStream().first.then((value) {
-        value.docs.forEach((element) {
-          logins.add(User.fromJson(element.data()).login);
-        });
-        for (int i = 0; i < logins.length; i++) {
-          if (logins[i] == login) {
-
-            return true;
-          }
+      value.docs.forEach((element) {
+        logins.add(User.fromJson(element.data()).login);
+      });
+      for (int i = 0; i < logins.length; i++) {
+        if (logins[i] == login) {
+          return true;
         }
-        return false;
+      }
+      return false;
     });
   }
 }

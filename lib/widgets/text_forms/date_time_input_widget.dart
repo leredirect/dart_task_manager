@@ -58,7 +58,10 @@ class DateTimeInputWidget extends StatelessWidget {
           firstDate: DateTime(2021),
           lastDate: DateTime(2022),
           decoration: InputDecoration(
-            suffixIcon: Icon(Icons.calendar_today_outlined, color: Colors.grey,),
+            suffixIcon: Icon(
+              Icons.calendar_today_outlined,
+              color: Colors.grey,
+            ),
             labelText: this.helperText,
             labelStyle: standartText,
             enabledBorder: UnderlineInputBorder(
