@@ -43,7 +43,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
 
   Future<void> addTask() async {
     bool isOnline = context.read<ConnectivityBloc>().state;
-
+widget.task.priority = priorityValue;
     widget.task.name = context.read<TaskDataBloc>().name.value;
     widget.task.text = context.read<TaskDataBloc>().text.value;
     widget.task.tags = tagValue;
@@ -208,7 +208,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                       taskDataBloc.submit();
                     },
                     borderColor: Colors.white,
-                    text: "создать",
+                    text: "редактировать",
                     textColor: Colors.white,
                   ),
                 ],

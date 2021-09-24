@@ -12,12 +12,12 @@ import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
+import 'package:dart_task_manager/widgets/grid_view_widget.dart';
 import 'package:dart_task_manager/widgets/task_list_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:hive/hive.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -84,7 +84,6 @@ class _HomeScreenState extends State<HomeScreen> {
       taskBox.clear();
       taskBox.put('task', tasks);
       taskBox.close();
-      //snackBarNotification(context, "Обновлено");
     });
   }
 
@@ -105,9 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (connectivityState == true) {
         myStream();
       }
-
       return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         appBar: AppBar(
           actions: [
             PopupMenuButton<String>(
@@ -155,70 +152,76 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        body: BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
-          return BlocBuilder<TaskListBloc, List<Task>>(
-            builder: (context, state) {
-              if (filtState != null) {
-                List<Task> filtredState = state
-                    .where((element) => element.tags.contains(filtState))
-                    .toList();
-                return AnimationConfiguration.synchronized(
-                  child: SlideAnimation(
-                    verticalOffset: 50.0,
-                    child: FadeInAnimation(
-                        child: TaskListWidget(taskList: filtredState)),
-                  ),
-                );
-              } else {
-                return AnimationConfiguration.synchronized(
-                  child: SlideAnimation(
-                    verticalOffset: 50.0,
-                    child:
-                        FadeInAnimation(child: TaskListWidget(taskList: state)),
-                  ),
-                );
-              }
-            },
-          );
-        }),
+        backgroundColor: backgroundColor,
         floatingActionButton: Container(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          FloatingActionButton(
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+            onPressed: createTask,
+            backgroundColor: snackBarColor,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          SpeedDial(
+            backgroundColor: snackBarColor,
+            child: Icon(
+              Icons.filter_list,
+              color: Colors.white,
+            ),
+            overlayColor: Colors.black.withOpacity(0.8),
+            childMargin: EdgeInsets.only(top: 3, bottom: 3),
+            childPadding: EdgeInsets.all(3),
             children: [
-              FloatingActionButton(
-                child: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                onPressed: createTask,
-                backgroundColor: taskColorDark,
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              SpeedDial(
-                child: Icon(
-                  Icons.filter_list,
-                  color: Colors.white,
-                ),
-                overlayColor: Colors.black.withOpacity(0.8),
-                childMargin: EdgeInsets.only(top: 3, bottom: 3),
-                childPadding: EdgeInsets.all(3),
-                children: [
-                  mySpeedDialChild(Tags.CLEAR, clearColor, true, currentFilter),
-                  mySpeedDialChild(
-                      Tags.FLUTTER, taskColorDark, false, currentFilter),
-                  mySpeedDialChild(
-                      Tags.DART, taskColorDark, false, currentFilter),
-                  mySpeedDialChild(
-                      Tags.ALGORITHMS, clearColor, false, currentFilter),
-                ],
-                backgroundColor: taskColorDark,
-              ),
+              mySpeedDialChild(Tags.CLEAR, clearColor, true, currentFilter),
+              mySpeedDialChild(
+                  Tags.FLUTTER, taskColorDark, false, currentFilter),
+              mySpeedDialChild(Tags.DART, taskColorDark, false, currentFilter),
+              mySpeedDialChild(
+                  Tags.ALGORITHMS, clearColor, false, currentFilter),
             ],
           ),
+        ])),
+        body: CustomScrollView(
+          slivers: <Widget>[
+            SliverPersistentHeader(
+              delegate: SectionHeaderDelegate("высокий приоритет"),
+              pinned: true,
+            ),
+            BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+              return BlocBuilder<TaskListBloc, List<Task>>(
+                builder: (context, state) {
+                  return GridViewWidget(state, filtState, Priorities.HIGH);
+                }
+              );
+            }),
+            SliverPersistentHeader(
+              delegate: SectionHeaderDelegate("средний приоритет"),
+              pinned: true,
+            ),
+            BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+              return BlocBuilder<TaskListBloc, List<Task>>(
+                  builder: (context, state) {
+                    return GridViewWidget(state, filtState, Priorities.MEDIUM);
+                  }
+              );
+            }),
+            SliverPersistentHeader(
+              delegate: SectionHeaderDelegate("низкий приоритет"),
+              pinned: true,
+            ),
+            BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+              return BlocBuilder<TaskListBloc, List<Task>>(
+                  builder: (context, state) {
+                    return GridViewWidget(state, filtState, Priorities.LOW);
+                  }
+              );
+            }),
+          ],
         ),
-        backgroundColor: backgroundColor,
       );
     });
   }
@@ -249,4 +252,29 @@ class _HomeScreenState extends State<HomeScreen> {
       myStream();
     }
   }
+}
+
+class SectionHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final String title;
+  final double height;
+
+  SectionHeaderDelegate(this.title, [this.height = 50]);
+
+  @override
+  Widget build(context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: backgroundColor,
+      alignment: Alignment.center,
+      child: Text(title, style: headerText),
+    );
+  }
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  double get minExtent => height;
+
+  @override
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => false;
 }

@@ -153,6 +153,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                       value: tagValue.map((e) => e.index).toList(),
                       choiceItems: s2Options,
                       onChange: (state) {
+                        tagValue = [];
                         setState(() => state.value.forEach((e) {
                               tagValue.add(Tags.values[e]);
                             }));
