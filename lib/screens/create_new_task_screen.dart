@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dart_task_manager/bloc/connectivity_bloc/connectivity_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_event.dart';
@@ -18,6 +20,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:smart_select/smart_select.dart';
 import 'package:uiblock/uiblock.dart';
 
@@ -46,24 +50,59 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     String taskText = context.read<TaskDataBloc>().text.value;
     User user = context.read<UserBloc>().state;
     DateTime taskCreateTime = DateTime.now();
-    int id = await IdRepository().getLastCreatedTaskId();
+    int id = await IdRepository().getLastCreatedTaskId().catchError((err) => print("ids"));
     bool isOnline = context.read<ConnectivityBloc>().state;
     DateTime deadline = context.read<TaskDataBloc>().deadline.value;
     List<Tags> tags = tagValue.toSet().toList();
     Task task;
 
-      task = Task(taskName, taskText, tags, user, taskCreateTime, deadline,
-          id, priorityValue, isOnline);
-
+    task = Task(taskName, taskText, tags, user, taskCreateTime, deadline, id,
+        priorityValue, isOnline);
 
     context.read<TaskListBloc>().add(AddTaskEvent(task));
     var listBox = await Hive.openBox<List<Task>>('taskList');
     listBox.put('task', context.read<TaskListBloc>().state);
     listBox.close();
-    Navigator.of(context).pop();
-    TaskRepository repository = new TaskRepository();
-    repository.addTask(task);
+
+    try {
+      TaskRepository repository = new TaskRepository();
+      repository.addTask(task);
+    } on Exception catch (e) {
+    }
+
     context.read<TaskDataBloc>().clear();
+
+    print(
+        "=========push time${DateFormat('dd-MM-yyyy kk:mm').format(task.taskDeadline.subtract(Duration(hours: 24))).toString()}");
+
+    Map<String, String> getHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        "Authorization":
+            'Bearer AAAAEtcfO7Q:APA91bFbVoqxDh6btMDZBoMjiYcnI-nOfkmf_NYpzY88UAEAHQnbQr64h2cFxmmSOv1xNSsnkZXAqRm8YSN1N88Og-8-75RwBEmDURlD-BfFymNQbYHdx6BtjYnSZ3q-HEDNIHOJihif'
+      };
+    }
+
+    Map<String, dynamic> body = {
+      "to": "/topics/scheduled",
+      "priority":"high",
+      "data": {
+        "title": "Дедлайн!",
+        "message": "Через 24 часа наступит дедлайн задачи '" + taskName + "'!",
+        "isScheduled": true,
+        "scheduledTime": DateFormat('yyyy-MM-dd kk:mm:ss')
+            .format(task.taskDeadline.subtract(Duration(hours: 24)))
+            .toString(),
+      }
+    };
+
+        await http.post(
+        Uri.parse("https://fcm.googleapis.com/fcm/send"),
+        headers: getHeaders(),
+        body: jsonEncode(body)).catchError((err) => print("push"));
+
+
+    Navigator.of(context).pop();
   }
 
   @override

@@ -30,6 +30,9 @@ dependencies:
   smart_select: ^4.3.2
   flutter_form_bloc: ^0.20.0
   uiblock: ^2.0.2
+  firebase_messaging: ^10.0.3
+  http: ^0.13.3
+
 
 flutter_native_splash:
   color: "#353E46"
@@ -47,7 +50,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   hive_generator: 1.1.0
-  build_runner: 2.0.6
+  build_runner: ^2.1.2
 
 
 flutter:

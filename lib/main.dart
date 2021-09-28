@@ -5,6 +5,7 @@ import 'package:dart_task_manager/screens/home_screen.dart';
 import 'package:dart_task_manager/screens/login_screen.dart';
 import 'package:dart_task_manager/screens/registration_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,6 +49,12 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+
+    FirebaseMessaging.instance.subscribeToTopic("scheduled");
+    FirebaseMessaging.instance.getToken().then((value) {
+      print("=============================\n=================\n$value");
+    });
+
     return BlocProvider<NavigatorBloc>(
       create: (BuildContext context) => NavigatorBloc(navigatorKey: _navKey),
       child: MultiBlocProvider(
