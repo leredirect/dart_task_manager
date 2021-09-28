@@ -8,23 +8,12 @@ import '../constants.dart';
 
 class TaskWidget extends StatelessWidget {
   final Task task;
+  final Color color;
 
-  const TaskWidget({Key key, this.task}) : super(key: key);
+  const TaskWidget({Key key, this.task, this.color}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // var circlesIterable = task.tags.map((e) {
-    //   return Container(
-    //       width: 15,
-    //       height: 15,
-    //       margin: EdgeInsets.only(top: 10, left: 5, right: 5),
-    //       decoration: BoxDecoration(
-    //         color: Utils.tagColor(
-    //             isWhite: false, isDetail: false, drpv: tagToNameMap[e]),
-    //         shape: BoxShape.circle,
-    //       ));
-    // });
-    //List<Widget> circles = circlesIterable.toList();
 
     Utils.statusBarColor();
     void openTaskDetails() {
@@ -59,9 +48,34 @@ class TaskWidget extends StatelessWidget {
               onTap: openTaskDetails,
               child: Container(
                 padding: EdgeInsets.all(3),
-                color: taskColorDark,
+                color: this.color,
                 child: Column(
                   children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Visibility(
+                        visible: task.isPushed ? false : true,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.access_time,
+                              color: Colors.white,
+                              size: 15,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              "не загружено..",
+                              style: smallItalicText,
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
                     Container(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -86,7 +100,7 @@ class TaskWidget extends StatelessWidget {
                       child: Text(
                         task.text,
                         maxLines: 5,
-                        style: standartTextWithOverflow,
+                        style: standartText,
                       ),
                     ),
                     Spacer(),
@@ -100,21 +114,9 @@ class TaskWidget extends StatelessWidget {
                                   "дедлайн: ${DateFormat('dd-MM-yyyy в kk:mm').format(task.taskCreateTime).toString()}",
                                   style: smallItalicText),
                             ),
-                            Container(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                  "создана: ${DateFormat('dd-MM-yyyy в kk:mm').format(task.taskCreateTime).toString()}",
-                                  style: smallItalicText),
-                            ),
                           ],
                         ),
                         Spacer(),
-                        Visibility(
-                            visible: task.isPushed ? false : true,
-                            child: Icon(
-                              Icons.access_time,
-                              color: Colors.white,
-                            )),
                       ],
                     ),
                   ],

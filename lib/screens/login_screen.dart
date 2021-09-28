@@ -34,6 +34,8 @@ class _LoginScreenState extends State<LoginScreen> {
       snackBarNotification(context, "Отсутствует подключение к интернету.");
     } else {
       try {
+        snackBarNotification(context, "Выполняется вход...", duration: 1);
+
         User currentUser = await repository.getUser(login, pass);
         context.read<UserBloc>().add(SetUserEvent(currentUser));
         var userBox = await Hive.openBox<User>('userBox');
@@ -89,8 +91,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   onSuccess: (context, state) async {
                     await Future.delayed(Duration(milliseconds: 1000));
                     UIBlock.unblock(context);
-                    snackBarNotification(context, "Выполняется вход...",
-                        duration: 1);
                     login(loginBloc.login.value, loginBloc.password.value);
                   },
                   onFailure: (context, state) {
@@ -122,8 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   Spacer(),
                                   Container(
-                                    // margin: EdgeInsets.only(
-                                    //     top: 100, bottom: 100),
+
                                     child: Text(
                                       "вход в существующий аккаунт",
                                       style: headerText,

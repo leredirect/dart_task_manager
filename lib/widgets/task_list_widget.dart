@@ -1,12 +1,13 @@
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/widgets/task_widget.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter/material.dart';
 
 class TaskListWidget extends StatelessWidget {
   final List<Task> taskList;
+  final Color color;
 
-  const TaskListWidget({Key key, this.taskList}) : super(key: key);
+  const TaskListWidget({Key key, this.taskList, this.color}) : super(key: key);
 
   int gridAxisCount() {
     switch (taskList.length) {
@@ -52,7 +53,7 @@ class TaskListWidget extends StatelessWidget {
         mainAxisSpacing: gridAxisParameters(),
         crossAxisSpacing: gridAxisParameters(),
         crossAxisCount: gridAxisCount(),
-        children: taskList.map((e) => TaskWidget(task: e)).toList(),
+        children: taskList.map((e) => TaskWidget(task: e, color: this.color)).toList(),
       ),
     );
   }

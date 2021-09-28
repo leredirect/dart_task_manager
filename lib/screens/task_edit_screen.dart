@@ -41,9 +41,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   List<S2Choice<int>> s2Options = Utils.s2TagsList();
   List<S2Choice<int>> s2Priority = Utils.s2PriorityList();
 
-  Future<void> addTask() async {
+  Future<void> editTask() async {
     bool isOnline = context.read<ConnectivityBloc>().state;
-widget.task.priority = priorityValue;
+    widget.task.priority = priorityValue;
     widget.task.name = context.read<TaskDataBloc>().name.value;
     widget.task.text = context.read<TaskDataBloc>().text.value;
     widget.task.tags = tagValue;
@@ -75,11 +75,10 @@ widget.task.priority = priorityValue;
           UIBlock.block(context);
         },
         onSuccess: (context, state) async {
-          snackBarNotification(context, "Создание задачи...", duration: 1);
-          addTask();
+          editTask();
           await Future.delayed(Duration(milliseconds: 500));
           UIBlock.unblock(context);
-          snackBarNotification(context, "Задача создана.", duration: 1);
+          snackBarNotification(context, "задача отредактирована.", duration: 1);
           context.read<LoginFormBloc>().clear();
         },
         onFailure: (context, state) {
@@ -92,7 +91,7 @@ widget.task.priority = priorityValue;
             appBar: AppBar(
               systemOverlayStyle: Utils.statusBarColor(),
               iconTheme: IconThemeData(color: Colors.white),
-              title: Text("Новая задача", style: headerText),
+              title: Text("редактировать задачу", style: headerText),
               backgroundColor: backgroundColor,
             ),
             body: SingleChildScrollView(

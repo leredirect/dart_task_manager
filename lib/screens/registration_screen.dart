@@ -36,6 +36,8 @@ class _RegistrationScreen extends State<RegistrationScreen> {
       snackBarNotification(context, "Отсутствует подключение к интернету.",
           duration: 2);
     } else {
+      snackBarNotification(context, "Выполняется регистрация...", duration: 1);
+
       AuthorisationRepository repository = new AuthorisationRepository();
 
       int newId = await IdRepository().getLastCreatedUserId();
@@ -74,8 +76,7 @@ class _RegistrationScreen extends State<RegistrationScreen> {
             },
             onSuccess: (context, state) async {
               UIBlock.unblock(context);
-              snackBarNotification(context, "Выполняется регистрация...",
-                  duration: 1);
+
               register(registrationBloc.login.value,
                   registrationBloc.password.value);
             },

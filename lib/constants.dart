@@ -22,8 +22,7 @@ const TextStyle smallText = TextStyle(
 const TextStyle headerText =
     TextStyle(fontSize: 17, letterSpacing: 2, color: Colors.white);
 
-const TextStyle standartTextWithOverflow = TextStyle(
-    overflow: TextOverflow.ellipsis,
+const TextStyle standartTextWithoutOverflow = TextStyle(
     fontSize: 13,
     letterSpacing: 2,
     color: Colors.white);

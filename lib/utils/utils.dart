@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:dart_task_manager/models/task.dart';
-import 'package:dart_task_manager/widgets/task_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:smart_select/smart_select.dart';
@@ -54,9 +53,14 @@ class Utils {
 void snackBarNotification(context, String text,
     {int duration, Color backgroundColor}) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    backgroundColor: backgroundColor == null ? snackBarColor : backgroundColor,
+    behavior: SnackBarBehavior.floating,
+    width: MediaQuery.of(context).size.width/2.2,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+    ),
+    backgroundColor: backgroundColor == null ? snackBarColor.withOpacity(0.9) : backgroundColor.withOpacity(0.9),
     duration: Duration(seconds: duration == null ? 3 : duration),
-    content: Text(text),
+    content: Text(text, style: standartTextWithoutOverflow, textAlign: TextAlign.center,),
   ));
 }
 

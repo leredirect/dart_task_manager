@@ -13,12 +13,12 @@ import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:dart_task_manager/widgets/grid_view_widget.dart';
-import 'package:dart_task_manager/widgets/task_list_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:hive/hive.dart';
+import 'package:smart_select/smart_select.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -29,6 +29,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String currentFilter = tagToNameMap[Tags.CLEAR];
+  List<Tags> tagValue = [Tags.CLEAR];
+  List<S2Choice<int>> s2Options = Utils.s2TagsList();
 
   Future<void> userSignOut() async {
     context.read<UserBloc>().add(ClearUserEvent());
@@ -89,13 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, Function> offlineMenuOptions = {
-      'Выход': userSignOut,
-    };
-
     Map<String, Function> menuOptions = {
       'Выход': userSignOut,
-      'Обновить': myStream,
     };
 
     Utils.statusBarColor();
@@ -114,28 +111,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.white,
               ),
               onSelected: (String value) async {
-                if (connectivityState) {
-                  menuOptions[value]();
-                } else {
-                  offlineMenuOptions[value]();
-                }
+                menuOptions[value]();
               },
               itemBuilder: (BuildContext context) {
-                if (connectivityState) {
-                  return menuOptions.keys.map((String choice) {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: Text(choice, style: standartText),
-                    );
-                  }).toList();
-                } else {
-                  return offlineMenuOptions.keys.map((String choice) {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: Text(choice, style: standartText),
-                    );
-                  }).toList();
-                }
+                return menuOptions.keys.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice, style: standartText),
+                  );
+                }).toList();
               },
             ),
           ],
@@ -185,42 +169,56 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ])),
-        body: CustomScrollView(
-          slivers: <Widget>[
-            SliverPersistentHeader(
-              delegate: SectionHeaderDelegate("высокий приоритет"),
-              pinned: true,
-            ),
-            BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
-              return BlocBuilder<TaskListBloc, List<Task>>(
-                builder: (context, state) {
+        body: RefreshIndicator(
+          displacement: 40,
+          onRefresh: () async {
+            await myStream();
+            snackBarNotification(context, "обновлено");
+          },
+          child: CustomScrollView(
+            slivers: <Widget>[
+              SliverPersistentHeader(
+                delegate: SectionHeaderDelegate("высокий приоритет"),
+                pinned: true,
+              ),
+              BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+                return BlocBuilder<TaskListBloc, List<Task>>(
+                    builder: (context, state) {
                   return GridViewWidget(state, filtState, Priorities.HIGH);
-                }
-              );
-            }),
-            SliverPersistentHeader(
-              delegate: SectionHeaderDelegate("средний приоритет"),
-              pinned: true,
-            ),
-            BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
-              return BlocBuilder<TaskListBloc, List<Task>>(
-                  builder: (context, state) {
-                    return GridViewWidget(state, filtState, Priorities.MEDIUM);
-                  }
-              );
-            }),
-            SliverPersistentHeader(
-              delegate: SectionHeaderDelegate("низкий приоритет"),
-              pinned: true,
-            ),
-            BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
-              return BlocBuilder<TaskListBloc, List<Task>>(
-                  builder: (context, state) {
-                    return GridViewWidget(state, filtState, Priorities.LOW);
-                  }
-              );
-            }),
-          ],
+                });
+              }),
+              SliverPersistentHeader(
+                delegate: SectionHeaderDelegate("средний приоритет"),
+                pinned: true,
+              ),
+              BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+                return BlocBuilder<TaskListBloc, List<Task>>(
+                    builder: (context, state) {
+                  return GridViewWidget(state, filtState, Priorities.MEDIUM);
+                });
+              }),
+              SliverPersistentHeader(
+                delegate: SectionHeaderDelegate("низкий приоритет"),
+                pinned: true,
+              ),
+              BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+                return BlocBuilder<TaskListBloc, List<Task>>(
+                    builder: (context, state) {
+                  return GridViewWidget(state, filtState, Priorities.LOW);
+                });
+              }),
+              SliverPersistentHeader(
+                delegate: SectionHeaderDelegate("просроченные"),
+                pinned: true,
+              ),
+              BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+                return BlocBuilder<TaskListBloc, List<Task>>(
+                    builder: (context, state) {
+                  return GridViewWidget(state, filtState);
+                });
+              }),
+            ],
+          ),
         ),
       );
     });
@@ -239,8 +237,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     bool isOnline = context.read<ConnectivityBloc>().state;
     if (!isOnline) {
-      snackBarNotification(
-          context, "Отсутствует подключение к сети. Режим чтения.");
       Hive.openBox('taskList').then((value) {
         if (value.isNotEmpty) {
           List<Task> hiveTasks = value.get('task').cast<Task>();
@@ -258,14 +254,30 @@ class SectionHeaderDelegate extends SliverPersistentHeaderDelegate {
   final String title;
   final double height;
 
-  SectionHeaderDelegate(this.title, [this.height = 50]);
+  SectionHeaderDelegate(this.title, [this.height = 35]);
 
   @override
   Widget build(context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      color: backgroundColor,
+      decoration: BoxDecoration(
+          color: backgroundColor,
+          boxShadow: [
+            BoxShadow(
+              color: backgroundColor,
+              spreadRadius: 3,
+              blurRadius: 0,
+              offset: Offset(0, 0),
+            ),
+          ]),
+      padding: EdgeInsets.only(left: 30),
       alignment: Alignment.center,
-      child: Text(title, style: headerText),
+      child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            title,
+            style: headerText,
+            textAlign: TextAlign.start,
+          )),
     );
   }
 

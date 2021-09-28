@@ -18,7 +18,8 @@ class TaskRepository {
   }
 
   Future<DocumentReference> addTask(Task task) {
-    return collection.add(task.toJson());
+    return collection.add(task.toJson()).catchError((err) => print("shh")
+    );
   }
 
   Future<DocumentReference> deleteTask(Task task) {
