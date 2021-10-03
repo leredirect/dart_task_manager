@@ -50,7 +50,9 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     String taskText = context.read<TaskDataBloc>().text.value;
     User user = context.read<UserBloc>().state;
     DateTime taskCreateTime = DateTime.now();
-    int id = await IdRepository().getLastCreatedTaskId().catchError((err) => print("ids"));
+    int id = await IdRepository()
+        .getLastCreatedTaskId()
+        .catchError((err) => print("ids"));
     bool isOnline = context.read<ConnectivityBloc>().state;
     DateTime deadline = context.read<TaskDataBloc>().deadline.value;
     List<Tags> tags = tagValue.toSet().toList();
@@ -67,8 +69,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     try {
       TaskRepository repository = new TaskRepository();
       repository.addTask(task);
-    } on Exception catch (e) {
-    }
+    } on Exception catch (e) {}
 
     context.read<TaskDataBloc>().clear();
 
@@ -85,7 +86,8 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
 
     Map<String, dynamic> body = {
       "to": "/topics/scheduled",
-      "priority":"high",
+      "priority": "high",
+      "icon": "default",
       "data": {
         "title": "Дедлайн!",
         "message": "Через 24 часа наступит дедлайн задачи '" + taskName + "'!",
@@ -96,13 +98,10 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
       }
     };
 
-        await http.post(
-        Uri.parse("https://fcm.googleapis.com/fcm/send"),
-        headers: getHeaders(),
-        body: jsonEncode(body)).catchError((err) => print("push"));
-
-
-    Navigator.of(context).pop();
+    await http
+        .post(Uri.parse("https://fcm.googleapis.com/fcm/send"),
+            headers: getHeaders(), body: jsonEncode(body))
+        .catchError((err) => print("push"));
   }
 
   @override
@@ -112,15 +111,20 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
       var taskDataBloc = BlocProvider.of<TaskDataBloc>(context);
       return FormBlocListener<TaskDataBloc, String, String>(
         onSubmitting: (context, state) {
-          UIBlock.block(context);
+          UIBlock.block(context,
+              customLoaderChild: CircularProgressIndicator(
+                backgroundColor: backgroundColor,
+                valueColor: AlwaysStoppedAnimation<Color>(taskColorDark),
+              ));
         },
         onSuccess: (context, state) async {
           snackBarNotification(context, "создание задачи...", duration: 1);
-          addTask();
+          await addTask();
           await Future.delayed(Duration(milliseconds: 500));
           UIBlock.unblock(context);
           snackBarNotification(context, "задача создана.", duration: 1);
           context.read<LoginFormBloc>().clear();
+          Navigator.of(context).pop();
         },
         onFailure: (context, state) {
           UIBlock.unblock(context);

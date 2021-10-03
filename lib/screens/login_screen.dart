@@ -116,13 +116,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Container(
                                     margin: EdgeInsets.only(top: 10),
                                     child: Text(
-                                      "DTM",
+                                      "STICKY",
                                       style: bigText,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(top: 10),
+                                    child: Text(
+                                      "управление задачами",
+                                      style: headerText,
                                     ),
                                   ),
                                   Spacer(),
                                   Container(
-
                                     child: Text(
                                       "вход в существующий аккаунт",
                                       style: headerText,

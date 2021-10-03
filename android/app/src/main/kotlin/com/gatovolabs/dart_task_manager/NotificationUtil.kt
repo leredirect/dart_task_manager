@@ -24,8 +24,8 @@ class NotificationUtil(private val context: Context) {
         val channelId = "default"
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
-                .setColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
-                .setSmallIcon(R.drawable.launch_background)
+//                .setSmallIcon(R.drawable.launch_background)
+                .setSmallIcon(R.mipmap.launcher_icon)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)

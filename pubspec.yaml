@@ -36,7 +36,7 @@ dependencies:
 
 flutter_native_splash:
   color: "#353E46"
-  image: "assets/images/SPLASH.png"
+  image: "assets/images/sticky_splash.png"
 
 flutter_icons:
   android: "launcher_icon"
@@ -56,7 +56,11 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/SPLASH.png
+    - assets/images/sticky_splash.png
+  fonts:
+    - family: Ropa
+      fonts:
+        - asset: assets/fonts/RopaSansSCPro-Light.ttf
 
 #flutter pub run flutter_launcher_icons:main
 #flutter pub run flutter_native_splash:create

@@ -61,7 +61,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       Navigator.of(context).pop();
     } on Exception catch (e) {
       snackBarNotification(context, e.toString());
-      Navigator.of(context).pushNamedAndRemoveUntil("/", (_) => false);
     }
   }
 
@@ -72,14 +71,19 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       var taskDataBloc = BlocProvider.of<TaskDataBloc>(context);
       return FormBlocListener<TaskDataBloc, String, String>(
         onSubmitting: (context, state) {
-          UIBlock.block(context);
+          UIBlock.block(context,
+              customLoaderChild: CircularProgressIndicator(
+                backgroundColor: backgroundColor,
+                valueColor: AlwaysStoppedAnimation<Color>(taskColorDark),
+              ));
         },
         onSuccess: (context, state) async {
-          editTask();
+          await editTask();
           await Future.delayed(Duration(milliseconds: 500));
           UIBlock.unblock(context);
           snackBarNotification(context, "задача отредактирована.", duration: 1);
           context.read<LoginFormBloc>().clear();
+          Navigator.of(context).pushNamedAndRemoveUntil("/", (_) => false);
         },
         onFailure: (context, state) {
           UIBlock.unblock(context);

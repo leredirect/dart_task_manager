@@ -19,6 +19,7 @@ import 'bloc/user_bloc/user_bloc.dart';
 import 'bloc/validation_bloc/login_bloc.dart';
 import 'bloc/validation_bloc/registration_bloc.dart';
 import 'bloc/validation_bloc/task_data_bloc/task_data_bloc.dart';
+import 'constants.dart';
 import 'models/task.dart';
 import 'models/user.dart';
 
@@ -49,7 +50,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-
     FirebaseMessaging.instance.subscribeToTopic("scheduled");
     FirebaseMessaging.instance.getToken().then((value) {
       print("=============================\n=================\n$value");
@@ -82,7 +82,8 @@ class _MyAppState extends State<MyApp> {
                 title: 'Flutter Demo',
                 debugShowCheckedModeBanner: false,
                 theme: ThemeData(
-                  primarySwatch: Colors.grey,
+                  fontFamily: 'Ropa',
+                  primarySwatch: stickyPrimary,
                   visualDensity: VisualDensity.adaptivePlatformDensity,
                 ),
               ))),

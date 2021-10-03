@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: backgroundColor,
           title: Row(
             children: [
-              Text("DTM", style: headerText),
+              Text("STICKY", style: headerText),
               Spacer(),
               Visibility(
                 visible: !connectivityState,
@@ -259,16 +259,14 @@ class SectionHeaderDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: BoxDecoration(color: backgroundColor, boxShadow: [
+        BoxShadow(
           color: backgroundColor,
-          boxShadow: [
-            BoxShadow(
-              color: backgroundColor,
-              spreadRadius: 3,
-              blurRadius: 0,
-              offset: Offset(0, 0),
-            ),
-          ]),
+          spreadRadius: 3,
+          blurRadius: 0,
+          offset: Offset(0, 0),
+        ),
+      ]),
       padding: EdgeInsets.only(left: 30),
       alignment: Alignment.center,
       child: Align(

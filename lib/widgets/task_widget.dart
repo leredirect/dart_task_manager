@@ -14,7 +14,6 @@ class TaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     Utils.statusBarColor();
     void openTaskDetails() {
       Navigator.push(context, MaterialPageRoute(builder: (_) {
@@ -111,7 +110,7 @@ class TaskWidget extends StatelessWidget {
                             Container(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                  "дедлайн: ${DateFormat('dd-MM-yyyy в kk:mm').format(task.taskCreateTime).toString()}",
+                                  "дедлайн: ${DateFormat('dd-MM-yyyy в kk:mm').format(task.taskDeadline).toString()}",
                                   style: smallItalicText),
                             ),
                           ],

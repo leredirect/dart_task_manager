@@ -119,7 +119,7 @@ class TaskDetailsScreen extends StatelessWidget {
                 padding: EdgeInsets.only(right: 10, left: 10),
                 color: snackBarColor,
                 width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 7.5,
+                height: MediaQuery.of(context).size.height / 7,
                 child: Column(
                   children: [
                     Row(

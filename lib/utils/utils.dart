@@ -54,17 +54,21 @@ void snackBarNotification(context, String text,
     {int duration, Color backgroundColor}) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     behavior: SnackBarBehavior.floating,
-    width: MediaQuery.of(context).size.width/2.2,
+    width: MediaQuery.of(context).size.width / 2.2,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(10)),
     ),
-    backgroundColor: backgroundColor == null ? snackBarColor.withOpacity(0.9) : backgroundColor.withOpacity(0.9),
+    backgroundColor: backgroundColor == null
+        ? snackBarColor.withOpacity(0.9)
+        : backgroundColor.withOpacity(0.9),
     duration: Duration(seconds: duration == null ? 3 : duration),
-    content: Text(text, style: standartTextWithoutOverflow, textAlign: TextAlign.center,),
+    content: Text(
+      text,
+      style: standartTextWithoutOverflow,
+      textAlign: TextAlign.center,
+    ),
   ));
 }
-
-
 
 final nameToPriorityMap = {
   "высокий": Priorities.HIGH,

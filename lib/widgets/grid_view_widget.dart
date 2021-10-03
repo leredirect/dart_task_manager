@@ -24,9 +24,11 @@ class GridViewWidget extends StatelessWidget {
         List<Task> priorititedFiltredState = filtredState
             .where((element) => element.priority == this.priority)
             .toList();
-        priorititedFiltredState.removeWhere((element) => element.taskDeadline.isBefore(DateTime.now()));
+        priorititedFiltredState.removeWhere(
+            (element) => element.taskDeadline.isBefore(DateTime.now()));
         if (priorititedFiltredState.isNotEmpty) {
-          return TaskListWidget(taskList: priorititedFiltredState,color: taskColorDark);
+          return TaskListWidget(
+              taskList: priorititedFiltredState, color: taskColorDark);
         } else {
           return SliverToBoxAdapter(
             child: Container(
@@ -43,9 +45,11 @@ class GridViewWidget extends StatelessWidget {
             .where((element) => element.priority == this.priority)
             .toList();
 
-        priorititedFiltredState.removeWhere((element) => element.taskDeadline.isBefore(DateTime.now()));
+        priorititedFiltredState.removeWhere(
+            (element) => element.taskDeadline.isBefore(DateTime.now()));
         if (priorititedFiltredState.isNotEmpty) {
-          return TaskListWidget(taskList: priorititedFiltredState, color: taskColorDark);
+          return TaskListWidget(
+              taskList: priorititedFiltredState, color: taskColorDark);
         } else {
           return SliverToBoxAdapter(
             child: Container(

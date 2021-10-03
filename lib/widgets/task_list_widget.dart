@@ -46,14 +46,20 @@ class TaskListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: EdgeInsets.only(left: gridAxisParameters(), right: gridAxisParameters(), top: 20, bottom: 20),
+      padding: EdgeInsets.only(
+          left: gridAxisParameters(),
+          right: gridAxisParameters(),
+          top: 20,
+          bottom: 20),
       sliver: SliverGrid.count(
         childAspectRatio: ((MediaQuery.of(context).size.width - 90) / 2) /
             (MediaQuery.of(context).size.height / 4.9),
         mainAxisSpacing: gridAxisParameters(),
         crossAxisSpacing: gridAxisParameters(),
         crossAxisCount: gridAxisCount(),
-        children: taskList.map((e) => TaskWidget(task: e, color: this.color)).toList(),
+        children: taskList
+            .map((e) => TaskWidget(task: e, color: this.color))
+            .toList(),
       ),
     );
   }
