@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dart_task_manager/bloc/connectivity_bloc/connectivity_bloc.dart';
 import 'package:dart_task_manager/bloc/filter_bloc/filter_bloc.dart';
 import 'package:dart_task_manager/bloc/filter_bloc/filter_event.dart';
 import 'package:dart_task_manager/bloc/task_list_bloc/task_list_bloc.dart';
@@ -12,15 +12,13 @@ import 'package:dart_task_manager/models/user.dart';
 import 'package:dart_task_manager/repository/task_repo.dart';
 import 'package:dart_task_manager/screens/create_new_task_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
-import 'package:dart_task_manager/widgets/task_list_widget.dart';
+import 'package:dart_task_manager/widgets/grid_view_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:hive/hive.dart';
-
-
+import 'package:smart_select/smart_select.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -31,6 +29,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String currentFilter = tagToNameMap[Tags.CLEAR];
+  List<Tags> tagValue = [Tags.CLEAR];
+  List<S2Choice<int>> s2Options = Utils.s2TagsList();
 
   Future<void> userSignOut() async {
     context.read<UserBloc>().add(ClearUserEvent());
@@ -49,66 +49,29 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   SpeedDialChild mySpeedDialChild(
-      Tags tag, Color color, bool isFirst, currentFilter) {
-    if (isFirst) {
-      return SpeedDialChild(
-        labelWidget: Container(
-          padding: EdgeInsets.only(bottom: 3, top: 3, left: 5, right: 5),
-          margin: EdgeInsets.only(bottom: 20),
-          color: color,
-          child: Text(
-            tagToNameMap[tag],
-            style: TextStyle(
-                fontWeight: FontWeight.w300, letterSpacing: 2, fontSize: 18),
-          ),
+      Tags tag, Color color, bool isClear, currentFilter) {
+    return SpeedDialChild(
+      labelWidget: Container(
+        padding: EdgeInsets.only(bottom: 5, top: 5, left: 10, right: 10),
+        margin: EdgeInsets.only(bottom: 20),
+        color: backgroundColor,
+        child: Text(
+          tagToNameMap[tag],
+          style: headerText,
         ),
-        label: tagToNameMap[tag],
-        onTap: () {
+      ),
+      label: tagToNameMap[tag],
+      onTap: () {
+        if (isClear) {
           currentFilter = tagToNameMap[tag];
-          context.read<FilterBloc>().add(ClearFilter(tag));
-        },
-        labelBackgroundColor: color,
-      );
-    } else {
-      return SpeedDialChild(
-        labelWidget: Container(
-          padding: EdgeInsets.only(bottom: 3, top: 3, left: 5, right: 5),
-          color: color,
-          child: Text(
-            tagToNameMap[tag],
-            style: TextStyle(
-                fontWeight: FontWeight.w300, letterSpacing: 2, fontSize: 18),
-          ),
-        ),
-        label: tagToNameMap[tag],
-        onTap: () {
+          context.read<FilterBloc>().add(ClearFilter(Tags.CLEAR));
+        } else {
           currentFilter = tagToNameMap[tag];
           context.read<FilterBloc>().add(FilterChecker(tag));
-        },
-        labelBackgroundColor: color,
-      );
-    }
-  }
-
-  void isOnline() async {
-    var internet = await (Connectivity().checkConnectivity());
-    switch (internet) {
-      case ConnectivityResult.wifi:
-        setState(() {
-          isOnlineVar = true;
-        });
-        break;
-      case ConnectivityResult.mobile:
-        setState(() {
-          isOnlineVar = true;
-        });
-        break;
-      case ConnectivityResult.none:
-        setState(() {
-          isOnlineVar = false;
-        });
-        break;
-    }
+        }
+      },
+      labelBackgroundColor: color,
+    );
   }
 
   Future<void> myStream() async {
@@ -120,154 +83,145 @@ class _HomeScreenState extends State<HomeScreen> {
         tasks.add(Task.fromJson(element.data()));
       });
       context.read<TaskListBloc>().add(HiveChecker(tasks));
-      Utils.taskFromBaseDisplay(tasks);
       taskBox.clear();
       taskBox.put('task', tasks);
       taskBox.close();
-      snackBarNotification(context, "Обновлено");
     });
   }
 
-  bool isOnlineVar;
-
   @override
   Widget build(BuildContext context) {
-    Map<String, Function> offlineMenuOptions = {
+    Map<String, Function> menuOptions = {
       'Выход': userSignOut,
     };
 
-    Map<String, Function> menuOptions  = {
-      'Выход': userSignOut,
-      'Обновить': myStream,
-    };
-
-    isOnline();
     Utils.statusBarColor();
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      appBar: AppBar(
-        actions: [
-          PopupMenuButton<String>(
-            color: backgroundColor,
-            icon: Icon(
-              Icons.more_vert,
-              color: Colors.white,
-            ),
-            onSelected: (String value) async {
-              if (isOnlineVar) {
-                menuOptions [value]();
-              } else {
-                offlineMenuOptions[value]();
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              if (isOnlineVar) {
+    return BlocBuilder<ConnectivityBloc, bool>(
+        builder: (context, connectivityState) {
+      if (connectivityState == true) {
+        myStream();
+      }
+      return Scaffold(
+        appBar: AppBar(
+          actions: [
+            PopupMenuButton<String>(
+              color: backgroundColor,
+              icon: Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ),
+              onSelected: (String value) async {
+                menuOptions[value]();
+              },
+              itemBuilder: (BuildContext context) {
                 return menuOptions.keys.map((String choice) {
                   return PopupMenuItem<String>(
                     value: choice,
-                    child: Text(
-                      choice,
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: Text(choice, style: standartText),
                   );
                 }).toList();
-              } else {
-                return offlineMenuOptions.keys.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(
-                      choice,
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  );
-                }).toList();
-              }
-            },
+              },
+            ),
+          ],
+          systemOverlayStyle: Utils.statusBarColor(),
+          backgroundColor: backgroundColor,
+          title: Row(
+            children: [
+              Text("DTM", style: headerText),
+              Spacer(),
+              Visibility(
+                visible: !connectivityState,
+                child: Text("Оффлайн", style: standartText),
+              )
+            ],
           ),
-        ],
-        systemOverlayStyle: Utils.statusBarColor(),
-        backwardsCompatibility: false,
+        ),
         backgroundColor: backgroundColor,
-        title: Row(
-          children: [
-            Text(
-              "DTM",
-              style: TextStyle(color: Colors.white),
+        floatingActionButton: Container(
+            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          FloatingActionButton(
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
             ),
-            Spacer(),
-            Visibility(
-              visible: !isOnlineVar,
-              child: Text(
-                "Оффлайн",
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-            )
-          ],
-        ),
-      ),
-      body: BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
-        return BlocBuilder<TaskListBloc, List<Task>>(
-          builder: (context, state) {
-            if (filtState != null) {
-              List<Task> filtredState = state
-                  .where((element) => element.tags.contains(filtState))
-                  .toList();
-              return AnimationConfiguration.synchronized(
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                      child: TaskListWidget(taskList: filtredState)),
-                ),
-              );
-            } else {
-              return AnimationConfiguration.synchronized(
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child:
-                      FadeInAnimation(child: TaskListWidget(taskList: state)),
-                ),
-              );
-            }
+            onPressed: createTask,
+            backgroundColor: snackBarColor,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          SpeedDial(
+            backgroundColor: snackBarColor,
+            child: Icon(
+              Icons.filter_list,
+              color: Colors.white,
+            ),
+            overlayColor: Colors.black.withOpacity(0.8),
+            childMargin: EdgeInsets.only(top: 3, bottom: 3),
+            childPadding: EdgeInsets.all(3),
+            children: [
+              mySpeedDialChild(Tags.CLEAR, clearColor, true, currentFilter),
+              mySpeedDialChild(
+                  Tags.FLUTTER, taskColorDark, false, currentFilter),
+              mySpeedDialChild(Tags.DART, taskColorDark, false, currentFilter),
+              mySpeedDialChild(
+                  Tags.ALGORITHMS, clearColor, false, currentFilter),
+            ],
+          ),
+        ])),
+        body: RefreshIndicator(
+          displacement: 40,
+          onRefresh: () async {
+            await myStream();
+            snackBarNotification(context, "обновлено");
           },
-        );
-      }),
-      floatingActionButton: Container(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            FloatingActionButton(
-              child: Icon(
-                Icons.add,
-                color: backgroundColor,
+          child: CustomScrollView(
+            slivers: <Widget>[
+              SliverPersistentHeader(
+                delegate: SectionHeaderDelegate("высокий приоритет"),
+                pinned: true,
               ),
-              onPressed: createTask,
-              backgroundColor: Utils.tagColor(
-                  isWhite: false, isDetail: false, drpv: currentFilter),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            SpeedDial(
-              child: Icon(Icons.filter_list),
-              overlayColor: Colors.black.withOpacity(0.8),
-              childMargin: EdgeInsets.only(top: 3, bottom: 3),
-              childPadding: EdgeInsets.all(3),
-              children: [
-                mySpeedDialChild(Tags.CLEAR, clearColor, true, currentFilter),
-                mySpeedDialChild(
-                    Tags.FLUTTER, flutterColor, false, currentFilter),
-                mySpeedDialChild(Tags.DART, dartColor, false, currentFilter),
-                mySpeedDialChild(
-                    Tags.ALGORITHMS, algosColor, false, currentFilter),
-              ],
-              backgroundColor: Utils.tagColor(
-                  isWhite: false, isDetail: false, drpv: currentFilter),
-            ),
-          ],
+              BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+                return BlocBuilder<TaskListBloc, List<Task>>(
+                    builder: (context, state) {
+                  return GridViewWidget(state, filtState, Priorities.HIGH);
+                });
+              }),
+              SliverPersistentHeader(
+                delegate: SectionHeaderDelegate("средний приоритет"),
+                pinned: true,
+              ),
+              BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+                return BlocBuilder<TaskListBloc, List<Task>>(
+                    builder: (context, state) {
+                  return GridViewWidget(state, filtState, Priorities.MEDIUM);
+                });
+              }),
+              SliverPersistentHeader(
+                delegate: SectionHeaderDelegate("низкий приоритет"),
+                pinned: true,
+              ),
+              BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+                return BlocBuilder<TaskListBloc, List<Task>>(
+                    builder: (context, state) {
+                  return GridViewWidget(state, filtState, Priorities.LOW);
+                });
+              }),
+              SliverPersistentHeader(
+                delegate: SectionHeaderDelegate("просроченные"),
+                pinned: true,
+              ),
+              BlocBuilder<FilterBloc, Tags>(builder: (context, filtState) {
+                return BlocBuilder<TaskListBloc, List<Task>>(
+                    builder: (context, state) {
+                  return GridViewWidget(state, filtState);
+                });
+              }),
+            ],
+          ),
         ),
-      ),
-      backgroundColor: backgroundColor,
-    );
+      );
+    });
   }
 
   @override
@@ -281,20 +235,58 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       context.read<TaskListBloc>().add(HiveChecker(tasks));
     });
-    Connectivity().checkConnectivity().then((value) {
-      if (value == ConnectivityResult.none) {
-        snackBarNotification(
-            context, "Отсутствует подключение к сети. Режим чтения.");
-        Hive.openBox('taskList').then((value) {
-          if (value.isNotEmpty) {
-            List<Task> hiveTasks = value.get('task').cast<Task>();
-            context.read<TaskListBloc>().add(HiveChecker(hiveTasks));
-          }
-          value.close();
-        });
-      } else {
-        myStream();
-      }
-    });
+    bool isOnline = context.read<ConnectivityBloc>().state;
+    if (!isOnline) {
+      Hive.openBox('taskList').then((value) {
+        if (value.isNotEmpty) {
+          List<Task> hiveTasks = value.get('task').cast<Task>();
+          context.read<TaskListBloc>().add(HiveChecker(hiveTasks));
+        }
+        value.close();
+      });
+    } else {
+      myStream();
+    }
   }
+}
+
+class SectionHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final String title;
+  final double height;
+
+  SectionHeaderDelegate(this.title, [this.height = 35]);
+
+  @override
+  Widget build(context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      decoration: BoxDecoration(
+          color: backgroundColor,
+          boxShadow: [
+            BoxShadow(
+              color: backgroundColor,
+              spreadRadius: 3,
+              blurRadius: 0,
+              offset: Offset(0, 0),
+            ),
+          ]),
+      padding: EdgeInsets.only(left: 30),
+      alignment: Alignment.center,
+      child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            title,
+            style: headerText,
+            textAlign: TextAlign.start,
+          )),
+    );
+  }
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  double get minExtent => height;
+
+  @override
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => false;
 }

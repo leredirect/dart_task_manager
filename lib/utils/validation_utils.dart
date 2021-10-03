@@ -1,5 +1,4 @@
 class ValidationUtils {
-
   static String required(dynamic value) {
     if (value == null ||
         value == false ||
@@ -9,5 +8,4 @@ class ValidationUtils {
     }
     return null;
   }
-  
 }

@@ -1,4 +1,5 @@
 import 'package:dart_task_manager/models/user.dart';
+import 'package:dart_task_manager/utils/utils.dart';
 import 'package:hive/hive.dart';
 
 part 'task.g.dart';
@@ -12,9 +13,9 @@ class Task {
   @HiveField(2)
   List<Tags> tags;
   @HiveField(3)
-  String taskCreateTime;
+  DateTime taskCreateTime;
   @HiveField(4)
-  String taskDeadline;
+  DateTime taskDeadline;
   @HiveField(5)
   int id;
   @HiveField(6)
@@ -24,19 +25,20 @@ class Task {
   @HiveField(8)
   bool isPushed;
 
-  Task(this.name, this.text, this.tags, this.creator, this.taskCreateTime, this.taskDeadline,
-      this.id, this.priority, [this.isPushed]);
+  Task(this.name, this.text, this.tags, this.creator, this.taskCreateTime,
+      this.taskDeadline, this.id, this.priority,
+      [this.isPushed]);
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       "name": this.name,
       "text": this.text,
       "tag": this.tags.map((e) => e.index).toList(),
-      "taskCreateTime": this.taskCreateTime,
-      "taskDeadline": this.taskDeadline,
+      "taskCreateTime": this.taskCreateTime.toString(),
+      "taskDeadline": this.taskDeadline.toString(),
       "id": this.id,
       "priority": priorityToNameMap[this.priority],
-      "creator" : this.creator.toJson(),
+      "creator": this.creator.toJson(),
     };
   }
 
@@ -47,8 +49,8 @@ class Task {
     json['tag'].forEach((e) {
       tags.add(Tags.values[e]);
     });
-    taskCreateTime = json['taskCreateTime'];
-    taskDeadline = json['taskDeadline'] as String;
+    taskCreateTime = DateTime.parse(json['taskCreateTime']);
+    taskDeadline = DateTime.parse(json['taskDeadline']);
     id = json['id'] as int;
     priority = nameToPriorityMap[json['priority']];
     creator = User.fromJson(json['creator']);
@@ -79,31 +81,3 @@ enum Priorities {
   @HiveField(2)
   LOW,
 }
-
-final nameToPriorityMap = {
-  "Высокий": Priorities.HIGH,
-  "Средний": Priorities.MEDIUM,
-  "Низкий": Priorities.LOW,
-};
-
-final priorityToNameMap = {
-  Priorities.HIGH: "Высокий",
-  Priorities.MEDIUM: "Средний",
-  Priorities.LOW: "Низкий",
-};
-
-final nameToTagMap = {
-  "Flutter": Tags.FLUTTER,
-  "Dart": Tags.DART,
-  "Алгоритмы": Tags.ALGORITHMS,
-  "Нет фильтра": Tags.CLEAR,
-  "Истекшие": Tags.EXPIRED,
-};
-
-final tagToNameMap = {
-  Tags.FLUTTER: "Flutter",
-  Tags.DART: "Dart",
-  Tags.ALGORITHMS: "Алгоритмы",
-  Tags.CLEAR: "Нет фильтра",
-  Tags.EXPIRED: "Истекшие",
-};

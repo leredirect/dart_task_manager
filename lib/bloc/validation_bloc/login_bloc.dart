@@ -30,7 +30,7 @@ class LoginFormBloc extends FormBloc<String, String> {
     bool isUserExist =
         await repository.isUserExists(login.value, password.value);
     if (isUserExist) {
-      emitSuccess();
+      emitSuccess(canSubmitAgain: true);
     } else {
       emitFailure(failureResponse: "Проверьте правильность введенных данных.");
     }

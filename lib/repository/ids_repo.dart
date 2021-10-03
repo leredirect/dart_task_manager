@@ -40,7 +40,6 @@ class IdRepository {
           this.userId = this.userId + 1;
           idCollection.doc(element.id).update(idToJson());
         });
-        print(this.userId);
         return this.userId;
       } else {
         this.userId = 0;
@@ -53,19 +52,17 @@ class IdRepository {
   Future<int> getLastCreatedTaskId() async {
     Future<QuerySnapshot> collection = this.getStream();
     var value = await collection.asStream().first;
-      if (value.docs.isNotEmpty) {
-        value.docs.forEach((element) {
-          idFromJson(element.data());
-          this.taskId = this.taskId + 1;
-          idCollection.doc(element.id).update(idToJson());
-        });
-        print(this.taskId);
-        return this.taskId;
-      } else {
-        this.taskId = 0;
-        idCollection.add(this.idToJson());
-        return this.taskId;
-      }
+    if (value.docs.isNotEmpty) {
+      value.docs.forEach((element) {
+        idFromJson(element.data());
+        this.taskId = this.taskId + 1;
+        idCollection.doc(element.id).update(idToJson());
+      });
+      return this.taskId;
+    } else {
+      this.taskId = 0;
+      idCollection.add(this.idToJson());
+      return this.taskId;
+    }
   }
-
 }

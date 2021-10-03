@@ -6,8 +6,8 @@ import 'package:dart_task_manager/screens/task_edit_screen.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:hive/hive.dart';
 
 import '../constants.dart';
@@ -43,16 +43,10 @@ class TaskDetailsScreen extends StatelessWidget {
       }));
     }
 
-    String deadlineDisplay(String deadline) {
-      print(task.taskDeadline);
-      String result = "Дедлайн: $deadline";
-      return result;
-    }
-
     return BlocBuilder<TaskListBloc, List<Task>>(builder: (context, state) {
       Map<String, Function> options = {
-        'Редактировать': openTaskEditor,
-        'Удалить': deleteCurrentTask,
+        'редактировать': openTaskEditor,
+        'удалить': deleteCurrentTask,
       };
       Utils.statusBarColor();
       return Scaffold(
@@ -71,25 +65,16 @@ class TaskDetailsScreen extends StatelessWidget {
                 return options.keys.map((String choice) {
                   return PopupMenuItem<String>(
                     value: choice,
-                    child: Text(
-                      choice,
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: Text(choice, style: standartText),
                   );
                 }).toList();
               },
             ),
           ],
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarIconBrightness: Brightness.light,
-          ),
-          backwardsCompatibility: false,
+          systemOverlayStyle: Utils.statusBarColor(),
           iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: backgroundColor,
-          title: Text(
-            "Детали задачи",
-            style: TextStyle(color: Colors.white),
-          ),
+          title: Text("детали задачи", style: headerText),
         ),
         body: Stack(
           children: [
@@ -107,10 +92,7 @@ class TaskDetailsScreen extends StatelessWidget {
                             child: Container(
                               child: Text(
                                 task.name,
-                                style: TextStyle(
-                                    fontSize: 30, color: Colors.white),
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.left,
+                                style: bigText,
                               ),
                             ),
                           ),
@@ -119,15 +101,10 @@ class TaskDetailsScreen extends StatelessWidget {
                   Container(
                     margin: EdgeInsets.only(bottom: 20),
                     height: 2,
-                    color: Utils.tagColor(
-                        isWhite: false,
-                        isDetail: true,
-                        drpv: null,
-                        tag: task.tags.first),
+                    color: taskColorDark,
                   ),
                   Container(
-                    child: Text(task.text,
-                        style: TextStyle(fontSize: 20, color: Colors.white)),
+                    child: Text(task.text, style: headerText),
                     alignment: Alignment.centerLeft,
                     margin: EdgeInsets.only(
                         left: 15,
@@ -150,21 +127,16 @@ class TaskDetailsScreen extends StatelessWidget {
                         Container(
                           margin: EdgeInsets.only(top: 20),
                           alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Тэги: ${Utils.tagsDisplay(task.tags)}",
-                            textAlign: TextAlign.right,
-                            style: TextStyle(color: Colors.grey),
-                          ),
+                          child: Text("теги: ${Utils.tagsDisplay(task.tags)}",
+                              style: smallLetterSpacingStandartGreyText),
                         ),
                         Spacer(),
                         Container(
                           margin: EdgeInsets.only(top: 20),
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Создано: ${task.taskCreateTime}",
-                            textAlign: TextAlign.right,
-                            style: TextStyle(color: Colors.grey),
-                          ),
+                              "создано: ${DateFormat('dd-MM-yyyy в kk:mm').format(task.taskCreateTime).toString()}",
+                              style: smallLetterSpacingStandartGreyText),
                         ),
                       ],
                     ),
@@ -174,20 +146,16 @@ class TaskDetailsScreen extends StatelessWidget {
                           margin: EdgeInsets.only(top: 20),
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Приоритет: ${priorityToNameMap[task.priority]}",
-                            textAlign: TextAlign.right,
-                            style: TextStyle(color: Colors.grey),
-                          ),
+                              "приоритет: ${priorityToNameMap[task.priority]}",
+                              style: smallLetterSpacingStandartGreyText),
                         ),
                         Spacer(),
                         Container(
                           margin: EdgeInsets.only(top: 20),
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "${deadlineDisplay(task.taskDeadline)}",
-                            textAlign: TextAlign.right,
-                            style: TextStyle(color: Colors.grey),
-                          ),
+                              "дедлайн: ${DateFormat('dd-MM-yyyy в kk:mm').format(task.taskDeadline).toString()}",
+                              style: smallLetterSpacingStandartGreyText),
                         ),
                       ],
                     ),
@@ -195,9 +163,8 @@ class TaskDetailsScreen extends StatelessWidget {
                       margin: EdgeInsets.only(top: 20),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Создатель: ${task.creator.login}",
-                        textAlign: TextAlign.right,
-                        style: TextStyle(color: Colors.grey),
+                        "создатель: ${task.creator.login}",
+                        style: smallLetterSpacingStandartGreyText,
                       ),
                     ),
                   ],

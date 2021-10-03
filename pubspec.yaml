@@ -17,7 +17,6 @@ dependencies:
   hive: 2.0.4
   path_provider: 2.0.2
   hive_flutter: ^1.1.0
-  enum_to_string: ^2.0.1
   cupertino_icons: ^1.0.0
   flutter_native_splash: ^1.1.8+4
   flutter_launcher_icons: ^0.9.0
@@ -33,7 +32,7 @@ dependencies:
   uiblock: ^2.0.2
 
 flutter_native_splash:
-  color: "#2B2B2B"
+  color: "#353E46"
   image: "assets/images/SPLASH.png"
 
 flutter_icons:

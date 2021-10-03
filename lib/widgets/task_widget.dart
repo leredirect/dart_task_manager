@@ -1,50 +1,27 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dart_task_manager/models/task.dart';
 import 'package:dart_task_manager/screens/task_details_screen.dart';
-import 'package:dart_task_manager/screens/task_details_screen_noActions.dart';
 import 'package:dart_task_manager/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 
 import '../constants.dart';
 
 class TaskWidget extends StatelessWidget {
   final Task task;
+  final Color color;
 
-  const TaskWidget({Key key, this.task}) : super(key: key);
+  const TaskWidget({Key key, this.task, this.color}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
 
-    var circlesIterable = task.tags.map((e) {
-      return Container(
-          width: 15,
-          height: 15,
-          margin: EdgeInsets.only(top: 10, left: 5, right: 5),
-          decoration: BoxDecoration(
-            color: Utils.tagColor(
-                isWhite: false, isDetail: false, drpv: tagToNameMap[e]),
-            shape: BoxShape.circle,
-          ));
-    });
-    List<Widget> circles = circlesIterable.toList();
-
     Utils.statusBarColor();
     void openTaskDetails() {
-      var connectivityResult = Connectivity().checkConnectivity().then((value) {
-        if (value == ConnectivityResult.none) {
-          Navigator.push(context, MaterialPageRoute(builder: (_) {
-            return TaskDetailsScreenNoActions(
-              task: task,
-            );
-          }));
-        } else {
-          Navigator.push(context, MaterialPageRoute(builder: (_) {
-            return TaskDetailsScreen(
-              task: task,
-            );
-          }));
-        }
-      });
+      Navigator.push(context, MaterialPageRoute(builder: (_) {
+        return TaskDetailsScreen(
+          task: task,
+        );
+      }));
     }
 
     return Column(
@@ -71,24 +48,40 @@ class TaskWidget extends StatelessWidget {
               onTap: openTaskDetails,
               child: Container(
                 padding: EdgeInsets.all(3),
-                color: Utils.tagColor(
-                    isWhite: false,
-                    isDetail: true,
-                    drpv: null,
-                    tag: task.tags.first),
+                color: this.color,
                 child: Column(
                   children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Visibility(
+                        visible: task.isPushed ? false : true,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.access_time,
+                              color: Colors.white,
+                              size: 15,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              "не загружено..",
+                              style: smallItalicText,
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
                     Container(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         task.name,
                         maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            color: clearColor,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w300),
+                        style: headerTextWithOverflow,
                       ),
                     ),
                     SizedBox(
@@ -106,43 +99,32 @@ class TaskWidget extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         task.text,
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            color: clearColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w200),
+                        maxLines: 5,
+                        style: standartText,
                       ),
                     ),
                     Spacer(),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        task.taskCreateTime,
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            color: clearColor.withOpacity(0.7),
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic,
-                            fontWeight: FontWeight.w300),
-                      ),
+                    Row(
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                  "дедлайн: ${DateFormat('dd-MM-yyyy в kk:mm').format(task.taskCreateTime).toString()}",
+                                  style: smallItalicText),
+                            ),
+                          ],
+                        ),
+                        Spacer(),
+                      ],
                     ),
-                    Visibility(
-                        visible: !task.isPushed? false:true,
-                        child:
-                            Icon(Icons.access_time)),
                   ],
                 ),
               ),
             ),
           ),
         ),
-        Row(
-          children: circles,
-        )
       ],
     );
   }
